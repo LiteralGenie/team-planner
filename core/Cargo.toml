@@ -6,7 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-splr = { version = "0.17.2", features = ["platform_wasm"] }
 wasm-bindgen = "0.2.92"
 
 [build-dependencies]
