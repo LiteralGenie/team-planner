@@ -33,21 +33,28 @@ impl Clause {
     }
 }
 
+pub struct Variable {
+    id: i32,
+    name: String,
+}
+
 pub struct CnfBuilder {
-    pub num_variables: i32,
+    pub variables: Vec<Variable>,
     pub clauses: Vec<Clause>,
 }
 
 impl Default for CnfBuilder {
     fn default() -> Self {
-        Self { num_variables: 0, clauses: Vec::new() }
+        Self { variables: vec![], clauses: Vec::new() }
     }
 }
 
 impl CnfBuilder {
-    pub fn add_variable(&mut self) -> i32 {
-        self.num_variables += 1;
-        self.num_variables
+    pub fn add_variable(&mut self, name: String) -> i32 {
+        let id = (self.variables.len() as i32) + 1;
+        self.variables.push(Variable { id, name });
+
+        id
     }
 
     pub fn dump(&self) -> Vec<Vec<i32>> {
@@ -57,5 +64,13 @@ impl CnfBuilder {
                 .iter()
                 .map(|c| c.dump())
         )
+    }
+
+    pub fn get_name(&self, cnf_id: i32) -> String {
+        // DIMACS 1-indexes the variable ids
+        let idx = (cnf_id.abs() - 1) as usize;
+        let name = self.variables.get(idx).unwrap().name.clone();
+
+        return if cnf_id > 0 { name } else { format!("~{}", name) };
     }
 }

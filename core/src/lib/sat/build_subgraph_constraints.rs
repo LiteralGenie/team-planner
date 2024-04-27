@@ -10,11 +10,14 @@ use super::{
     Xor,
 };
 
+/**
+ * Vertices referenced in edges should be 0-indexed even though the CNF output is 1-indexed
+ */
 pub fn build_subgraph_contraints(
     num_vertices: i32,
     subgraph_size: i32,
     edges: HashSet<(i32, i32)>
-) -> Vec<BooleanExpression> {
+) -> CnfBuilder {
     let n = num_vertices as usize;
     let iter_n = Vec::from_iter(0..n);
 
@@ -29,7 +32,9 @@ pub fn build_subgraph_contraints(
     let vs: Vec<BooleanExpression> = iter_n
         .iter()
         .map(|i|
-            BooleanExpression::from_variable(builder.add_variable())
+            BooleanExpression::from_variable(
+                builder.add_variable(format!("v{}", i))
+            )
         )
         .collect();
 
@@ -41,7 +46,7 @@ pub fn build_subgraph_contraints(
                 .iter()
                 .map(|j|
                     BooleanExpression::from_variable(
-                        builder.add_variable()
+                        builder.add_variable(format!("e_{}_{}", i, j))
                     )
                 )
                 .collect()
@@ -49,14 +54,14 @@ pub fn build_subgraph_contraints(
         .collect();
 
     // Decisions (vertex picked per timestep)
-    let ds: Vec<Vec<BooleanExpression>> = iter_n
+    let ds: Vec<Vec<BooleanExpression>> = iter_k
         .iter()
-        .map(|i|
+        .map(|t|
             iter_n
                 .iter()
                 .map(|j|
                     BooleanExpression::from_variable(
-                        builder.add_variable()
+                        builder.add_variable(format!("d_{}_{}", t, j))
                     )
                 )
                 .collect()
@@ -176,5 +181,10 @@ pub fn build_subgraph_contraints(
         }
     }
 
-    constraints
+    builder.clauses = constraints
+        .into_iter()
+        .flat_map(|con| con.dump().into_iter())
+        .collect();
+
+    builder
 }
