@@ -30,7 +30,9 @@ fn vec_vec_to_hash_hash(cnf: Vec<Vec<i32>>) -> HashSet<HashedClause> {
             .clone()
             .into_iter()
             .map(|clause| {
-                let hashed = HashedClause(HashSet::from_iter(clause.clone().into_iter()));
+                let hashed = HashedClause(
+                    HashSet::from_iter(clause.clone().into_iter())
+                );
 
                 // No dupes should be removed, each variable should appear at most once
                 assert_eq!(
@@ -45,12 +47,20 @@ fn vec_vec_to_hash_hash(cnf: Vec<Vec<i32>>) -> HashSet<HashedClause> {
     );
 
     // No dupes should be removed, each variable should appear at most once
-    assert_eq!(result.len(), cnf.len(), "Duplicate clauses removed from {:?}", cnf);
+    assert_eq!(
+        result.len(),
+        cnf.len(),
+        "Duplicate clauses removed from {:?}",
+        cnf
+    );
 
     result
 }
 
-pub fn assert_cnf(expr: BooleanExpression, expected_value: Vec<Vec<i32>>) {
+pub fn assert_cnf(
+    expr: BooleanExpression,
+    expected_value: Vec<Vec<i32>>
+) {
     let actual_value: Vec<Vec<i32>> = expr
         .dump()
         .iter()

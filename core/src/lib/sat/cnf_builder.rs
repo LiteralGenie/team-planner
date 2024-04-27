@@ -33,6 +33,7 @@ impl Clause {
     }
 }
 
+#[derive(Debug)]
 pub struct Variable {
     id: i32,
     name: String,
