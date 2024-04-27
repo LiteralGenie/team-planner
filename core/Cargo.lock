@@ -1525,6 +1525,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6980e8d7511241f8acf4aebddbb1ff938df5eebe98691418c4468d0b72a96a67"
 
 [[package]]
+name = "splr"
+version = "0.17.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c6c8d72268886573a95520ff76c282876c69d3776e02a0b4ac8eea2b310d69ca"
+dependencies = [
+ "bitflags 2.5.0",
+]
+
+[[package]]
 name = "stable_deref_trait"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1601,6 +1610,7 @@ dependencies = [
 name = "tft-core"
 version = "0.1.0"
 dependencies = [
+ "splr",
  "wasm-bindgen",
  "wasm-bindgen-cli",
  "wasm-server-runner",
