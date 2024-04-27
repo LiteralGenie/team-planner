@@ -1,12 +1,12 @@
 use super::{ Clause, Literal };
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum BooleanExpressionMode {
     And,
     Or,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct BooleanExpression {
     pub mode: BooleanExpressionMode,
     pub literals: Vec<Literal>,
@@ -108,6 +108,11 @@ impl BooleanExpression {
             lit.negate = !lit.negate;
         }
 
+        expr.expressions = expr.expressions
+            .iter()
+            .map(|sub| sub.negate())
+            .collect();
+
         expr.mode = match expr.mode {
             BooleanExpressionMode::Or => BooleanExpressionMode::And,
             BooleanExpressionMode::And => BooleanExpressionMode::Or,
@@ -131,59 +136,8 @@ fn distribute(left: Vec<Clause>, right: Vec<Clause>) -> Vec<Clause> {
 
 #[cfg(test)]
 mod tests {
-    use std::{ collections::HashSet, hash::{ Hash, Hasher } };
-
     use crate::lib::sat::*;
-
-    // https://stackoverflow.com/questions/36562419/hashset-as-key-for-other-hashset
-    #[derive(Debug)]
-    struct HashedClause(HashSet<i32>);
-
-    impl PartialEq for HashedClause {
-        fn eq(&self, other: &HashedClause) -> bool {
-            self.0.is_subset(&other.0) && other.0.is_subset(&self.0)
-        }
-    }
-
-    impl Eq for HashedClause {}
-
-    impl Hash for HashedClause {
-        fn hash<H>(&self, state: &mut H) where H: Hasher {
-            let mut a: Vec<&i32> = self.0.iter().collect();
-            a.sort();
-            for s in a.iter() {
-                s.hash(state);
-            }
-        }
-    }
-
-    fn vec_vec_to_hash_hash(cnf: Vec<Vec<i32>>) -> HashSet<HashedClause> {
-        HashSet::from_iter(
-            cnf.into_iter().map(|clause| {
-                let n = clause.len();
-                let hashed = HashedClause(HashSet::from_iter(clause.into_iter()));
-
-                // No dupes should be removed, each variable should appear at most once
-                assert_eq!(hashed.0.len(), n);
-
-                hashed
-            })
-        )
-    }
-
-    fn assert_cnf(expr: BooleanExpression, expected_value: Vec<Vec<i32>>) {
-        let actual_value: Vec<Vec<i32>> = expr
-            .dump()
-            .iter()
-            .map(|clause| clause.dump())
-            .collect();
-
-        // Remove ordering
-        let expected_value = vec_vec_to_hash_hash(expected_value);
-        let actual_value = vec_vec_to_hash_hash(actual_value);
-
-        assert_eq!(actual_value, expected_value);
-    }
+    use self::utils::assert_cnf;
 
     #[test]
     fn literal_dump() {
