@@ -24,6 +24,13 @@ impl Default for BooleanExpression {
 }
 
 impl BooleanExpression {
+    pub fn from_variable(variable: i32) -> Self {
+        Self {
+            literals: vec![Literal { variable, negate: false }],
+            ..Default::default()
+        }
+    }
+
     pub fn dump(&self) -> Vec<Clause> {
         let mut clauses = Vec::new();
 
@@ -47,10 +54,18 @@ impl BooleanExpression {
                 //   and we can AND these lists together
                 //      result = e1.dump() + e2.dump()
                 //             = [Clause(a+b), Clause(c+d), Clause(e+f)]
-                clauses.extend(self.expressions.iter().flat_map(|expr| expr.dump()));
+                clauses.extend(
+                    self.expressions
+                        .iter()
+                        .flat_map(|expr| expr.dump())
+                );
 
                 // We can treat literals as an AND expression with one term and do the same thing
-                clauses.extend(self.literals.iter().map(|l| Clause { literals: vec![l.clone()] }));
+                clauses.extend(
+                    self.literals
+                        .iter()
+                        .map(|l| Clause { literals: vec![l.clone()] })
+                );
             }
 
             BooleanExpressionMode::Or => {
@@ -83,15 +98,21 @@ impl BooleanExpression {
                 //   xy + uv = (x + u) (x + v) (y + u) (y + v)
                 //
                 // or "take the cartesian product of clauses from each expression and OR the literals inside each pair of clauses"
-                let cnfs = self.expressions.iter().map(|expr| expr.dump());
+                let cnfs = self.expressions
+                    .iter()
+                    .map(|expr| expr.dump());
 
                 let cnfs = cnfs.chain(
                     self.literals
                         .iter()
-                        .map(|literal| { vec![Clause { literals: vec![*literal] }] })
+                        .map(|literal| {
+                            vec![Clause { literals: vec![*literal] }]
+                        })
                 );
 
-                let result = cnfs.reduce(|acc, cnf| distribute(acc, cnf));
+                let result = cnfs.reduce(|acc, cnf|
+                    distribute_or_over_and(acc, cnf)
+                );
 
                 if let Some(cs) = result {
                     clauses.extend(cs);
@@ -122,7 +143,15 @@ impl BooleanExpression {
     }
 }
 
-fn distribute(left: Vec<Clause>, right: Vec<Clause>) -> Vec<Clause> {
+/**
+ *   ab + cd
+ * = (ab + c) (ab + d)
+ * = (a + c) (b + c) (a + d) (b + d)
+ */
+fn distribute_or_over_and(
+    left: Vec<Clause>,
+    right: Vec<Clause>
+) -> Vec<Clause> {
     let mut result = Vec::<Clause>::new();
 
     for c1 in left {
@@ -322,7 +351,15 @@ mod tests {
                 }
             ],
         };
-        assert_cnf(expr, vec![vec![4, 1, 2], vec![4, 1, 3], vec![5, 1, 2], vec![5, 1, 3]]);
+        assert_cnf(
+            expr,
+            vec![
+                vec![4, 1, 2],
+                vec![4, 1, 3],
+                vec![5, 1, 2],
+                vec![5, 1, 3]
+            ]
+        );
     }
 
     #[test]
@@ -408,6 +445,9 @@ mod tests {
             ],
         };
 
-        assert_cnf(expr, vec![vec![1], vec![2], vec![3], vec![4], vec![5]]);
+        assert_cnf(
+            expr,
+            vec![vec![1], vec![2], vec![3], vec![4], vec![5]]
+        );
     }
 }

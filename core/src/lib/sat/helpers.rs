@@ -1,6 +1,9 @@
 use super::{ Clause, BooleanExpression, BooleanExpressionMode };
 
-pub fn Or(x1: &BooleanExpression, x2: &BooleanExpression) -> BooleanExpression {
+pub fn Or(
+    x1: &BooleanExpression,
+    x2: &BooleanExpression
+) -> BooleanExpression {
     BooleanExpression {
         mode: BooleanExpressionMode::Or,
         expressions: vec![x1.clone(), x2.clone()],
@@ -8,7 +11,18 @@ pub fn Or(x1: &BooleanExpression, x2: &BooleanExpression) -> BooleanExpression {
     }
 }
 
-pub fn And(x1: &BooleanExpression, x2: &BooleanExpression) -> BooleanExpression {
+pub fn OrAll(xs: &Vec<BooleanExpression>) -> BooleanExpression {
+    xs.clone()
+        .into_iter()
+        .reduce(|acc, x| Or(&acc, &x))
+        .unwrap_or_else(|| BooleanExpression { ..Default::default() })
+        .clone()
+}
+
+pub fn And(
+    x1: &BooleanExpression,
+    x2: &BooleanExpression
+) -> BooleanExpression {
     BooleanExpression {
         mode: BooleanExpressionMode::And,
         expressions: vec![x1.clone(), x2.clone()],
@@ -20,7 +34,10 @@ pub fn Not(x1: &BooleanExpression) -> BooleanExpression {
     x1.negate()
 }
 
-pub fn Implies(x1: &BooleanExpression, x2: &BooleanExpression) -> BooleanExpression {
+pub fn Implies(
+    x1: &BooleanExpression,
+    x2: &BooleanExpression
+) -> BooleanExpression {
     // a => b  <=>  ~a | b
     BooleanExpression {
         mode: BooleanExpressionMode::Or,
@@ -29,7 +46,10 @@ pub fn Implies(x1: &BooleanExpression, x2: &BooleanExpression) -> BooleanExpress
     }
 }
 
-pub fn Xor(x1: &BooleanExpression, x2: &BooleanExpression) -> BooleanExpression {
+pub fn Xor(
+    x1: &BooleanExpression,
+    x2: &BooleanExpression
+) -> BooleanExpression {
     // a xor b <=> (a + b) * ~(a * b)
     //         <=> "a or b is true but not both"
     let at_least_one = Or(x1, x2);
