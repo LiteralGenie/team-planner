@@ -1,5 +1,7 @@
 use std::{ collections::HashSet };
 
+use crate::console::log;
+
 use super::{
     exactly_one,
     and,
@@ -184,6 +186,8 @@ pub fn build_subgraph_contraints(
             }
         }
     }
+
+    log!("Built {} constraints", constraints.len());
 
     builder.clauses = constraints
         .into_iter()

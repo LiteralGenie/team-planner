@@ -166,6 +166,7 @@ fn distribute_or_over_and(
 #[cfg(test)]
 mod tests {
     use crate::lib::sat::*;
+
     use self::utils::assert_cnf;
 
     #[test]

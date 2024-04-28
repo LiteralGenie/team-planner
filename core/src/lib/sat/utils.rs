@@ -4,7 +4,7 @@ use std::{ collections::HashSet, hash::{ Hash, Hasher } };
 
 // https://stackoverflow.com/questions/36562419/hashset-as-key-for-other-hashset
 #[derive(Debug)]
-struct HashedClause(HashSet<i32>);
+pub struct HashedClause(pub HashSet<i32>);
 
 impl PartialEq for HashedClause {
     fn eq(&self, other: &HashedClause) -> bool {
@@ -24,15 +24,21 @@ impl Hash for HashedClause {
     }
 }
 
-fn vec_vec_to_hash_hash(cnf: Vec<Vec<i32>>) -> HashSet<HashedClause> {
+impl HashedClause {
+    pub fn from_vec(clause: &Vec<i32>) -> Self {
+        Self(HashSet::from_iter(clause.clone().into_iter()))
+    }
+}
+
+pub fn vec_vec_to_hash_hash(
+    cnf: Vec<Vec<i32>>
+) -> HashSet<HashedClause> {
     let result = HashSet::from_iter(
         cnf
             .clone()
             .into_iter()
             .map(|clause| {
-                let hashed = HashedClause(
-                    HashSet::from_iter(clause.clone().into_iter())
-                );
+                let hashed = HashedClause::from_vec(&clause);
 
                 // No dupes should be removed, each variable should appear at most once
                 assert_eq!(
