@@ -1,71 +1,68 @@
-use splr::{
-    Certificate,
-    Config,
-    Solver,
-    SolverError,
-    SolveIF,
-    SatSolverIF,
-};
+use varisat::{ CnfFormula, ExtendFormula, Lit, Solver };
 
 use crate::console::log;
+
+use super::CnfBuilder;
 
 pub type Solution = Vec<i32>;
 pub type Cnf = Vec<Vec<i32>>;
 
-fn solve_once(cnf: Cnf) -> Option<Solution> {
-    match Certificate::try_from(cnf) {
-        Ok(Certificate::SAT(ans)) => { Some(ans) }
-        Ok(Certificate::UNSAT) => None,
-        Err(e) => panic!("s UNKNOWN; {}", e),
-    }
-}
+// fn solve_once(cnf: Cnf) -> Option<Solution> {
+//     match Certificate::try_from(cnf) {
+//         Ok(Certificate::SAT(ans)) => { Some(ans) }
+//         Ok(Certificate::UNSAT) => None,
+//         Err(e) => panic!("s UNKNOWN; {}", e),
+//     }
+// }
 
 // Lazy solution "generator"
-pub struct AllSolver {
-    solver: Solver,
+pub struct AllSolver<'a> {
+    pub builder: CnfBuilder,
+    // pub formula: CnfFormula,
+    pub solver: Solver<'a>,
 }
 
-impl AllSolver {
-    pub fn new(cnf: Cnf) -> Self {
-        let solver = Solver::try_from((
-            Config::default(),
-            cnf.as_ref(),
-        )).unwrap();
+impl AllSolver<'_> {
+    pub fn new(builder: &CnfBuilder) -> Self {
+        let mut solver = Solver::new();
 
-        Self { solver }
+        for clause in builder.dump().iter() {
+            let with_varisat_lits: Vec<Lit> = clause
+                .iter()
+                .map(|id| Lit::from_dimacs(*id as isize))
+                .collect();
+
+            solver.add_clause(&with_varisat_lits);
+        }
+
+        Self { builder: builder.clone(), solver }
     }
 
-    // https://github.com/shnarazk/splr?tab=readme-ov-file#all-solutions-sat-solver-as-an-application-of-incremental_solver-feature
     pub fn next(&mut self) -> Option<Solution> {
-        match self.solver.solve() {
-            Ok(Certificate::SAT(ans)) => {
-                let remapped = ans
-                    .iter()
-                    .map(|i| -i)
-                    .collect::<Vec<i32>>();
+        let _ = self.solver.solve();
 
-                match self.solver.add_clause(remapped) {
-                    Err(SolverError::Inconsistent) => {
-                        println!(
-                            "c no answer due to level zero conflict"
-                        );
-                        return None;
-                    }
-                    Err(e) => {
-                        println!("s UNKNOWN; {:?}", e);
-                        return None;
-                    }
-                    Ok(_) => self.solver.reset(),
-                }
+        match self.solver.model() {
+            Some(model) => {
+                // log!(
+                //     "Adding clause {:?}",
+                //     Vec::from_iter(
+                //         model.iter().map(|lit| !lit.clone())
+                //     )
+                // );
+                self.solver.add_clause(
+                    &Vec::from_iter(
+                        model.iter().map(|lit| !lit.clone())
+                    )
+                );
 
-                return Some(ans);
+                return Some(
+                    model
+                        .iter()
+                        .map(|lit| lit.to_dimacs() as i32)
+                        .collect()
+                );
             }
-            Ok(Certificate::UNSAT) => {
-                println!("s UNSATISFIABLE");
-                return None;
-            }
-            Err(e) => {
-                println!("s UNKNOWN; {}", e);
+            None => {
                 return None;
             }
         }
@@ -197,7 +194,7 @@ mod tests {
     #[test]
     fn test_ab() {
         let builder = build_ab_graph(1);
-        let mut solver = AllSolver::new(builder.dump());
+        let mut solver = AllSolver::new(&builder);
         let sols = collect(&mut solver);
 
         println!(

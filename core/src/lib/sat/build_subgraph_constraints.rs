@@ -1,13 +1,14 @@
 use std::{ collections::HashSet };
 
 use super::{
-    And,
+    exactly_one,
+    and,
     BooleanExpression,
     CnfBuilder,
-    Implies,
-    Not,
-    OrAll,
-    Xor,
+    implies,
+    not,
+    or_all,
+    xor,
 };
 
 /**
@@ -73,7 +74,7 @@ pub fn build_subgraph_contraints(
     let mut constraints = Vec::<BooleanExpression>::new();
 
     // Subgraph is non-empty
-    constraints.push(OrAll(&vs));
+    constraints.push(or_all(&vs));
 
     // Edges are undirected
     for i in iter_n.clone() {
@@ -83,7 +84,7 @@ pub fn build_subgraph_contraints(
             }
 
             constraints.push(
-                Implies(&es[i][j].clone(), &es[j][i].clone())
+                implies(&es[i][j].clone(), &es[j][i].clone())
             );
         }
     }
@@ -92,34 +93,30 @@ pub fn build_subgraph_contraints(
     for t in iter_k.clone() {
         for i in iter_n.clone() {
             constraints.push(
-                Implies(&ds[t][i].clone(), &vs[i].clone())
+                implies(&ds[t][i].clone(), &vs[i].clone())
             );
         }
     }
 
     // Include *only* vertices from decisions
     for i in iter_n.clone() {
-        let any_timestep = OrAll(
+        let any_timestep = or_all(
             &iter_k
                 .clone()
                 .into_iter()
                 .map(|t| ds[t][i].clone())
                 .collect()
         );
-        constraints.push(Implies(&vs[i].clone(), &any_timestep));
+        constraints.push(implies(&vs[i].clone(), &any_timestep));
     }
 
     // One decision per timestep
     for t in iter_k.clone() {
-        let decisions_for_timestep = ds[t]
-            .clone()
-            .into_iter()
-            .reduce(|acc, d| Xor(&acc, &d.clone()))
-            .unwrap();
+        let decisions_for_timestep = exactly_one(ds[t].clone());
         constraints.push(decisions_for_timestep);
     }
 
-    // For t > 1, the node picked at each timestep
+    // For t >= 1, the node picked at each timestep
     // must share an edge with one of the previous nodes
     for t1 in iter_k.clone().into_iter().skip(1) {
         for i in iter_n.clone().into_iter() {
@@ -130,7 +127,7 @@ pub fn build_subgraph_contraints(
                 // "If node j was picked at time t0, it shares an edge with node i"
                 for j in iter_n.clone().into_iter() {
                     is_connected_to_prev_edge.push(
-                        And(&ds[t0][j], &es[i][j])
+                        and(&ds[t0][j], &es[i][j])
                     );
                 }
             }
@@ -147,9 +144,9 @@ pub fn build_subgraph_contraints(
             //   node n was picked at time 0 and shares an edge with node i
             // """
             constraints.push(
-                Implies(
+                implies(
                     &ds[t1][i],
-                    &OrAll(&is_connected_to_prev_edge)
+                    &or_all(&is_connected_to_prev_edge)
                 )
             );
         }
@@ -163,7 +160,7 @@ pub fn build_subgraph_contraints(
                     continue;
                 }
 
-                constraints.push(Not(&And(&ds[t0][i], &ds[t1][i])));
+                constraints.push(not(&and(&ds[t0][i], &ds[t1][i])));
             }
         }
     }
@@ -183,7 +180,7 @@ pub fn build_subgraph_contraints(
             {
                 constraints.push(constraint);
             } else {
-                constraints.push(Not(&constraint));
+                constraints.push(not(&constraint));
             }
         }
     }

@@ -13,7 +13,7 @@ impl Literal {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Clause {
     pub literals: Vec<Literal>,
 }
@@ -34,12 +34,13 @@ impl Clause {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Variable {
     id: i32,
     name: String,
 }
 
+#[derive(Clone)]
 pub struct CnfBuilder {
     pub variables: Vec<Variable>,
     pub clauses: Vec<Clause>,

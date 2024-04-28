@@ -1,6 +1,6 @@
 use super::{ Clause, Literal };
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub enum BooleanExpressionMode {
     And,
     Or,
