@@ -13,6 +13,7 @@ impl Literal {
     }
 }
 
+#[derive(Debug)]
 pub struct Clause {
     pub literals: Vec<Literal>,
 }

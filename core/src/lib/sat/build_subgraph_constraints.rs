@@ -78,8 +78,12 @@ pub fn build_subgraph_contraints(
     // Edges are undirected
     for i in iter_n.clone() {
         for j in iter_n.clone() {
+            if i == j {
+                continue;
+            }
+
             constraints.push(
-                Implies(&es[i][j].clone(), &es[j][j].clone())
+                Implies(&es[i][j].clone(), &es[j][i].clone())
             );
         }
     }
@@ -169,11 +173,14 @@ pub fn build_subgraph_contraints(
         for j in iter_n.clone().into_iter() {
             let constraint = es[i][j].clone();
             let edge = (i as i32, j as i32);
+            let edge_reversed = (j as i32, i as i32);
 
             if i == j {
                 // Vertices have edge to self
                 constraints.push(constraint);
-            } else if edges.contains(&edge) {
+            } else if
+                edges.contains(&edge) | edges.contains(&edge_reversed)
+            {
                 constraints.push(constraint);
             } else {
                 constraints.push(Not(&constraint));

@@ -1,4 +1,4 @@
-use super::{ Clause, BooleanExpression, BooleanExpressionMode };
+use super::{ BooleanExpression, BooleanExpressionMode };
 
 pub fn Or(
     x1: &BooleanExpression,
