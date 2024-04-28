@@ -1,82 +1,69 @@
 use std::{ collections::HashSet };
 
+use logicng::formulas::{ EncodedFormula, FormulaFactory, Variable };
+
 use crate::console::log;
 
-use super::{
-    exactly_one,
-    and,
-    BooleanExpression,
-    CnfBuilder,
-    implies,
-    not,
-    or_all,
-    xor,
-};
+pub struct SubgraphConstraints {
+    pub factory: FormulaFactory,
+    pub formula: EncodedFormula,
+    pub num_constraints: usize,
+    pub num_vertices: i32,
+}
 
-/**
- * Vertices referenced in edges should be 0-indexed even though the CNF output is 1-indexed
- */
 pub fn build_subgraph_contraints(
     num_vertices: i32,
     subgraph_size: i32,
     edges: HashSet<(i32, i32)>
-) -> CnfBuilder {
+) -> SubgraphConstraints {
+    let f = FormulaFactory::new();
+
     let n = num_vertices as usize;
     let iter_n = Vec::from_iter(0..n);
 
     let k = subgraph_size as usize;
     let iter_k = Vec::from_iter(0..k);
 
-    let mut builder = CnfBuilder { ..Default::default() };
-
-    // --- Init variables ---
+    // --- Variables ---
 
     // Vertices (true if in subgraph)
-    let vs: Vec<BooleanExpression> = iter_n
+    let vs: Vec<EncodedFormula> = iter_n
         .iter()
-        .map(|i|
-            BooleanExpression::from_variable(
-                builder.add_variable(format!("v{}", i))
-            )
-        )
+        .map(|i| f.variable(format!("v{}", i).as_str()))
         .collect();
 
     // Edges
-    let es: Vec<Vec<BooleanExpression>> = iter_n
+    let es: Vec<Vec<EncodedFormula>> = iter_n
         .iter()
         .map(|i|
             iter_n
                 .iter()
                 .map(|j|
-                    BooleanExpression::from_variable(
-                        builder.add_variable(format!("e_{}_{}", i, j))
-                    )
+                    f.variable(format!("e_{}_{}", i, j).as_str())
                 )
                 .collect()
         )
         .collect();
 
     // Decisions (vertex picked per timestep)
-    let ds: Vec<Vec<BooleanExpression>> = iter_k
+    let ds: Vec<Vec<EncodedFormula>> = iter_k
         .iter()
         .map(|t|
             iter_n
                 .iter()
                 .map(|j|
-                    BooleanExpression::from_variable(
-                        builder.add_variable(format!("d_{}_{}", t, j))
-                    )
+                    f.variable(format!("d_{}_{}", t, j).as_str())
                 )
                 .collect()
         )
         .collect();
 
-    // --- Define constraints ---
+    // --- Constraints ---
 
-    let mut constraints = Vec::<BooleanExpression>::new();
+    let mut constraints = Vec::<EncodedFormula>::new();
 
     // Subgraph is non-empty
-    constraints.push(or_all(&vs));
+    constraints.push(f.or(&vs));
 
     // Edges are undirected
     for i in iter_n.clone() {
@@ -85,9 +72,7 @@ pub fn build_subgraph_contraints(
                 continue;
             }
 
-            constraints.push(
-                implies(&es[i][j].clone(), &es[j][i].clone())
-            );
+            constraints.push(f.implication(es[i][j], es[j][i]));
         }
     }
 
@@ -95,26 +80,34 @@ pub fn build_subgraph_contraints(
     for t in iter_k.clone() {
         for i in iter_n.clone() {
             constraints.push(
-                implies(&ds[t][i].clone(), &vs[i].clone())
+                f.implication(ds[t][i].clone(), vs[i].clone())
             );
         }
     }
 
     // Include *only* vertices from decisions
     for i in iter_n.clone() {
-        let any_timestep = or_all(
-            &iter_k
-                .clone()
-                .into_iter()
-                .map(|t| ds[t][i].clone())
-                .collect()
+        let any_timestep = f.or(
+            &Vec::from_iter(
+                iter_k
+                    .clone()
+                    .into_iter()
+                    .map(|t| ds[t][i].clone())
+            )
         );
-        constraints.push(implies(&vs[i].clone(), &any_timestep));
+        constraints.push(f.implication(vs[i].clone(), any_timestep));
     }
 
     // One decision per timestep
+    // @todo: verify this exactly-one stuff works
     for t in iter_k.clone() {
-        let decisions_for_timestep = exactly_one(ds[t].clone());
+        let vars = Vec::<Variable>::from_iter(
+            // ds[t][0].variables(&f).iter()
+            iter_n
+                .iter()
+                .map(|i| f.var(format!("d_{}_{}", t, i).as_str()))
+        );
+        let decisions_for_timestep = f.exo(vars);
         constraints.push(decisions_for_timestep);
     }
 
@@ -123,13 +116,13 @@ pub fn build_subgraph_contraints(
     for t1 in iter_k.clone().into_iter().skip(1) {
         for i in iter_n.clone().into_iter() {
             let mut is_connected_to_prev_edge =
-                Vec::<BooleanExpression>::new();
+                Vec::<EncodedFormula>::new();
 
             for t0 in 0..t1 {
                 // "If node j was picked at time t0, it shares an edge with node i"
                 for j in iter_n.clone().into_iter() {
                     is_connected_to_prev_edge.push(
-                        and(&ds[t0][j], &es[i][j])
+                        f.and(&vec![ds[t0][j], es[i][j]])
                     );
                 }
             }
@@ -146,9 +139,9 @@ pub fn build_subgraph_contraints(
             //   node n was picked at time 0 and shares an edge with node i
             // """
             constraints.push(
-                implies(
-                    &ds[t1][i],
-                    &or_all(&is_connected_to_prev_edge)
+                f.implication(
+                    ds[t1][i],
+                    f.or(&is_connected_to_prev_edge)
                 )
             );
         }
@@ -162,7 +155,9 @@ pub fn build_subgraph_contraints(
                     continue;
                 }
 
-                constraints.push(not(&and(&ds[t0][i], &ds[t1][i])));
+                constraints.push(
+                    f.not(f.and(&[ds[t0][i], ds[t1][i]]))
+                );
             }
         }
     }
@@ -170,7 +165,7 @@ pub fn build_subgraph_contraints(
     // --- Init edge connections ---
     for i in iter_n.clone().into_iter() {
         for j in iter_n.clone().into_iter() {
-            let constraint = es[i][j].clone();
+            let constraint = es[i][j];
             let edge = (i as i32, j as i32);
             let edge_reversed = (j as i32, i as i32);
 
@@ -182,17 +177,18 @@ pub fn build_subgraph_contraints(
             {
                 constraints.push(constraint);
             } else {
-                constraints.push(not(&constraint));
+                constraints.push(f.not(constraint));
             }
         }
     }
 
-    log!("Built {} constraints", constraints.len());
+    let num_constraints = constraints.len();
+    let all_constraints = f.and(&constraints);
 
-    builder.clauses = constraints
-        .into_iter()
-        .flat_map(|con| con.dump().into_iter())
-        .collect();
-
-    builder
+    SubgraphConstraints {
+        factory: f,
+        formula: all_constraints,
+        num_constraints,
+        num_vertices,
+    }
 }

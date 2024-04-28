@@ -226,7 +226,28 @@ def test_diamond():
             print_model(model)
 
 
+def test_kite():
+    """
+      a
+     / \
+    b   c
+     \ /
+      d
+      |
+      e
+    """
+
+    constraints = build_constraints(5, 4, [(0, 1), (0, 2), (1, 3), (2, 3), (3, 4)])
+
+    with Glucose4(bootstrap_with=And(*constraints)) as solver:
+        print("clauses", solver.nof_clauses())
+        models = list(solver.enum_models())
+        for model in models:
+            print_model(model)
+
+
 if __name__ == "__main__":
     # test_ab()
     # test_abc()
-    test_diamond()
+    # test_diamond()
+    test_kite()

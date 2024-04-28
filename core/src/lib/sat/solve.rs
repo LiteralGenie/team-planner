@@ -1,81 +1,59 @@
-use std::collections::HashSet;
+use logicng::{
+    formulas::{ ToFormula, Variable },
+    solver::minisat::{ sat::{ mk_lit, MsLit, MsVar }, MiniSat },
+};
 
-use varisat::{ ExtendFormula, Lit, Solver };
+use super::SubgraphConstraints;
 
-use crate::console::log;
+pub type Solution = Vec<String>;
 
-use super::CnfBuilder;
-
-pub type Solution = Vec<i32>;
-
-// Lazy solution "generator"
-pub struct AllSolver<'a> {
-    pub builder: CnfBuilder,
-    pub solver: Solver<'a>,
-
-    /**
-     * Sometimes we only care about a certain subset in the solution,
-     *   and we only want one solution per unique subset
-     * To filter for those unique solutions, the 1-based ids of
-     *   each var in the subset should be included here.
-     * Defaults to all variables.
-     */
-    pub vars_to_dedupe: HashSet<i32>,
+/**
+ * Reimplements logicng::solver::functions::enumerate_models
+ * to make it lazy / generator-like
+ */
+pub struct SubgraphSolver {
+    pub constraints: SubgraphConstraints,
+    pub solver: MiniSat,
+    pub solution_variables: Vec<Variable>,
 }
 
-impl AllSolver<'_> {
-    pub fn new(builder: &CnfBuilder) -> Self {
-        let mut solver = Solver::new();
+impl SubgraphSolver {
+    pub fn new(constraints: SubgraphConstraints) -> Self {
+        let mut solver = MiniSat::new();
+        solver.add(constraints.formula, &constraints.factory);
 
-        log!("dumping clauses");
-        let d = builder.dump();
+        let solution_variables = (0..constraints.num_vertices)
+            .map(|i| format!("v{}", i))
+            .map(|name| constraints.factory.var(&name))
+            .collect();
 
-        log!("adding {} clauses", d.len());
-        for clause in builder.dump().iter() {
-            let with_varisat_lits: Vec<Lit> = clause
-                .iter()
-                .map(|id| Lit::from_dimacs(*id as isize))
-                .collect();
-
-            solver.add_clause(&with_varisat_lits);
-        }
-
-        let vars_to_dedupe = HashSet::from_iter(
-            1..=builder.variables.len() as i32
-        );
-
-        log!("returning solver");
         Self {
-            builder: builder.clone(),
+            constraints,
             solver,
-            vars_to_dedupe,
+            solution_variables,
         }
     }
 
     pub fn next(&mut self) -> Option<Solution> {
-        let _ = self.solver.solve();
+        self.solver.sat();
 
-        match self.solver.model() {
+        let model = self.solver.model(Some(&self.solution_variables));
+
+        match model {
             Some(model) => {
-                // The solution we found but filtered to only contain certain vars
-                let to_ignore = Vec::from_iter(
-                    model
-                        .iter()
-                        .filter(|lit|
-                            self.vars_to_dedupe.contains(
-                                &(lit.to_dimacs().abs() as i32)
-                            )
-                        )
-                        .map(|lit| !lit.clone())
-                );
-
-                self.solver.add_clause(&to_ignore);
+                self.block_latest_model();
 
                 return Some(
-                    model
-                        .iter()
-                        .map(|lit| lit.to_dimacs() as i32)
-                        .collect()
+                    Vec::from_iter(
+                        model
+                            .literals()
+                            .iter()
+                            .map(|lit|
+                                lit.to_string(
+                                    &self.constraints.factory
+                                )
+                            )
+                    )
                 );
             }
             None => {
@@ -83,86 +61,112 @@ impl AllSolver<'_> {
             }
         }
     }
+
+    // https://github.com/booleworks/logicng-rs/blob/2fc0f76558fb9194cdf8a44b4c67a243116ea61c/src/solver/functions/model_enumeration.rs#L268
+    fn block_latest_model(&mut self) {
+        let relevant_indices: Vec<MsVar> = self.solution_variables
+            .iter()
+            .filter_map(|&v|
+                self.solver.underlying_solver.idx_for_variable(v)
+            )
+            .collect();
+
+        let model_from_solver = &self.solver.underlying_solver.model;
+
+        let mut blocking_clause = Vec::<MsLit>::with_capacity(
+            relevant_indices.len()
+        );
+
+        for var_index in relevant_indices {
+            blocking_clause.push(
+                mk_lit(var_index, model_from_solver[var_index.0])
+            );
+        }
+
+        self.solver.underlying_solver.add_clause(
+            blocking_clause,
+            &None
+        );
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashSet;
+    use std::{ collections::HashSet, hash::{ Hash, Hasher } };
 
     use crate::lib::sat::{
+        build_ab_graph,
+        build_kite_graph,
+        build_square_graph,
         build_subgraph_contraints,
-        utils::{ vec_vec_to_hash_hash, HashedClause },
-        CnfBuilder,
+        SubgraphConstraints,
     };
 
-    use super::{ AllSolver, Solution };
+    use super::{ SubgraphSolver, Solution };
 
-    /**
-     * a - b
-     */
-    fn build_ab_graph(subgraph_size: i32) -> (CnfBuilder, i32) {
-        let node_count = 2;
+    // https://stackoverflow.com/questions/36562419/hashset-as-key-for-other-hashset
+    #[derive(Debug)]
+    pub struct HashedSolution(pub HashSet<String>);
 
-        let builder = build_subgraph_contraints(
-            node_count,
-            subgraph_size,
-            HashSet::from_iter([(0, 1)])
-        );
-
-        (builder, node_count)
+    impl PartialEq for HashedSolution {
+        fn eq(&self, other: &HashedSolution) -> bool {
+            self.0.is_subset(&other.0) && other.0.is_subset(&self.0)
+        }
     }
 
-    /**
-     * a - b
-     * |   |
-     * c - d
-     */
-    fn build_square_graph(subgraph_size: i32) -> (CnfBuilder, i32) {
-        let node_count = 4;
+    impl Eq for HashedSolution {}
 
-        let builder = build_subgraph_contraints(
-            4,
-            subgraph_size,
-            HashSet::from_iter([
-                (0, 1),
-                (0, 2),
-                (1, 3),
-                (2, 3),
-            ])
-        );
-
-        (builder, node_count)
+    impl Hash for HashedSolution {
+        fn hash<H>(&self, state: &mut H) where H: Hasher {
+            let mut a: Vec<&String> = self.0.iter().collect();
+            a.sort();
+            for s in a.iter() {
+                s.hash(state);
+            }
+        }
     }
 
-    /**
-     *   a
-     *  / \
-     * b   c
-     *  \ /
-     *   d
-     *   |
-     *   e
-     */
-    fn build_kite_graph(subgraph_size: i32) -> (CnfBuilder, i32) {
-        let node_count = 5;
-
-        let builder = build_subgraph_contraints(
-            5,
-            subgraph_size,
-            HashSet::from_iter([
-                (0, 1),
-                (0, 2),
-                (1, 3),
-                (2, 3),
-                (3, 4),
-            ])
-        );
-
-        (builder, node_count)
+    impl HashedSolution {
+        pub fn from_vec(clause: &Solution) -> Self {
+            Self(HashSet::from_iter(clause.clone().into_iter()))
+        }
     }
 
-    fn collect(solver: &mut AllSolver) -> Vec<Vec<i32>> {
-        let mut results = Vec::<Vec<i32>>::new();
+    pub fn vec_vec_to_hash_hash(
+        cnf: Vec<Solution>
+    ) -> HashSet<HashedSolution> {
+        let result = HashSet::from_iter(
+            cnf
+                .clone()
+                .into_iter()
+                .map(|clause| {
+                    let hashed = HashedSolution::from_vec(&clause);
+
+                    // No dupes should be removed, each variable should appear at most once
+                    assert_eq!(
+                        hashed.0.len(),
+                        clause.len(),
+                        "Duplicate variables removed from cnf clause {:?}",
+                        clause
+                    );
+
+                    hashed
+                })
+        );
+
+        // No dupes should be removed, each variable should appear at most once
+        assert_eq!(
+            result.len(),
+            cnf.len(),
+            "Duplicate clauses removed from {:?}",
+            cnf
+        );
+
+        result
+    }
+
+    fn collect(solver: &mut SubgraphSolver) -> Vec<Solution> {
+        let mut results = Vec::<Solution>::new();
 
         loop {
             match solver.next() {
@@ -178,16 +182,16 @@ mod tests {
         results
     }
 
-    fn truncate(solution: Solution, node_count: i32) -> Solution {
+    fn truncate(solution: Solution, num_vertices: &i32) -> Solution {
         let mut sol = solution.clone();
-        sol.truncate(node_count as usize);
+        sol.truncate(*num_vertices as usize);
         sol
     }
 
     fn filter_negatives(solution: Solution) -> Solution {
         solution
             .into_iter()
-            .filter(|var| var.is_positive())
+            .filter(|lit| !lit.starts_with("~"))
             .collect()
     }
 
@@ -199,14 +203,14 @@ mod tests {
      *      pass in [3, 5] or [5,3], NOT [-1, -2, 3, -4, 5]
      */
     fn assert_solutions(
-        node_count: i32,
+        num_vertices: &i32,
         actual: Vec<Solution>,
         expected: Vec<Solution>
     ) {
         let actual = vec_vec_to_hash_hash(
             actual
                 .into_iter()
-                .map(|sol| truncate(sol, node_count))
+                .map(|sol| truncate(sol, num_vertices))
                 .map(|sol| filter_negatives(sol))
                 .collect()
         );
@@ -214,7 +218,7 @@ mod tests {
         let expected = vec_vec_to_hash_hash(
             expected
                 .into_iter()
-                .map(|sol| truncate(sol, node_count))
+                .map(|sol| truncate(sol, num_vertices))
                 .map(|sol| filter_negatives(sol))
                 .collect()
         );
@@ -238,206 +242,220 @@ mod tests {
         }
     }
 
-    fn format_solution(
-        solution: Vec<i32>,
-        builder: &CnfBuilder
-    ) -> String {
-        solution
-            .iter()
-            .map(|id| builder.get_name(*id))
-            .map(|name| format!("{: >3}", name))
-            .collect::<Vec<String>>()
-            .join(", ")
+    fn to_id(id: i32) -> String {
+        format!("v{}", id)
+    }
+
+    fn to_ids(ids: Vec<i32>) -> Vec<String> {
+        Vec::from_iter(ids.iter().map(|id| to_id(*id)))
+    }
+
+    fn to_sols(ids: Vec<Vec<i32>>) -> Vec<Vec<String>> {
+        Vec::from_iter(ids.into_iter().map(|sol| to_ids(sol)))
     }
 
     #[test]
     fn test_ab1() {
-        let (builder, node_count) = build_ab_graph(1);
+        let constraints = build_ab_graph(1);
+        let nv = constraints.num_vertices.clone();
 
-        let mut solver = AllSolver::new(&builder);
-        solver.vars_to_dedupe = HashSet::from_iter(1..=node_count);
+        let mut solver = SubgraphSolver::new(constraints);
 
         let sols = collect(&mut solver);
 
-        assert_solutions(node_count, sols, vec![vec![1], vec![2]])
+        assert_solutions(&nv, sols, to_sols(vec![vec![0], vec![1]]))
     }
 
     #[test]
     fn test_ab2() {
-        let (builder, node_count) = build_ab_graph(2);
+        let constraints = build_ab_graph(2);
+        let nv = constraints.num_vertices.clone();
 
-        let mut solver = AllSolver::new(&builder);
-        solver.vars_to_dedupe = HashSet::from_iter(1..=node_count);
+        let mut solver = SubgraphSolver::new(constraints);
 
         let sols = collect(&mut solver);
 
-        assert_solutions(node_count, sols, vec![vec![1, 2]])
+        assert_solutions(&nv, sols, to_sols(vec![vec![0, 1]]))
     }
 
     #[test]
     fn test_square1() {
-        let (builder, node_count) = build_square_graph(1);
+        let constraints = build_square_graph(1);
+        let nv = constraints.num_vertices.clone();
 
-        let mut solver = AllSolver::new(&builder);
-        solver.vars_to_dedupe = HashSet::from_iter(1..=node_count);
+        let mut solver = SubgraphSolver::new(constraints);
 
         let sols = collect(&mut solver);
 
         assert_solutions(
-            node_count,
+            &nv,
             sols,
-            vec![vec![1], vec![2], vec![3], vec![4]]
+            to_sols(vec![vec![0], vec![1], vec![2], vec![3]])
         )
     }
 
     #[test]
     fn test_square2() {
-        let (builder, node_count) = build_square_graph(2);
+        let constraints = build_square_graph(2);
+        let nv = constraints.num_vertices.clone();
 
-        let mut solver = AllSolver::new(&builder);
-        solver.vars_to_dedupe = HashSet::from_iter(1..=node_count);
+        let mut solver = SubgraphSolver::new(constraints);
 
         let sols = collect(&mut solver);
 
         assert_solutions(
-            node_count,
+            &nv,
             sols,
-            vec![vec![1, 2], vec![1, 3], vec![2, 4], vec![3, 4]]
+            to_sols(
+                vec![vec![0, 1], vec![0, 2], vec![1, 3], vec![2, 3]]
+            )
         )
     }
 
     #[test]
     fn test_square3() {
-        let (builder, node_count) = build_square_graph(3);
+        let constraints = build_square_graph(3);
+        let nv = constraints.num_vertices.clone();
 
-        let mut solver = AllSolver::new(&builder);
-        solver.vars_to_dedupe = HashSet::from_iter(1..=node_count);
+        let mut solver = SubgraphSolver::new(constraints);
 
         let sols = collect(&mut solver);
 
         assert_solutions(
-            node_count,
+            &nv,
             sols,
             // Solutions clockwise
-            vec![
-                vec![1, 2, 4],
-                vec![2, 4, 3],
-                vec![4, 3, 1],
-                vec![3, 1, 2]
-            ]
+            to_sols(
+                vec![
+                    vec![0, 1, 3],
+                    vec![1, 3, 2],
+                    vec![3, 2, 0],
+                    vec![2, 0, 1]
+                ]
+            )
         )
     }
 
     #[test]
     fn test_square4() {
-        let (builder, node_count) = build_square_graph(4);
+        let constraints = build_square_graph(4);
+        let nv = constraints.num_vertices.clone();
 
-        let mut solver = AllSolver::new(&builder);
-        solver.vars_to_dedupe = HashSet::from_iter(1..=node_count);
+        let mut solver = SubgraphSolver::new(constraints);
 
         let sols = collect(&mut solver);
 
         assert_solutions(
-            node_count,
+            &nv,
             sols,
             // Solutions clockwise
-            vec![vec![1, 2, 3, 4]]
+            to_sols(vec![vec![0, 1, 2, 3]])
         )
     }
 
     #[test]
     fn test_kite1() {
-        let (builder, node_count) = build_kite_graph(1);
+        let constraints = build_kite_graph(1);
+        let nv = constraints.num_vertices.clone();
 
-        let mut solver = AllSolver::new(&builder);
-        solver.vars_to_dedupe = HashSet::from_iter(1..=node_count);
+        let mut solver = SubgraphSolver::new(constraints);
 
         let sols = collect(&mut solver);
 
         assert_solutions(
-            node_count,
+            &nv,
             sols,
-            vec![vec![1], vec![2], vec![3], vec![4], vec![5]]
+            to_sols(vec![vec![0], vec![1], vec![2], vec![3], vec![4]])
         )
     }
 
     #[test]
     fn test_kite2() {
-        let (builder, node_count) = build_kite_graph(2);
+        let constraints = build_kite_graph(2);
+        let nv = constraints.num_vertices.clone();
 
-        let mut solver = AllSolver::new(&builder);
-        solver.vars_to_dedupe = HashSet::from_iter(1..=node_count);
+        let mut solver = SubgraphSolver::new(constraints);
 
         let sols = collect(&mut solver);
 
         assert_solutions(
-            node_count,
+            &nv,
             sols,
-            vec![
-                vec![1, 2],
-                vec![1, 3],
-                vec![2, 4],
-                vec![3, 4],
-                vec![4, 5]
-            ]
+            to_sols(
+                vec![
+                    vec![0, 1],
+                    vec![0, 2],
+                    vec![1, 3],
+                    vec![2, 3],
+                    vec![3, 4]
+                ]
+            )
         )
     }
 
     #[test]
     fn test_kite3() {
-        let (builder, node_count) = build_kite_graph(3);
+        let constraints = build_kite_graph(3);
+        let nv = constraints.num_vertices.clone();
 
-        let mut solver = AllSolver::new(&builder);
-        solver.vars_to_dedupe = HashSet::from_iter(1..=node_count);
+        let mut solver = SubgraphSolver::new(constraints);
 
         let sols = collect(&mut solver);
 
         assert_solutions(
-            node_count,
+            &nv,
             sols,
             // Solutions clockwise
-            vec![
-                vec![1, 3, 4],
-                vec![3, 4, 2],
-                vec![4, 2, 1],
-                vec![2, 1, 3],
-                vec![2, 4, 5],
-                vec![3, 4, 5]
-            ]
+            to_sols(
+                vec![
+                    vec![0, 2, 3],
+                    vec![2, 3, 1],
+                    vec![3, 1, 0],
+                    vec![1, 0, 2],
+                    vec![1, 3, 4],
+                    vec![2, 3, 4]
+                ]
+            )
         )
     }
 
     #[test]
     fn test_kite4() {
-        let (builder, node_count) = build_kite_graph(4);
+        let constraints = build_kite_graph(4);
+        let nv = constraints.num_vertices.clone();
 
-        let mut solver = AllSolver::new(&builder);
-        solver.vars_to_dedupe = HashSet::from_iter(1..=node_count);
+        let mut solver = SubgraphSolver::new(constraints);
 
         let sols = collect(&mut solver);
 
         assert_solutions(
-            node_count,
+            &nv,
             sols,
-            vec![
-                vec![2, 3, 4, 5], // all but 1
-                vec![1, 3, 4, 5], // all but 2
-                vec![1, 2, 4, 5], // all but 3
-                vec![1, 2, 3, 4] // all but 5
-                // but removing 4 also removes 5, so a 4-graph can't be constructed
-            ]
+            to_sols(
+                vec![
+                    vec![1, 2, 3, 4], // all but 0
+                    vec![0, 2, 3, 4], // all but 1
+                    vec![0, 1, 3, 4], // all but 2
+                    vec![0, 1, 2, 3] // all but 4
+                    // but removing 3 also removes 4, so a 4-graph can't be constructed
+                ]
+            )
         )
     }
 
     #[test]
     fn test_kite5() {
-        let (builder, node_count) = build_kite_graph(5);
+        let constraints = build_kite_graph(5);
+        let nv = constraints.num_vertices.clone();
 
-        let mut solver = AllSolver::new(&builder);
-        solver.vars_to_dedupe = HashSet::from_iter(1..=node_count);
+        let mut solver = SubgraphSolver::new(constraints);
 
         let sols = collect(&mut solver);
 
-        assert_solutions(node_count, sols, vec![vec![1, 2, 3, 4, 5]])
+        assert_solutions(
+            &nv,
+            sols,
+            to_sols(vec![vec![0, 1, 2, 3, 4]])
+        )
     }
 }
