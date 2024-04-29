@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="data:,">
-    <title>{{ TITLE }}</title>
+    <title>lfmoa</title>
 
     <style>
         body,
@@ -29,11 +29,10 @@
 </head>
 
 <body>
-    {{ NO_MODULE }}
     <script type="module">
         import loadWasm, * as tft from '/lib/assets/wasm/tft_core.js'
         
-        window.loadWasm = loadWasm
+        loadWasm()
         window.tft = tft
     </script>
 </body>

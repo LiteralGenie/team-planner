@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::{ HashMap, HashSet };
 
 use serde::{ Deserialize, Serialize };
 use serde_wasm_bindgen::to_value;
@@ -6,10 +6,11 @@ use wasm_bindgen::{ prelude::wasm_bindgen, JsValue, UnwrapThrowExt };
 use crate::lib::data::{ Champion, ChampionId, GameData, TraitId };
 
 use crate::console::log;
+use crate::lib::sat::{ build_champion_constraints, SubgraphSolver };
 
 #[derive(Debug, Serialize, Deserialize)]
 struct SearchOptions {
-    pub team_size: i32,
+    pub team_size: u8,
     pub champions: Option<Vec<ChampionFilter>>,
 }
 
@@ -28,7 +29,39 @@ pub fn search_teams(options: JsValue) {
         ::from_value(options)
         .unwrap_throw();
 
-    log!("options {:?}", options)
+    let champion_filters: Vec<Vec<ChampionId>> = options.champions
+        .unwrap_or(vec![])
+        .into_iter()
+        .map(|filter| filter_champions(filter))
+        .collect();
+
+    let (constraints, index_to_id) = build_champion_constraints(
+        options.team_size,
+        champion_filters
+    );
+
+    let mut solver = SubgraphSolver::new(constraints);
+
+    for _ in 0..20 {
+        match solver.next() {
+            Some(sol) =>
+                log!("{:?}", format_solution(sol, &index_to_id)),
+            None => {
+                break;
+            }
+        }
+    }
+}
+
+pub fn format_solution(
+    sol: Vec<String>,
+    index_to_id: &HashMap<i32, ChampionId>
+) -> Vec<String> {
+    sol.iter()
+        .filter(|s| !s.starts_with("~"))
+        .map(|s| s[1..].parse::<i32>().unwrap())
+        .map(|idx| index_to_id[&idx].clone())
+        .collect()
 }
 
 #[wasm_bindgen]
@@ -37,12 +70,18 @@ pub fn search_champions(filter: JsValue) -> JsValue {
         ::from_value(filter)
         .unwrap_throw();
 
+    let champions = filter_champions(filter);
+
+    to_value(&champions).unwrap()
+}
+
+pub fn filter_champions(filter: ChampionFilter) -> Vec<ChampionId> {
     // @TODO: Is there a way to avoid reinit'ing the champion data every call?
     //        While still exposing this function to JS. Cant wasm-bindgen return closures?
     let data = GameData::new();
 
-    let mut champions: Vec<&Champion> = Vec::from_iter(
-        data.champions.values()
+    let mut champions: Vec<Champion> = Vec::from_iter(
+        data.champions.into_values()
     );
 
     if let Some(ids) = filter.ids {
@@ -88,5 +127,8 @@ pub fn search_champions(filter: JsValue) -> JsValue {
             .collect();
     }
 
-    to_value(&champions).unwrap()
+    champions
+        .iter()
+        .map(|c| c.name.clone())
+        .collect()
 }
