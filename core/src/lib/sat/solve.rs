@@ -1,5 +1,5 @@
 use logicng::{
-    formulas::{ ToFormula, Variable },
+    formulas::Variable,
     solver::minisat::{ sat::{ mk_lit, MsLit, MsVar }, MiniSat },
 };
 
@@ -98,8 +98,6 @@ mod tests {
         build_ab_graph,
         build_kite_graph,
         build_square_graph,
-        build_subgraph_contraints,
-        SubgraphConstraints,
     };
 
     use super::{ SubgraphSolver, Solution };

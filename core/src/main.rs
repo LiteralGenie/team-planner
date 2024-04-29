@@ -6,7 +6,7 @@ use console::log;
 use crate::lib::sat::{ build_kite_graph, SubgraphSolver };
 
 fn main() {
-    let constraints = build_kite_graph(4);
+    let constraints = build_kite_graph(5);
 
     log!(
         "Solving with {} constraints mapped to {} clauses",
