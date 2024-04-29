@@ -83,6 +83,7 @@ impl ChampionSubset {
     }
 }
 
+// @TODO: really need to decouple this from SubgraphConstraints / FormulaFactory for testing
 fn build_slot_constraints(
     slot_options: Vec<Vec<ChampionId>>,
     subgraph_constraints: &SubgraphConstraints,
