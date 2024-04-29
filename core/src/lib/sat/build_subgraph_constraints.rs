@@ -100,10 +100,8 @@ pub fn build_subgraph_contraints(
     }
 
     // One decision per timestep
-    // @todo: verify this exactly-one stuff works
     for t in iter_k.clone() {
         let vars = Vec::<Variable>::from_iter(
-            // ds[t][0].variables(&f).iter()
             iter_n
                 .iter()
                 .map(|i| f.var(format!("d_{}_{}", t, i).as_str()))
