@@ -12,10 +12,9 @@ use super::{
 
 pub fn build_champion_constraints(
     subgraph_size: u8,
-    slot_options: Vec<Vec<ChampionId>>
+    slot_options: Vec<Vec<ChampionId>>,
+    data: &GameData
 ) -> (SubgraphConstraints, HashMap<i32, ChampionId>) {
-    let data = GameData::new();
-
     // Map each champion id to arbitrary vertex index
     let id_to_index: HashMap<&ChampionId, i32> = HashMap::from_iter(
         data.champions
