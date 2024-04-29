@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use serde::{ Deserialize, Serialize };
+
 pub type TraitId = String;
 pub type ChampionId = String;
 
@@ -18,7 +20,7 @@ impl Trait {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Champion {
     pub name: ChampionId,
     pub cost: u8,
@@ -28,12 +30,20 @@ pub struct Champion {
 }
 
 impl Champion {
-    pub fn new(cost: u8, name: &str, traits: Vec<&str>, range: u8, uses_ap: bool) -> Self {
+    pub fn new(
+        cost: u8,
+        name: &str,
+        traits: Vec<&str>,
+        range: u8,
+        uses_ap: bool
+    ) -> Self {
         Self {
             name: name.into(),
             cost,
             range,
-            traits: Vec::from_iter(traits.iter().map(|s| String::from(*s))),
+            traits: Vec::from_iter(
+                traits.iter().map(|s| String::from(*s))
+            ),
             uses_ap,
         }
     }
@@ -162,7 +172,9 @@ impl GameData {
         let mut champions_by_trait = HashMap::new();
         for ch in champions.values() {
             for t in ch.traits.iter() {
-                let bin = champions_by_trait.entry(t.clone()).or_insert_with(|| Vec::new());
+                let bin = champions_by_trait
+                    .entry(t.clone())
+                    .or_insert_with(|| Vec::new());
                 bin.push(ch.name.clone());
             }
         }

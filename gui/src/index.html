@@ -31,10 +31,10 @@
 <body>
     {{ NO_MODULE }}
     <script type="module">
-        import loadWasm, { search_teams } from '/lib/assets/wasm/tft_core.js'
+        import loadWasm, * as tft from '/lib/assets/wasm/tft_core.js'
         
         window.loadWasm = loadWasm
-        window.search_teams = search_teams
+        window.tft = tft
     </script>
 </body>
 
