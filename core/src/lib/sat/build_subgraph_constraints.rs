@@ -9,6 +9,7 @@ pub struct SubgraphConstraints {
     pub formula: EncodedFormula,
     pub num_constraints: usize,
     pub num_vertices: i32,
+    pub subgraph_size: i32,
 }
 
 pub fn build_subgraph_contraints(
@@ -190,5 +191,6 @@ pub fn build_subgraph_contraints(
         formula: all_constraints,
         num_constraints,
         num_vertices,
+        subgraph_size,
     }
 }

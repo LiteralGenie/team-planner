@@ -2,7 +2,7 @@ use std::{ collections::{ HashMap, HashSet } };
 
 use logicng::formulas::{ EncodedFormula, FormulaFactory };
 
-use crate::lib::data::{ ChampionId, GameData };
+use crate::{ console::log, lib::data::{ ChampionId, GameData } };
 
 use super::{
     build_subgraph_contraints,
@@ -69,6 +69,7 @@ pub fn build_champion_constraints(
     (constraints, index_to_id)
 }
 
+#[derive(Debug)]
 struct ChampionSubset {
     champions: HashSet<ChampionId>,
     parent_sets: Vec<usize>,
@@ -88,6 +89,8 @@ fn build_slot_constraints(
     subgraph_constraints: &SubgraphConstraints,
     id_to_index: HashMap<&ChampionId, i32>
 ) -> Vec<EncodedFormula> {
+    log!("slot options {:?}", slot_options);
+
     let mut disjoint_subsets = Vec::<ChampionSubset>::new();
 
     let slot_options: Vec<HashSet<String>> = slot_options
@@ -103,6 +106,11 @@ fn build_slot_constraints(
 
         merge_into_disjoint_list(new_set, &mut disjoint_subsets);
     }
+    log!(
+        "{} disjoint sets {:?}",
+        disjoint_subsets.len(),
+        disjoint_subsets
+    );
 
     let mut constraints = Vec::<EncodedFormula>::new();
     let f = &subgraph_constraints.factory;
@@ -151,7 +159,7 @@ fn build_slot_constraints(
     //   x_0        =>  x_other in { S_other - x_0 }
     //   x_0, x_1   =>  x_other in { S_other - x_0 - x_1 }
     //   ...
-    //   x_0, ..., x_k => x_other in (S_other - x_0 - ... x_k)
+    //   x_0, ..., x_k-1 => x_other in (S_other - x_0 - ... x_k-1)
     // for every combination of (x_0, ..., x_k) in the common set
     // where
     //   S_other = (S_0 union S_1 union S_2 ...)
@@ -163,8 +171,10 @@ fn build_slot_constraints(
         }
 
         let combinations = find_all_products(
-            set.champions,
-            n_parents
+            &set.champions,
+            n_parents.min(
+                (subgraph_constraints.subgraph_size as usize) - 1
+            )
         );
 
         let mut union_of_parents = HashSet::new();
@@ -173,6 +183,13 @@ fn build_slot_constraints(
             union_of_parents.extend(parent);
         }
 
+        log!(
+            "appending {} dedupe constraints involving {} champions from {} sets: {:?}",
+            combinations.len(),
+            set.champions.len(),
+            n_parents,
+            set.champions
+        );
         for lhs in combinations.iter() {
             let mut other_vars = union_of_parents.clone();
             for var in lhs.0.iter() {
@@ -191,9 +208,9 @@ fn build_slot_constraints(
                 &id_to_index
             );
 
-            constraints.push(
-                f.implication(f.and(&lhs_vars), f.or(&rhs_vars))
-            );
+            let c = f.implication(f.and(&lhs_vars), f.or(&rhs_vars));
+            // log!("{:?}", c.to_string(f));
+            constraints.push(c);
         }
     }
 
@@ -229,7 +246,7 @@ fn champion_ids_to_vars(
  *   }
  */
 fn find_all_products(
-    options: HashSet<String>,
+    options: &HashSet<String>,
     length: usize
 ) -> HashSet<HashStringSet> {
     // Init with the options mapped to sets
@@ -323,14 +340,19 @@ fn product(
  *   [
  *      { 3, 4 }      ->   parents: A
  *      { 2, 5, 7 }   ->   parents: A, B
- *       { 1 },        ->   parents: A, C
- *       { 6, 8 },     ->   parents: C
+ *      { 1 },        ->   parents: A, C
+ *      { 6, 8 },     ->   parents: C
  *   ]
  */
 fn merge_into_disjoint_list(
     mut new_set: ChampionSubset,
     disjoint_subsets: &mut Vec<ChampionSubset>
 ) {
+    if disjoint_subsets.len() == 0 {
+        disjoint_subsets.push(new_set);
+        return;
+    }
+
     let mut to_append = Vec::<ChampionSubset>::new();
 
     for existing_subset in disjoint_subsets.iter_mut() {
@@ -365,4 +387,10 @@ fn merge_into_disjoint_list(
     }
 
     disjoint_subsets.append(&mut to_append);
+
+    if new_set.champions.len() > 0 {
+        disjoint_subsets.push(new_set);
+    }
+
+    disjoint_subsets.retain(|s| s.champions.len() > 0);
 }
