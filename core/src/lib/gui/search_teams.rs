@@ -74,3 +74,16 @@ pub fn search_teams(options: JsValue) -> JsValue {
 
     to_value(&results).unwrap()
 }
+
+// #[wasm_bindgen(typescript_custom_section)]
+// const TYPES: &'static str = r#"
+
+// interface SearchOptions {
+//     team_size: number
+//     champions?: ChampionFilter[]
+//     debug?: boolean
+// }
+
+// interface SearchTeams
+
+// "#;
