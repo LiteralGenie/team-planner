@@ -16,9 +16,9 @@ pub struct ChampionFilter {
 }
 
 #[wasm_bindgen]
-pub fn search_champions(filter: JsValue) -> JsValue {
+pub fn search_champions(filter: IChampionFilter) -> JsValue {
     let filter: ChampionFilter = serde_wasm_bindgen
-        ::from_value(filter)
+        ::from_value(filter.into())
         .unwrap_throw();
 
     let champions = filter_champions(filter);
@@ -82,4 +82,24 @@ pub fn filter_champions(filter: ChampionFilter) -> Vec<ChampionId> {
         .iter()
         .map(|c| c.name.clone())
         .collect()
+}
+
+#[wasm_bindgen(typescript_custom_section)]
+const TYPES: &'static str =
+    r#"
+
+interface IChampionFilter {
+    team_size: number
+    champions?: ChampionFilter[]
+    debug?: boolean
+}
+
+type SearchTeams = (options: IChampionFilter) => Team[]
+
+"#;
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(typescript_type = "IChampionFilter")]
+    pub type IChampionFilter;
 }
