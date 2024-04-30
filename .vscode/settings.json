@@ -8,5 +8,8 @@
     "[rust]": {
         "editor.inlayHints.enabled": "offUnlessPressed",
         "editor.defaultFormatter": "jinxdash.prettier-rust",
+    },
+    "[css]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
     }
 }
