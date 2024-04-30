@@ -1,21 +1,9 @@
 <script lang="ts">
-    import FilterGroup from '$lib/components/app/filter-group.svelte'
-    import Button from '$lib/components/ui/button/button.svelte'
-    import * as Card from '$lib/components/ui/card'
+    import Search from '$lib/components/app/search/search.svelte'
 </script>
 
 <main class="h-full w-full p-4 flex flex-col gap-4">
-    <Card.Root
-        class="w-full h-48 p-4 flex flex-col justify-center items-center gap-4"
-    >
-        <FilterGroup />
-
-        <FilterGroup />
-
-        <section class="w-full flex justify-end">
-            <Button class="w-24">Search -></Button>
-        </section>
-    </Card.Root>
+    <Search />
 
     <div class="h-full rounded-md overflow-y-auto">
         <div class="h-full w-full p-4 flex flex-col">
