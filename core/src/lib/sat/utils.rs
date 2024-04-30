@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::{ collections::HashSet, hash::{ Hash, Hasher } };
 
 use super::{ build_subgraph_contraints, SubgraphConstraints };
 
@@ -52,4 +52,32 @@ pub fn build_kite_graph(subgraph_size: i32) -> SubgraphConstraints {
             (3, 4),
         ])
     )
+}
+
+// https://stackoverflow.com/questions/36562419/hashset-as-key-for-other-hashset
+#[derive(Clone, Debug)]
+pub struct HashStringSet(pub HashSet<String>);
+
+impl PartialEq for HashStringSet {
+    fn eq(&self, other: &HashStringSet) -> bool {
+        self.0.is_subset(&other.0) && other.0.is_subset(&self.0)
+    }
+}
+
+impl Eq for HashStringSet {}
+
+impl Hash for HashStringSet {
+    fn hash<H>(&self, state: &mut H) where H: Hasher {
+        let mut a: Vec<&String> = self.0.iter().collect();
+        a.sort();
+        for s in a.iter() {
+            s.hash(state);
+        }
+    }
+}
+
+impl HashStringSet {
+    pub fn from_vec(xs: &Vec<String>) -> Self {
+        Self(HashSet::from_iter(xs.clone().into_iter()))
+    }
 }

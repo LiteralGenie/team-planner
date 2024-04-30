@@ -7,11 +7,17 @@ edition = "2021"
 
 [dependencies]
 logicng = "0.1.0-alpha.3"
+serde = "1.0.199"
+serde-wasm-bindgen = "0.6.5"
 wasm-bindgen = "0.2.92"
 
 [build-dependencies]
-wasm-bindgen-cli = "0.2.92"
+wasm-pack = "0.12.1"
 wasm-server-runner = "0.6.3"
+
+[lib]
+path = "src/main.rs"
+crate-type = ["cdylib"]
 
 # @fixme: Setting default runner doesn't work for some reason, need to use env vars
 #   CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUNNER=wasm-server-runner cargo run --target wasm32-unknown-unknown

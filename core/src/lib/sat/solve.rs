@@ -1,5 +1,5 @@
 use logicng::{
-    formulas::{ ToFormula, Variable },
+    formulas::Variable,
     solver::minisat::{ sat::{ mk_lit, MsLit, MsVar }, MiniSat },
 };
 
@@ -92,55 +92,26 @@ impl SubgraphSolver {
 
 #[cfg(test)]
 mod tests {
-    use std::{ collections::HashSet, hash::{ Hash, Hasher } };
+    use std::collections::HashSet;
 
     use crate::lib::sat::{
         build_ab_graph,
         build_kite_graph,
         build_square_graph,
-        build_subgraph_contraints,
-        SubgraphConstraints,
+        HashStringSet,
     };
 
     use super::{ SubgraphSolver, Solution };
 
-    // https://stackoverflow.com/questions/36562419/hashset-as-key-for-other-hashset
-    #[derive(Debug)]
-    pub struct HashedSolution(pub HashSet<String>);
-
-    impl PartialEq for HashedSolution {
-        fn eq(&self, other: &HashedSolution) -> bool {
-            self.0.is_subset(&other.0) && other.0.is_subset(&self.0)
-        }
-    }
-
-    impl Eq for HashedSolution {}
-
-    impl Hash for HashedSolution {
-        fn hash<H>(&self, state: &mut H) where H: Hasher {
-            let mut a: Vec<&String> = self.0.iter().collect();
-            a.sort();
-            for s in a.iter() {
-                s.hash(state);
-            }
-        }
-    }
-
-    impl HashedSolution {
-        pub fn from_vec(clause: &Solution) -> Self {
-            Self(HashSet::from_iter(clause.clone().into_iter()))
-        }
-    }
-
     pub fn vec_vec_to_hash_hash(
         cnf: Vec<Solution>
-    ) -> HashSet<HashedSolution> {
+    ) -> HashSet<HashStringSet> {
         let result = HashSet::from_iter(
             cnf
                 .clone()
                 .into_iter()
                 .map(|clause| {
-                    let hashed = HashedSolution::from_vec(&clause);
+                    let hashed = HashStringSet::from_vec(&clause);
 
                     // No dupes should be removed, each variable should appear at most once
                     assert_eq!(

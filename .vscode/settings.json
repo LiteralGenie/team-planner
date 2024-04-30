@@ -7,6 +7,6 @@
 
     "[rust]": {
         "editor.inlayHints.enabled": "offUnlessPressed",
-        "editor.defaultFormatter": "jinxdash.prettier-rust"
+        "editor.defaultFormatter": "jinxdash.prettier-rust",
     }
 }
