@@ -89,9 +89,11 @@ const TYPES: &'static str =
     r#"
 
 interface IChampionFilter {
-    team_size: number
-    champions?: IChampionFilter[]
-    debug?: boolean
+    ids?: string[]
+    cost?: number[]
+    range?: number[]
+    trait_ids?: string[]
+    uses_ap?: boolean
 }
 
 type SearchTeams = (options: IChampionFilter) => Team[]

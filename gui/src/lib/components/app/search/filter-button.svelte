@@ -5,6 +5,7 @@
         class="hex inner-hex-color h-full w-full flex justify-center items-center"
     >
         <button
+            on:click
             type="button"
             class="h-full w-full text-5xl font-extralight"
         >

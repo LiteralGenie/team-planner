@@ -47,6 +47,29 @@
         --input: 240 3.7% 15.9%;
         --ring: 346.8 77.2% 49.8%;
     }
+
+    /* For ide previews, not actually used */
+    .dark {
+        --zbackground: hsl(20 14.3% 4.1%);
+        --zforeground: hsl(0 0% 95%);
+        --zcard: hsl(24 9.8% 10%);
+        --zcard-foreground: hsl(0 0% 95%);
+        --zpopover: hsl(0 0% 9%);
+        --zpopover-foreground: hsl(0 0% 95%);
+        --zprimary: hsl(346.8 77.2% 49.8%);
+        --zprimary-foreground: hsl(355.7 100% 97.3%);
+        --zsecondary: hsl(240 3.7% 15.9%);
+        --zsecondary-foreground: hsl(0 0% 98%);
+        --zmuted: hsl(0 0% 15%);
+        --zmuted-foreground: hsl(240 5% 64.9%);
+        --zaccent: hsl(12 6.5% 15.1%);
+        --zaccent-foreground: hsl(0 0% 98%);
+        --zdestructive: hsl(0 62.8% 30.6%);
+        --zdestructive-foreground: hsl(0 85.7% 97.3%);
+        --zborder: hsl(240 3.7% 15.9%);
+        --zinput: hsl(240 3.7% 15.9%);
+        --zring: hsl(346.8 77.2% 49.8%);
+    }
 }
 
 @layer base {
@@ -78,4 +101,20 @@ body {
     background-color: hsl(
         var(--muted) / var(--tw-bg-opacity)
     ) !important;
+}
+
+/* 
+ * Svelte doesnt understand @starting-style so this transition logic needs to be global
+ * https://github.com/sveltejs/svelte/issues/9267
+*/
+dialog::backdrop {
+    transition: background-color 0.3s;
+}
+dialog[open]::backdrop {
+    background-color: hsl(var(--background) / 75%);
+}
+@starting-style {
+    dialog[open]::backdrop {
+        background-color: hsl(var(--background) / 0%);
+    }
 }

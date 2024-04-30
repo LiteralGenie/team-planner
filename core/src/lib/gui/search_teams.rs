@@ -81,7 +81,7 @@ const TYPES: &'static str =
 
 interface ISearchTeamsOptions {
     team_size: number
-    champions?: ChampionFilter[]
+    champions?: IChampionFilter[]
     debug?: boolean
 }
 
