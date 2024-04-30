@@ -90,7 +90,7 @@ const TYPES: &'static str =
 
 interface IChampionFilter {
     team_size: number
-    champions?: ChampionFilter[]
+    champions?: IChampionFilter[]
     debug?: boolean
 }
 
