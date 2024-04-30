@@ -1,4 +1,26 @@
-<script lang="ts"></script>
+<script lang="ts">
+    import PlusIcon from '$lib/icons/plus-icon.svelte'
+    import UserIcon from '$lib/icons/user-icon.svelte'
+    import type { ComponentType } from 'svelte'
+
+    export let variant: 'inactive' | 'active' | 'champion' =
+        'inactive'
+
+    let icon: ComponentType | string
+    $: {
+        switch (variant) {
+            case 'inactive':
+                icon = PlusIcon
+                break
+            case 'active':
+                icon = UserIcon
+                break
+            case 'champion':
+                icon = '@TODO'
+                break
+        }
+    }
+</script>
 
 <div class="hex outer-hex-color h-24 w-24 p-1">
     <div
@@ -7,9 +29,13 @@
         <button
             on:click
             type="button"
-            class="h-full w-full text-5xl font-extralight"
+            class="h-full w-full text-5xl font-extralight flex justify-center items-center"
         >
-            +
+            {#if typeof icon === 'string'}
+                {icon}
+            {:else}
+                <svelte:component this={icon} class="h-12 w-12" />
+            {/if}
         </button>
     </div>
 </div>
