@@ -1,3 +1,8 @@
+import { isArray, isObject } from 'radash'
+import { FormControl } from './form-control'
+import { FormControlArray } from './form-control-array'
+import { FormControlGroup } from './form-control-group'
+
 export interface FormInput {
     value: string
     addEventListener: (
@@ -49,3 +54,20 @@ export const BoolParser = {
 }
 
 export type ValueOf<T> = T[keyof T]
+
+export function createControl<T>(
+    initValue: T,
+    // @fixme: any
+    parser: any,
+    onChange: (val: T) => void
+): ControlLike<T> {
+    if (isArray(initValue)) {
+        // @ts-ignore
+        return new FormControlArray(onChange, parser, initValue)
+    } else if (isObject(initValue)) {
+        // @ts-ignore
+        return new FormControlGroup(onChange, parser, initValue)
+    } else {
+        return new FormControl(onChange, parser)
+    }
+}

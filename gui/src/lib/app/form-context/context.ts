@@ -1,16 +1,13 @@
-import { clone, isArray, isObject, range } from 'radash'
+import { clone, objectify, range } from 'radash'
 import { getContext, setContext } from 'svelte'
 import { writable, type Readable } from 'svelte/store'
-import { FormControl } from './form-control'
-import { FormControlArray } from './form-control-array'
-import { FormControlGroup } from './form-control-group'
 import {
     BoolParser,
     IntParser,
     StringParser,
+    createControl,
     type ControlLike,
     type FormParsers,
-    type InputParser,
     type ValueOf
 } from './utils'
 
@@ -114,54 +111,20 @@ function getDefaultControls(
         value: ValueOf<FilterForm>
     ) => void
 ): FilterFormControls {
-    return Object.fromEntries(
-        Object.entries(DEFAULT_FILTER_FORM).map(([k, v]) => {
+    return objectify(
+        Object.entries(DEFAULT_FILTER_FORM) as any,
+        // These constants for the default and parsers
+        // should have already been typechecked at definition
+        // @ts-ignore
+        ([k, v]) => {
             let key = k as keyof FilterForm
+            const parser = FILTER_FORM_PARSERS[key]
 
-            if (isArray(v)) {
-                const parser = FILTER_FORM_PARSERS[
-                    key
-                ] as InputParser<any>
-
-                return [
-                    key,
-                    new FormControlArray(
-                        (vals) => onChange(key, vals),
-                        parser,
-                        v
-                    )
-                ]
-            }
-            if (isObject(v)) {
-                const parser = FILTER_FORM_PARSERS[key] as Record<
-                    string,
-                    InputParser<any>
-                >
-
-                return [
-                    key,
-                    new FormControlGroup(
-                        (val) => onChange(key, val),
-                        // @fixme: ts is inferring never here
-                        // @ts-ignore
-                        parser as any,
-                        v
-                    )
-                ]
-            } else {
-                const parser = FILTER_FORM_PARSERS[
-                    key
-                ] as InputParser<any>
-
-                return [
-                    key,
-                    new FormControl(
-                        (val) => onChange(key, val),
-                        parser
-                    )
-                ]
-            }
-        })
+            return [
+                key,
+                createControl(v, parser, (val) => onChange(key, val))
+            ] satisfies [keyof FilterForm, ControlLike<any>]
+        }
     )
 }
 
@@ -187,7 +150,6 @@ export const DEFAULT_FILTER_FORM = {
 export const FILTER_FORM_PARSERS = {
     teamSize: IntParser,
     slotsByAttribute: {
-        // @todo: enum parsers
         cost: BoolParser,
         range: StringParser as any,
         traitIdsExcluded: StringParser,

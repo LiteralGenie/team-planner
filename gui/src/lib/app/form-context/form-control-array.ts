@@ -1,6 +1,9 @@
 import { range, sort, zip } from 'radash'
-import { FormControl } from './form-control'
-import type { ControlLike, InputParser } from './utils'
+import {
+    createControl,
+    type ControlLike,
+    type InputParser
+} from './utils'
 
 type OnChangeHandler<T> = (vals: T[]) => void
 type Id = string
@@ -21,8 +24,7 @@ export class FormControlArray<T> implements ControlLike<T[]> {
         initValues: T[]
     ) {
         for (let value of initValues) {
-            let id = this._add().id
-            this.setSingleValue(id, value)
+            this._add(value)
         }
     }
 
@@ -30,11 +32,13 @@ export class FormControlArray<T> implements ControlLike<T[]> {
         // Make the item count match new number of vals
         const diff = vals.length - this.controls.length
         if (diff > 0) {
-            for (let _ of range(diff - 1)) {
-                this._add()
+            for (let idx of range(
+                this.controls.length,
+                vals.length - 1
+            )) {
+                this._add(vals[idx])
             }
         } else if (diff < 0) {
-            const items = this.itemsSorted
             const toRemove = this.itemsSorted.slice(diff)
 
             for (let it of toRemove) {
@@ -49,8 +53,8 @@ export class FormControlArray<T> implements ControlLike<T[]> {
         }
     }
 
-    public add() {
-        this._add()
+    public add(initValue: T) {
+        this._add(initValue)
     }
 
     public destroy() {
@@ -67,20 +71,19 @@ export class FormControlArray<T> implements ControlLike<T[]> {
         return sort(Object.values(this.items), (it) => it.index)
     }
 
-    private _add(): ArrayItem<T> {
+    private _add(initValue: T): ArrayItem<T> {
         let n = this.controls.length
         let uuid = crypto.randomUUID()
 
-        let control = new FormControl(
-            (val) => this.setAndPublishValue(uuid, val),
-            this.parser
+        let control = createControl(initValue, this.parser, (val) =>
+            this.setAndPublishValue(uuid, val)
         )
 
         this.items[uuid] = {
             id: uuid,
             control,
             index: n,
-            value: this.parser.fromString('')
+            value: initValue
         }
 
         return this.items[uuid]
