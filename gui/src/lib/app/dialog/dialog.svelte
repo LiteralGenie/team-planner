@@ -3,7 +3,6 @@
     import * as Card from '$lib/components/ui/card'
     import XIcon from '$lib/icons/x-icon.svelte'
     import { createEventDispatcher } from 'svelte'
-    import { get } from 'svelte/store'
     import { getFilterFormContext } from '../form-context/context'
     import CostInputGroup from './cost-input-group.svelte'
     import DamageTypeInput from './damage-type-input.svelte'
@@ -21,7 +20,6 @@
 
     const { form, controls } = getFilterFormContext()
     $: slot = controls.slots.controls[slotIndex]
-    $: console.log('form', get(form))
 
     function handleBackdropClick(ev: MouseEvent) {
         // This will only trigger on backdrop clicks, not dialog content clicks

@@ -1,7 +1,8 @@
 result generator
 deterministic results
 random search on page load
-searches are url-based
+serialize form to / from url
+    too much to be human friendly so just lzma it or smth
 
 filter
     preview button

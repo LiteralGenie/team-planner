@@ -8,6 +8,7 @@
     let showDialog = false
 
     const { form } = getFilterFormContext()
+    $: console.log('form', $form)
 
     function handleDialogOpen() {
         showDialog = true
@@ -19,10 +20,6 @@
 </script>
 
 <div>
-    <pre>
-        {JSON.stringify($form, null, 2)}
-    </pre>
-
     <Dialog
         open={showDialog}
         slotIndex={1}

@@ -1,8 +1,7 @@
 <script lang="ts">
     import { type FilterForm } from '../form-context/context'
     import type { FormControlWrapper } from '../form-context/types'
-    import 
-ort CostInput from './cost-input.svelte'
+    import CostInput from './cost-input.svelte'
 
     export let slot: FormControlWrapper<FilterForm['slots'][number]>
 

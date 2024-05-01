@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { setFilterFormContext } from '$lib/app/form-context/context'
     import { DEFAULT_FILTER_FORM } from '$lib/app/form-context/defaults'
     import Search from '$lib/app/search/search.svelte'
 

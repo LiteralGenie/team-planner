@@ -9,7 +9,6 @@
     $: id = `tier-${tier}`
 
     function handleChange() {
-        console.log('setting tier', tier, 'to', inputEl.checked)
         control.onChange(inputEl.checked)
     }
 </script>

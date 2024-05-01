@@ -25,6 +25,7 @@ export interface InputParser<T> {
 }
 
 export type Primitive = number | string | boolean | Boolean
+
 /**
  * FormParsers<Primitive> = InputParser<Primitive>
  * FormParsers<Primitive[]> = InputParser<Primitive>
