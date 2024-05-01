@@ -1,23 +1,22 @@
 <script lang="ts">
     import PencilIcon from '$lib/icons/pencil-icon.svelte'
     import PlusIcon from '$lib/icons/plus-icon.svelte'
-    import UserIcon from '$lib/icons/user-icon.svelte'
+    import UserGroupIcon from '$lib/icons/user-group-icon.svelte'
     import { objectify } from 'radash'
-    import type { ComponentType } from 'svelte'
 
     export let variant: 'inactive' | 'active' | string = 'inactive'
 
-    let icon: ComponentType | string
+    let championId: string | null = null
     $: {
         switch (variant) {
             case 'inactive':
-                icon = PlusIcon
+                championId = null
                 break
             case 'active':
-                icon = UserIcon
+                championId = null
                 break
             default:
-                icon = variant
+                championId = variant
         }
     }
 
@@ -45,18 +44,20 @@
             type="button"
             class="h-full w-full relative text-5xl font-extralight flex justify-center items-center"
         >
-            {#if typeof icon === 'string'}
+            {#if championId}
                 <div
                     class="champion-image-hover-overlay absolute h-full w-full"
                 ></div>
 
-                <img src={getChampionIcon(variant)} />
+                <img src={getChampionIcon(championId)} />
 
                 <div class="pencil-icon absolute">
                     <PencilIcon class="h-8 w-8 font-bold" />
                 </div>
+            {:else if variant === 'active'}
+                <UserGroupIcon class="h-11 w-11" />
             {:else}
-                <svelte:component this={icon} class="h-12 w-12" />
+                <PlusIcon class="h-12 w-12" />
             {/if}
         </button>
     </div>
