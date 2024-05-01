@@ -2,6 +2,7 @@ import { range, sort, zip } from 'radash'
 import {
     createControl,
     type ControlLike,
+    type FormControlsContainer,
     type InputParser
 } from './utils'
 
@@ -10,7 +11,7 @@ type Id = string
 
 interface ArrayItem<T> {
     id: Id
-    control: ControlLike<T>
+    control: FormControlsContainer<T>
     index: number
     value: T
 }
@@ -63,8 +64,12 @@ export class FormControlArray<T> implements ControlLike<T[]> {
         }
     }
 
-    public get controls(): ControlLike<T>[] {
+    public get controls(): FormControlsContainer<T>[] {
         return this.itemsSorted.map((it) => it.control)
+    }
+
+    public get values(): T[] {
+        return this.itemsSorted.map((it) => it.value)
     }
 
     private get itemsSorted(): ArrayItem<T>[] {
@@ -103,6 +108,7 @@ export class FormControlArray<T> implements ControlLike<T[]> {
 
     private setSingleValue(id: Id, val: T) {
         let item = this.items[id]
+        // @ts-ignore
         item.control.setValue(val)
         item.value = val
     }

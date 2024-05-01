@@ -1,38 +1,41 @@
-import { FormControl } from './form-control'
-import type { ControlLike, InputParser, ValueOf } from './utils'
+import {
+    createControl,
+    type ControlLike,
+    type FormControlsContainer,
+    type FormParsers,
+    type ValueOf
+} from './utils'
 
-// @todo: FormControlGroups can't be nested or composed with FormControlArrays but it seems possible
-type GroupValue = Record<string, string | number>
+type OnChangeHandler<T> = (val: T) => void
 
-type ControlGroup<T> = { [K in keyof T]: FormControl<T[K]> }
+type IControls<T> = {
+    [K in keyof T]: FormControlsContainer<T[K]>
+}
 
-type ControlParsers<T> = { [K in keyof T]: InputParser<T[K]> }
-
-type OnChangeHandler<T> = (vals: T) => void
-
-export class FormControlGroup<T extends GroupValue>
+export class FormControlGroup<T extends Object>
     implements ControlLike<T>
 {
-    controls: ControlGroup<T>
+    controls: IControls<T>
 
     constructor(
         public onChange: OnChangeHandler<T>,
-        public parsers: ControlParsers<T>,
+        public parsers: FormParsers<T>,
         public value: T
     ) {
-        // Init controls based on type of value
         // @ts-ignore
-        const controls: ControlGroup<T> = {}
+        const controls: IControls<T> = {}
+
         for (let [k, v] of Object.entries(value)) {
             let key = k as keyof T
+
+            // @fixme: ignores
+            // @ts-ignore
             const parser = parsers[key]
 
-            if (typeof v === 'string') {
-                controls[key] = new FormControl(
-                    (update) => this.setAndPublishValue(k, update),
-                    parser
-                )
-            }
+            // @ts-ignore
+            controls[key] = createControl(v, parser, (update) =>
+                this.setAndPublishValue(key, update)
+            )
         }
         this.controls = controls
     }
@@ -41,6 +44,8 @@ export class FormControlGroup<T extends GroupValue>
         for (let [key, val] of Object.entries(x)) {
             let k = key as keyof T
             let v = val as ValueOf<T>
+            // @fixme: ignores
+            // @ts-ignore
             this.controls[k].setValue(v)
         }
 

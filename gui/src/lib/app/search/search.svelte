@@ -2,9 +2,12 @@
     import Button from '../../components/ui/button/button.svelte'
     import * as Card from '../../components/ui/card'
     import Dialog from '../dialog/dialog.svelte'
+    import { getFilterFormContext } from '../form-context/context'
     import FilterButton from './filter-button.svelte'
 
     let showDialog = false
+
+    const { form } = getFilterFormContext()
 
     function handleDialogOpen() {
         showDialog = true
@@ -16,7 +19,15 @@
 </script>
 
 <div>
-    <Dialog open={showDialog} on:close={handleDialogClose} />
+    <pre>
+        {JSON.stringify($form, null, 2)}
+    </pre>
+
+    <Dialog
+        open={showDialog}
+        slotIndex={1}
+        on:close={handleDialogClose}
+    />
 
     <Card.Root
         class="w-full h-48 p-8 flex flex-col justify-center gap-4"

@@ -26,6 +26,8 @@ export class FormControl<T> {
         this.subSink.push(() =>
             inp.removeEventListener('change', onChange)
         )
+
+        // @todo: handle element unmount
     }
 
     publishValue(val: string, ignore?: FormInput) {

@@ -6,7 +6,7 @@ import {
     IntParser,
     StringParser,
     createControl,
-    type ControlLike,
+    type FormControlsContainer,
     type FormParsers,
     type ValueOf
 } from './utils'
@@ -38,10 +38,19 @@ export interface AttributeFilter {
 
 export type IdFilter = string[]
 
+export interface SlotFilter {
+    useAttributes: boolean
+    byAttribute: AttributeFilter
+    byId: IdFilter
+}
+
 export interface FilterForm {
     teamSize: number
-    slotsByAttribute: AttributeFilter[]
-    slotsById: IdFilter[]
+    slots: SlotFilter[]
+}
+
+export type FilterFormControls = {
+    [K in keyof FilterForm]: FormControlsContainer<FilterForm[K]>
 }
 
 export type FilterFormValue = {
@@ -53,20 +62,12 @@ export type FilterFormValue = {
     destroy: () => void
 }
 
-export type FilterFormControls = Record<
-    keyof FilterForm,
-    ControlLike<ValueOf<FilterForm>>
->
-
 const KEY = 'filter-form'
 
 export function setFilterFormContext(initValue: FilterForm) {
     const controls = getDefaultControls(onChange)
-
-    // Re-init form on client-side navigation
     const form = writable(clone(initValue))
 
-    // Create context
     const value = {
         form,
         formInitial: initValue,
@@ -94,6 +95,7 @@ export function setFilterFormContext(initValue: FilterForm) {
         for (let key in DEFAULT_FILTER_FORM) {
             const k = key as keyof FilterForm
             const control = controls[k]
+            // @ts-ignore: @todo why ts mad
             control.setValue(update[k])
         }
     }
@@ -111,19 +113,19 @@ function getDefaultControls(
         value: ValueOf<FilterForm>
     ) => void
 ): FilterFormControls {
+    // Constants for the default and parsers
+    // should have already been typechecked at definition
+    // and TS cant really infer the key-value relationship here so need to sprinkle ignores
+    // @ts-ignore
     return objectify(
-        Object.entries(DEFAULT_FILTER_FORM) as any,
-        // These constants for the default and parsers
-        // should have already been typechecked at definition
-        // @ts-ignore
+        Object.entries(DEFAULT_FILTER_FORM),
+        ([k, _]) => k as keyof FilterForm,
         ([k, v]) => {
             let key = k as keyof FilterForm
             const parser = FILTER_FORM_PARSERS[key]
-
-            return [
-                key,
-                createControl(v, parser, (val) => onChange(key, val))
-            ] satisfies [keyof FilterForm, ControlLike<any>]
+            return createControl(v, parser, (val) =>
+                onChange(key, val)
+            )
         }
     )
 }
@@ -132,28 +134,38 @@ export function getFilterFormContext() {
     return getContext(KEY) as FilterFormValue
 }
 
-const DEFAULT_ATTRIBUTE_SLOT = {
+const DEFAULT_ATTRIBUTE_FILTER = {
     cost: [true, true, true, true, true],
     range: [true, true, true],
     traitIdsExcluded: [],
     damageType: [true, true]
 } satisfies AttributeFilter
 
+const DEFAULT_SLOT_FILTER = {
+    useAttributes: true,
+    byAttribute: DEFAULT_ATTRIBUTE_FILTER,
+    byId: []
+} satisfies SlotFilter
+
+const DEFAULT_TEAM_SIZE = 7
+
 export const DEFAULT_FILTER_FORM = {
-    teamSize: 7,
-    slotsByAttribute: [...range(7)].map((_) =>
-        clone(DEFAULT_ATTRIBUTE_SLOT)
-    ),
-    slotsById: [[], [], [], [], [], [], []]
+    teamSize: DEFAULT_TEAM_SIZE,
+    slots: [...range(DEFAULT_TEAM_SIZE)].map((_) =>
+        clone(DEFAULT_SLOT_FILTER)
+    )
 } as const satisfies FilterForm
 
 export const FILTER_FORM_PARSERS = {
     teamSize: IntParser,
-    slotsByAttribute: {
-        cost: BoolParser,
-        range: StringParser as any,
-        traitIdsExcluded: StringParser,
-        damageType: StringParser as any
-    },
-    slotsById: StringParser
-} as const satisfies FormParsers<FilterForm>
+    slots: {
+        useAttributes: BoolParser,
+        byAttribute: {
+            cost: BoolParser,
+            range: BoolParser,
+            traitIdsExcluded: StringParser,
+            damageType: BoolParser
+        },
+        byId: StringParser
+    }
+} satisfies FormParsers<FilterForm>

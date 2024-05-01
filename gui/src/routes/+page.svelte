@@ -1,5 +1,11 @@
 <script lang="ts">
+    import {
+        DEFAULT_FILTER_FORM,
+        setFilterFormContext
+    } from '$lib/app/form-context/context'
     import Search from '$lib/app/search/search.svelte'
+
+    setFilterFormContext(DEFAULT_FILTER_FORM)
 </script>
 
 <main class="h-full w-full p-4 flex flex-col gap-4">

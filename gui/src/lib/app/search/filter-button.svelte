@@ -34,7 +34,6 @@
     )
 
     function getChampionIcon(id: string) {
-        console.log(champion_icons)
         return champion_icons[id] as string
     }
 </script>
