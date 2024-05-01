@@ -4,32 +4,30 @@ from typing import TypeAlias, TypedDict
 from img2vec_pytorch import Img2Vec
 from PIL import Image
 from sklearn.metrics.pairwise import cosine_similarity
-
-IImage: TypeAlias = Image.Image
+from utils import (
+    CENTERED_BANNER_DIR,
+    GUI_ASSETS_DIR,
+    GUI_BANNER_DIR,
+    GUI_SPRITE_DIR,
+    IImage,
+    read_image,
+    write_image,
+)
 
 # pip install img2vec_pytorch pillow
 
-ROOT_DIR = Path(__file__).parent.parent
-GUI_ASSETS_DIR = ROOT_DIR / "gui" / "src" / "lib" / "assets"
-
-OUTPUT_DIR = GUI_ASSETS_DIR / "tft" / "icons"
+OUTPUT_DIR = GUI_BANNER_DIR
 if not OUTPUT_DIR.exists():
     print("Creating output directory", OUTPUT_DIR)
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-DEBUG_DIR = GUI_ASSETS_DIR / "tft" / "debug"
+DEBUG_DIR = GUI_ASSETS_DIR / "tft" / "banner_debug"
 if not DEBUG_DIR.exists():
     DEBUG_DIR.mkdir(exist_ok=True, parents=True)
 if DEBUG_DIR.exists():
     for fp in DEBUG_DIR.glob("*"):
         fp.unlink()
 
-# https://ddragon.leagueoflegends.com/cdn/dragontail-14.8.1.tgz
-DRAGONTAIL_ASSETS_DIR = GUI_ASSETS_DIR / "dragontail-14.8.1"
-# BIGGER_IMAGE_DIR = DRAGONTAIL_ASSETS_DIR / "img" / "champion" / "tiles"
-BIGGER_IMAGE_DIR = DRAGONTAIL_ASSETS_DIR / "img" / "champion" / "centered"
-
-SPRITE_DIR = GUI_ASSETS_DIR / "tft" / "sprites"
 
 ###
 
@@ -42,14 +40,6 @@ class BiggerImage(TypedDict):
 class ScoredCandidate(TypedDict):
     image: BiggerImage
     score: float
-
-
-def read_image(fp: str | Path) -> IImage:
-    return Image.open(fp)
-
-
-def write_image(image: IImage, fp: str | Path):
-    image.save(fp)
 
 
 img2vec = Img2Vec(cuda=False)
@@ -81,7 +71,7 @@ def find_splashes_for_champion(id_champion: str) -> list[BiggerImage]:
     id_champion = id_champion.lower().replace("'", "")
 
     matches = []
-    for fp in BIGGER_IMAGE_DIR.glob("*"):
+    for fp in CENTERED_BANNER_DIR.glob("*"):
         name = str(fp.name).lower()
         if name.startswith(id_champion):
             matches.append(fp)
@@ -109,7 +99,7 @@ def preprocess_candidate(image: IImage) -> IImage:
 
 
 def main():
-    for fp_sprite in SPRITE_DIR.glob("*"):
+    for fp_sprite in GUI_SPRITE_DIR.glob("*"):
         fp_out = OUTPUT_DIR / fp_sprite.name
         if fp_out.exists() and False:
             print(f"Skipping {fp_sprite.stem}. Icon already exists")
@@ -118,7 +108,7 @@ def main():
         id_champion = fp_sprite.stem
         splash_screens = find_splashes_for_champion(id_champion)
         if not splash_screens:
-            print(f"No splashes for {id_champion} found in {BIGGER_IMAGE_DIR}")
+            print(f"No splashes for {id_champion} found in {CENTERED_BANNER_DIR}")
             continue
 
         sprite = read_image(fp_sprite)

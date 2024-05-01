@@ -1,26 +1,29 @@
 import json
 from pathlib import Path
 
-import cv2
+from utils import (
+    CHAMPION_DATA_FILE,
+    CHAMPION_SPRITE_DIR,
+    GUI_SPRITE_DIR,
+    read_image,
+    write_image,
+)
 
-# pip install opencv-python
+# pip install pillow
 
-ROOT_DIR = Path(__file__).parent.parent
-GUI_ASSETS_DIR = ROOT_DIR / "gui" / "src" / "lib" / "assets"
 
-OUTPUT_DIR = GUI_ASSETS_DIR / "tft" / "sprites"
+OUTPUT_DIR = GUI_SPRITE_DIR
 if not OUTPUT_DIR.exists():
     print("Creating output directory", OUTPUT_DIR)
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# https://ddragon.leagueoflegends.com/cdn/dragontail-14.8.1.tgz
-DRAGONTAIL_ASSETS_DIR = GUI_ASSETS_DIR / "dragontail-14.8.1"
-CHAMPION_SPRITE_DIR = DRAGONTAIL_ASSETS_DIR / "14.8.1" / "img" / "sprite"
-CHAMPION_DATA_FILE = (
-    DRAGONTAIL_ASSETS_DIR / "14.8.1" / "data" / "en_US" / "tft-champion.json"
-)
 
 ###
+
+
+def clean_name(name: str) -> str:
+    return name.replace(" ", "")
+
 
 with open(CHAMPION_DATA_FILE) as file:
     champion_data = json.load(file)
@@ -30,9 +33,10 @@ for champion in champion_data["data"].values():
         continue
 
     d = champion["image"]
+    name = clean_name(champion["name"])
 
     fp_image: Path = CHAMPION_SPRITE_DIR / d["sprite"]
-    fp_out = OUTPUT_DIR / (champion["name"] + fp_image.suffix)
+    fp_out = OUTPUT_DIR / (name + ".png")
     print(f"Cropping {fp_image} to {fp_out}")
 
     left = d["x"]
@@ -40,6 +44,6 @@ for champion in champion_data["data"].values():
     right = d["x"] + d["w"]
     bot = d["y"] + d["h"]
 
-    sprite_sheet = cv2.imread(str(fp_image))
-    cropped = sprite_sheet[top:bot, left:right]
-    cv2.imwrite(str(fp_out), cropped)
+    sprite_sheet = read_image(fp_image)
+    cropped = sprite_sheet.crop((left, top, right, bot))
+    write_image(cropped, fp_out)
