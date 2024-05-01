@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Search from '$lib/components/app/search/search.svelte'
+    import Search from '$lib/app/search/search.svelte'
 </script>
 
 <main class="h-full w-full p-4 flex flex-col gap-4">

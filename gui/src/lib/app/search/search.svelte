@@ -1,6 +1,6 @@
 <script lang="ts">
-    import Button from '../../ui/button/button.svelte'
-    import * as Card from '../../ui/card'
+    import Button from '../../components/ui/button/button.svelte'
+    import * as Card from '../../components/ui/card'
     import Dialog from '../dialog/dialog.svelte'
     import FilterButton from './filter-button.svelte'
 
