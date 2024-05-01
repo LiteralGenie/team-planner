@@ -2,7 +2,6 @@ import json
 from pathlib import Path
 
 import cv2
-from PIL import Image
 
 # pip install opencv-python
 
@@ -27,6 +26,9 @@ with open(CHAMPION_DATA_FILE) as file:
     champion_data = json.load(file)
 
 for champion in champion_data["data"].values():
+    if champion["id"].startswith("TFTTutorial_"):
+        continue
+
     d = champion["image"]
 
     fp_image: Path = CHAMPION_SPRITE_DIR / d["sprite"]
