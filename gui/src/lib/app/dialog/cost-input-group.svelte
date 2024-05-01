@@ -12,9 +12,9 @@
 <fieldset class="flex gap-4">
     <legend class="pb-2">Tier</legend>
 
-    <CostInput control={costArray.controls[0]} tier={0} />
     <CostInput control={costArray.controls[1]} tier={1} />
     <CostInput control={costArray.controls[2]} tier={2} />
     <CostInput control={costArray.controls[3]} tier={3} />
     <CostInput control={costArray.controls[4]} tier={4} />
+    <CostInput control={costArray.controls[5]} tier={5} />
 </fieldset>

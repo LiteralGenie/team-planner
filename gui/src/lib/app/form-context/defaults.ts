@@ -8,10 +8,23 @@ import { type FormParsers } from './types'
 import { BoolParser, IntParser, StringParser } from './utils'
 
 const DEFAULT_ATTRIBUTE_FILTER = {
-    cost: [true, true, true, true, true],
-    range: [true, true, true],
+    cost: {
+        1: true,
+        2: true,
+        3: true,
+        4: true,
+        5: true
+    },
+    range: {
+        close: true,
+        mid: true,
+        long: true
+    },
     traitIdsExcluded: [],
-    damageType: [true, true]
+    damageType: {
+        ad: true,
+        ap: true
+    }
 } satisfies AttributeFilter
 const DEFAULT_SLOT_FILTER = {
     useAttributes: true,
@@ -32,10 +45,23 @@ export const FILTER_FORM_PARSERS = {
     slots: {
         useAttributes: BoolParser,
         byAttribute: {
-            cost: BoolParser,
-            range: BoolParser,
+            cost: {
+                1: BoolParser,
+                2: BoolParser,
+                3: BoolParser,
+                4: BoolParser,
+                5: BoolParser
+            },
+            range: {
+                close: BoolParser,
+                mid: BoolParser,
+                long: BoolParser
+            },
             traitIdsExcluded: StringParser,
-            damageType: BoolParser
+            damageType: {
+                ad: BoolParser,
+                ap: BoolParser
+            }
         },
         byId: StringParser
     }

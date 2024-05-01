@@ -18,12 +18,23 @@ import { createControl, type ValueOf } from './utils'
 
 export interface AttributeFilter {
     /** 1,2,3,4,5 */
-    cost: [Boolean, Boolean, Boolean, Boolean, Boolean]
-    /** close, mid, far */
-    range: [Boolean, Boolean, Boolean]
+    cost: {
+        1: Boolean
+        2: Boolean
+        3: Boolean
+        4: Boolean
+        5: Boolean
+    }
+    range: {
+        close: Boolean
+        mid: Boolean
+        long: Boolean
+    }
     traitIdsExcluded: string[]
-    /** ad, ap */
-    damageType: [Boolean, Boolean]
+    damageType: {
+        ad: Boolean
+        ap: Boolean
+    }
 }
 
 export type IdFilter = string[]
