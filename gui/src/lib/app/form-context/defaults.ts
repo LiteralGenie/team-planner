@@ -1,4 +1,5 @@
-import { clone, range } from 'radash'
+import { deepCopy } from '$lib/utils/misc'
+import { range } from 'radash'
 import type {
     AttributeFilter,
     FilterForm,
@@ -26,17 +27,19 @@ const DEFAULT_ATTRIBUTE_FILTER = {
         ap: true
     }
 } satisfies AttributeFilter
+
 const DEFAULT_SLOT_FILTER = {
     useAttributes: true,
     byAttribute: DEFAULT_ATTRIBUTE_FILTER,
     byId: []
 } satisfies SlotFilter
+
 const DEFAULT_TEAM_SIZE = 7
 
 export const DEFAULT_FILTER_FORM = {
     teamSize: DEFAULT_TEAM_SIZE,
     slots: [...range(DEFAULT_TEAM_SIZE)].map((_) =>
-        clone(DEFAULT_SLOT_FILTER)
+        deepCopy(DEFAULT_SLOT_FILTER)
     )
 } as const satisfies FilterForm
 

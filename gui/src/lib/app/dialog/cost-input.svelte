@@ -22,6 +22,6 @@
         name={id}
         checked
     />
-    <!-- @TODO: COIN ICON -->
+    <!-- @todo: coin icon -->
     <label for={id}> {tier} cost </label>
 </div>

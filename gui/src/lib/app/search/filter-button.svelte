@@ -7,8 +7,6 @@
 
     export let variant: 'inactive' | 'active' | string = 'inactive'
 
-    variant = 'Azir'
-
     let icon: ComponentType | string
     $: {
         switch (variant) {
