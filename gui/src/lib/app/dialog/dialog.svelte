@@ -39,6 +39,7 @@
 <dialog
     bind:this={dialogEl}
     on:click={handleBackdropClick}
+    on:close
     class="h-full w-full max-h-[80vh] max-w-[80vw] bg-transparent"
 >
     <button
