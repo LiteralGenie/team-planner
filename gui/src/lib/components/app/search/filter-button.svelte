@@ -1,4 +1,5 @@
 <script lang="ts">
+    import PencilIcon from '$lib/icons/pencil-icon.svelte'
     import PlusIcon from '$lib/icons/plus-icon.svelte'
     import UserIcon from '$lib/icons/user-icon.svelte'
     import { objectify } from 'radash'
@@ -6,7 +7,7 @@
 
     export let variant: 'inactive' | 'active' | string = 'inactive'
 
-    variant = 'Ashe'
+    variant = 'Azir'
 
     let icon: ComponentType | string
     $: {
@@ -22,7 +23,7 @@
         }
     }
 
-    let icons = import.meta.glob('$lib/assets/tft/*.png', {
+    let icons = import.meta.glob('$lib/assets/tft/icons/*.png', {
         eager: true
     })
     let champion_icons = objectify(
@@ -45,10 +46,18 @@
         <button
             on:click
             type="button"
-            class="h-full w-full text-5xl font-extralight flex justify-center items-center"
+            class="h-full w-full relative text-5xl font-extralight flex justify-center items-center"
         >
             {#if typeof icon === 'string'}
-                <img src={getChampionIcon('Ashe')} />
+                <div
+                    class="champion-image-hover-overlay absolute h-full w-full"
+                ></div>
+
+                <img src={getChampionIcon(variant)} />
+
+                <div class="pencil-icon absolute">
+                    <PencilIcon class="h-8 w-8 font-bold" />
+                </div>
             {:else}
                 <svelte:component this={icon} class="h-12 w-12" />
             {/if}
@@ -64,10 +73,21 @@
     .inner-hex-color {
         background-color: hsl(var(--background) / 90%);
         color: hsl(var(--muted-foreground));
+    }
 
-        &:hover {
-            background-color: hsl(var(--background) / 40%);
-        }
+    .inner-hex-color:hover,
+    .champion-image-hover-overlay:hover {
+        background-color: hsl(var(--background) / 40%);
+    }
+
+    .pencil-icon {
+        z-index: 5;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .inner-hex-color:hover .pencil-icon {
+        visibility: visible;
     }
 
     .hex {
