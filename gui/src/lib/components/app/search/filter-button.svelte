@@ -75,17 +75,17 @@
         color: hsl(var(--muted-foreground));
     }
 
+    /* Show overlay on hover */
     .inner-hex-color:hover,
     .champion-image-hover-overlay:hover {
         background-color: hsl(var(--background) / 40%);
     }
 
+    /* Show pencil icon on hover */
     .pencil-icon {
-        z-index: 5;
         visibility: hidden;
         pointer-events: none;
     }
-
     .inner-hex-color:hover .pencil-icon {
         visibility: visible;
     }
