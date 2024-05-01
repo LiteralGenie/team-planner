@@ -1,15 +1,9 @@
-import { clone, objectify, range } from 'radash'
+import { clone, objectify } from 'radash'
 import { getContext, setContext } from 'svelte'
 import { writable, type Readable } from 'svelte/store'
-import {
-    BoolParser,
-    IntParser,
-    StringParser,
-    createControl,
-    type FormControlsContainer,
-    type FormParsers,
-    type ValueOf
-} from './utils'
+import { DEFAULT_FILTER_FORM, FILTER_FORM_PARSERS } from './defaults'
+import { type FormControlWrapper } from './types'
+import { createControl, type ValueOf } from './utils'
 
 /**
  * This context does a few form-related things...
@@ -21,10 +15,6 @@ import {
  *   - The shape of the parsed form data cannot have optional keys ({ k?: v })
  *   - The parsing logic has to be manually supplied for each field. This context doesn't do any fancy type reflection.
  */
-
-export type RangeAttribute = 'close' | 'mid' | 'far'
-
-export type DamageTypeAttribute = 'ap' | 'ad'
 
 export interface AttributeFilter {
     /** 1,2,3,4,5 */
@@ -50,7 +40,7 @@ export interface FilterForm {
 }
 
 export type FilterFormControls = {
-    [K in keyof FilterForm]: FormControlsContainer<FilterForm[K]>
+    [K in keyof FilterForm]: FormControlWrapper<FilterForm[K]>
 }
 
 export type FilterFormValue = {
@@ -133,39 +123,3 @@ function getDefaultControls(
 export function getFilterFormContext() {
     return getContext(KEY) as FilterFormValue
 }
-
-const DEFAULT_ATTRIBUTE_FILTER = {
-    cost: [true, true, true, true, true],
-    range: [true, true, true],
-    traitIdsExcluded: [],
-    damageType: [true, true]
-} satisfies AttributeFilter
-
-const DEFAULT_SLOT_FILTER = {
-    useAttributes: true,
-    byAttribute: DEFAULT_ATTRIBUTE_FILTER,
-    byId: []
-} satisfies SlotFilter
-
-const DEFAULT_TEAM_SIZE = 7
-
-export const DEFAULT_FILTER_FORM = {
-    teamSize: DEFAULT_TEAM_SIZE,
-    slots: [...range(DEFAULT_TEAM_SIZE)].map((_) =>
-        clone(DEFAULT_SLOT_FILTER)
-    )
-} as const satisfies FilterForm
-
-export const FILTER_FORM_PARSERS = {
-    teamSize: IntParser,
-    slots: {
-        useAttributes: BoolParser,
-        byAttribute: {
-            cost: BoolParser,
-            range: BoolParser,
-            traitIdsExcluded: StringParser,
-            damageType: BoolParser
-        },
-        byId: StringParser
-    }
-} satisfies FormParsers<FilterForm>

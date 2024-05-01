@@ -1,11 +1,10 @@
 <script lang="ts">
     import { type FilterForm } from '../form-context/context'
-    import type { FormControlsContainer } from '../form-context/utils'
-    import CostInput from './cost-input.svelte'
+    import type { FormControlWrapper } from '../form-context/types'
+    import 
+ort CostInput from './cost-input.svelte'
 
-    export let slot: FormControlsContainer<
-        FilterForm['slots'][number]
-    >
+    export let slot: FormControlWrapper<FilterForm['slots'][number]>
 
     const byAttribute = slot.controls.byAttribute
     const costArray = byAttribute.controls.cost

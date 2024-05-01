@@ -1,17 +1,17 @@
 import { range, sort, zip } from 'radash'
 import {
-    createControl,
     type ControlLike,
-    type FormControlsContainer,
+    type FormControlWrapper,
     type InputParser
-} from './utils'
+} from './types'
+import { createControl } from './utils'
 
 type OnChangeHandler<T> = (vals: T[]) => void
 type Id = string
 
 interface ArrayItem<T> {
     id: Id
-    control: FormControlsContainer<T>
+    control: FormControlWrapper<T>
     index: number
     value: T
 }
@@ -64,7 +64,7 @@ export class FormControlArray<T> implements ControlLike<T[]> {
         }
     }
 
-    public get controls(): FormControlsContainer<T>[] {
+    public get controls(): FormControlWrapper<T>[] {
         return this.itemsSorted.map((it) => it.control)
     }
 

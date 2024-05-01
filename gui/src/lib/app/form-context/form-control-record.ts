@@ -1,18 +1,17 @@
 import {
-    createControl,
     type ControlLike,
-    type FormControlsContainer,
-    type FormParsers,
-    type ValueOf
-} from './utils'
+    type FormControlWrapper,
+    type FormParsers
+} from './types'
+import { createControl, type ValueOf } from './utils'
 
 type OnChangeHandler<T> = (val: T) => void
 
 type IControls<T> = {
-    [K in keyof T]: FormControlsContainer<T[K]>
+    [K in keyof T]: FormControlWrapper<T[K]>
 }
 
-export class FormControlGroup<T extends Object>
+export class FormControlRecord<T extends Object>
     implements ControlLike<T>
 {
     controls: IControls<T>

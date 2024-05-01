@@ -1,4 +1,4 @@
-import type { FormInput, InputParser } from './utils'
+import type { FormInput, InputParser } from './types'
 
 type OnChangeHandler<T> = (val: T) => void
 
