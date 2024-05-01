@@ -1,11 +1,13 @@
 from pathlib import Path
 from typing import TypeAlias, TypedDict
 
-import cv2
+from img2vec_pytorch import Img2Vec
+from PIL import Image
+from sklearn.metrics.pairwise import cosine_similarity
 
-Image: TypeAlias = cv2.typing.MatLike
+IImage: TypeAlias = Image.Image
 
-# pip install opencv-python
+# pip install img2vec_pytorch pillow
 
 ROOT_DIR = Path(__file__).parent.parent
 GUI_ASSETS_DIR = ROOT_DIR / "gui" / "src" / "lib" / "assets"
@@ -15,9 +17,17 @@ if not OUTPUT_DIR.exists():
     print("Creating output directory", OUTPUT_DIR)
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
+DEBUG_DIR = GUI_ASSETS_DIR / "tft" / "debug"
+if not DEBUG_DIR.exists():
+    DEBUG_DIR.mkdir(exist_ok=True, parents=True)
+if DEBUG_DIR.exists():
+    for fp in DEBUG_DIR.glob("*"):
+        fp.unlink()
+
 # https://ddragon.leagueoflegends.com/cdn/dragontail-14.8.1.tgz
 DRAGONTAIL_ASSETS_DIR = GUI_ASSETS_DIR / "dragontail-14.8.1"
-BIGGER_IMAGE_DIR = DRAGONTAIL_ASSETS_DIR / "img" / "champion" / "tiles"
+# BIGGER_IMAGE_DIR = DRAGONTAIL_ASSETS_DIR / "img" / "champion" / "tiles"
+BIGGER_IMAGE_DIR = DRAGONTAIL_ASSETS_DIR / "img" / "champion" / "centered"
 
 SPRITE_DIR = GUI_ASSETS_DIR / "tft" / "sprites"
 
@@ -25,32 +35,45 @@ SPRITE_DIR = GUI_ASSETS_DIR / "tft" / "sprites"
 
 
 class BiggerImage(TypedDict):
-    image: Image
+    image: IImage
     fp: Path
 
 
 class ScoredCandidate(TypedDict):
     image: BiggerImage
-    score: tuple
+    score: float
+
+
+def read_image(fp: str | Path) -> IImage:
+    return Image.open(fp)
+
+
+def write_image(image: IImage, fp: str | Path):
+    image.save(fp)
+
+
+img2vec = Img2Vec(cuda=False)
+
+
+# https://github.com/christiansafka/img2vec/blob/master/example/test_img_similarity.py
+def score_one(template, candidate) -> float:
+    sim = cosine_similarity(template.reshape((1, -1)), candidate.reshape((1, -1)))
+    return sim[0][0]
 
 
 def score_candidates(
-    template: Image, candidates: list[BiggerImage]
+    template: IImage, candidates: list[BiggerImage]
 ) -> list[ScoredCandidate]:
-    method = cv2.TM_CCOEFF_NORMED
+    template_features = img2vec.get_vec(template, tensor=True)
 
-    scored: list[tuple[tuple, Image]] = []
+    scored: list[ScoredCandidate] = []
     for c in candidates:
-        res = cv2.matchTemplate(c["image"], template, method)
-        score = cv2.minMaxLoc(res)
+        features = img2vec.get_vec(c["image"], tensor=True)
+        score = score_one(template_features, features)
 
         scored.append(ScoredCandidate(image=c, score=score))
 
-    def get_score(x: ScoredCandidate):
-        min_val, max_val, min_loc, max_loc = x["score"]
-        return max_val
-
-    scored.sort(key=get_score, reverse=True)
+    scored.sort(key=lambda c: c["score"], reverse=True)
     return scored
 
 
@@ -65,7 +88,7 @@ def find_splashes_for_champion(id_champion: str) -> list[BiggerImage]:
 
     results = []
     for fp in matches:
-        image = cv2.imread(str(fp))
+        image = read_image(fp)
         image = preprocess_candidate(image)
         results.append(
             BiggerImage(
@@ -77,22 +100,11 @@ def find_splashes_for_champion(id_champion: str) -> list[BiggerImage]:
     return results
 
 
-def preprocess_sprite(image: Image) -> Image:
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+def preprocess_sprite(image: IImage) -> IImage:
     return image
 
-    # SCALE_FACTOR = 10
-    # w = image.shape[0] * SCALE_FACTOR
-    # h = image.shape[1] * SCALE_FACTOR
-    # return cv2.resize(image, (w, h))
 
-
-def preprocess_candidate(image: Image) -> Image:
-    SCALE_FACTOR = 8
-    w = image.shape[0] // SCALE_FACTOR
-    h = image.shape[1] // SCALE_FACTOR
-    image = cv2.resize(image, (w, h))
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+def preprocess_candidate(image: IImage) -> IImage:
     return image
 
 
@@ -109,22 +121,22 @@ def main():
             print(f"No splashes for {id_champion} found in {BIGGER_IMAGE_DIR}")
             continue
 
-        sprite = cv2.imread(str(fp_sprite))
+        sprite = read_image(fp_sprite)
         sprite = preprocess_sprite(sprite)
 
         scored = score_candidates(sprite, splash_screens)
         match = scored[0]
         print(
-            f'Matched sprite {fp_sprite.name} to {match["image"]["fp"].name} with score {match["score"][1]:.3f} from {len(splash_screens)} candidates'
+            f'Matched sprite {fp_sprite.name} to {match["image"]["fp"].name} with score {match["score"]:.6f} from {len(splash_screens)} candidates'
         )
 
         for c in scored:
-            fp = OUTPUT_DIR / f'_dbg_{id_champion}_{c["score"][1]:.3f}.jpg'
-            im = cv2.imread(str(c["image"]["fp"]))
+            fp = DEBUG_DIR / f'{id_champion}_{c["score"]:.6f}.jpg'
+            im = read_image(c["image"]["fp"])
             im = c["image"]["image"]
-            cv2.imwrite(str(fp), im)
+            write_image(im, fp)
 
-        cv2.imwrite(str(fp_out), cv2.imread(str(match["image"]["fp"])))
+        write_image(read_image(match["image"]["fp"]), fp_out)
 
         # break
 
