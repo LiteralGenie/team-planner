@@ -1,8 +1,9 @@
-import { clone, isArray } from 'radash'
+import { clone, isArray, isObject, range } from 'radash'
 import { getContext, setContext } from 'svelte'
 import { writable, type Readable } from 'svelte/store'
 import { FormControl } from './form-control'
 import { FormControlArray } from './form-control-array'
+import { FormControlGroup } from './form-control-group'
 import {
     IntParser,
     StringParser,
@@ -19,14 +20,27 @@ import {
  *   - <input> values can be programmatically modified
  *
  * There are a few constraints that can probably be removed if I wasn't lazy...
- *   - The shape of the parsed form data must be flat (no nested objects, no arrays)
  *   - The shape of the parsed form data cannot have optional keys ({ k?: v })
  *   - The parsing logic has to be manually supplied for each field. This context doesn't do any fancy type reflection.
  */
 
+export type RangeAttribute = 'close' | 'mid' | 'far'
+
+export type DamageTypeAttribute = 'ap' | 'ad'
+
+export interface AttributeFilter {
+    cost: number[]
+    range: RangeAttribute[]
+    traitIds: string[]
+    damageType: DamageTypeAttribute[]
+}
+
+export type IdFilter = string[]
+
 export interface FilterForm {
     teamSize: number
-    champions: string[]
+    slotsByAttribute: AttributeFilter[]
+    slotsById: IdFilter[]
 }
 
 export type FilterFormValue = {
@@ -46,34 +60,7 @@ export type FilterFormControls = Record<
 const KEY = 'filter-form'
 
 export function setFilterFormContext(initValue: FilterForm) {
-    // Init controls for each form field
-    const controls: FilterFormControls = Object.fromEntries(
-        Object.entries(DEFAULT_FILTER_FORM).map(([k, v]) => {
-            let key = k as keyof FilterForm
-            const parser = FILTER_FORM_PARSERS[
-                key
-            ] as InputParser<any>
-
-            if (isArray(v)) {
-                return [
-                    key,
-                    new FormControlArray(
-                        (vals) => onArrayChange(key, vals),
-                        parser,
-                        v
-                    )
-                ]
-            } else {
-                return [
-                    key,
-                    new FormControl(
-                        (val) => onChange(key, val),
-                        parser
-                    )
-                ]
-            }
-        })
-    ) as any
+    const controls = getDefaultControls(onChange)
 
     // Re-init form on client-side navigation
     const form = writable(clone(initValue))
@@ -100,17 +87,6 @@ export function setFilterFormContext(initValue: FilterForm) {
         }))
     }
 
-    function onArrayChange(key: keyof FilterForm, vals: string[]) {
-        const parser = FILTER_FORM_PARSERS[key]
-
-        let parsed = vals.map((v) => parser.fromString(v))
-
-        form.update((current) => ({
-            ...current,
-            [key]: parsed
-        }))
-    }
-
     function setValue(update: FilterForm) {
         form.set(clone(update))
 
@@ -128,16 +104,90 @@ export function setFilterFormContext(initValue: FilterForm) {
     }
 }
 
+function getDefaultControls(
+    onChange: (
+        key: keyof FilterForm,
+        value: ValueOf<FilterForm>
+    ) => void
+): FilterFormControls {
+    return Object.fromEntries(
+        Object.entries(DEFAULT_FILTER_FORM).map(([k, v]) => {
+            let key = k as keyof FilterForm
+
+            if (isArray(v)) {
+                const parser = FILTER_FORM_PARSERS[
+                    key
+                ] as InputParser<any>
+
+                return [
+                    key,
+                    new FormControlArray(
+                        (vals) => onChange(key, vals),
+                        parser,
+                        v
+                    )
+                ]
+            }
+            if (isObject(v)) {
+                const parser = FILTER_FORM_PARSERS[key] as Record<
+                    string,
+                    InputParser<any>
+                >
+
+                return [
+                    key,
+                    new FormControlGroup(
+                        (val) => onChange(key, val),
+                        // @fixme: ts is inferring never here
+                        // @ts-ignore
+                        parser as any,
+                        v
+                    )
+                ]
+            } else {
+                const parser = FILTER_FORM_PARSERS[
+                    key
+                ] as InputParser<any>
+
+                return [
+                    key,
+                    new FormControl(
+                        (val) => onChange(key, val),
+                        parser
+                    )
+                ]
+            }
+        })
+    )
+}
+
 export function getFilterFormContext() {
     return getContext(KEY) as FilterFormValue
 }
 
+const DEFAULT_ATTRIBUTE_SLOT = {
+    cost: [1, 2, 3, 4, 5],
+    range: ['close', 'mid', 'far'],
+    traitIds: [],
+    damageType: ['ad', 'ap']
+} satisfies AttributeFilter
+
 export const DEFAULT_FILTER_FORM = {
     teamSize: 7,
-    champions: []
+    slotsByAttribute: [...range(7)].map((_) =>
+        clone(DEFAULT_ATTRIBUTE_SLOT)
+    ),
+    slotsById: [[], [], [], [], [], [], []]
 } as const satisfies FilterForm
 
 export const FILTER_FORM_PARSERS = {
     teamSize: IntParser,
-    champions: StringParser
+    slotsByAttribute: {
+        // @todo: enum parsers
+        cost: IntParser,
+        range: StringParser as any,
+        traitIds: StringParser,
+        damageType: StringParser as any
+    },
+    slotsById: StringParser
 } as const satisfies FormParsers<FilterForm>

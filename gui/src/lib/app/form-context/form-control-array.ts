@@ -7,7 +7,7 @@ type Id = string
 
 interface ArrayItem<T> {
     id: Id
-    control: FormControl<T>
+    control: ControlLike<T>
     index: number
     value: T
 }
@@ -59,7 +59,7 @@ export class FormControlArray<T> implements ControlLike<T[]> {
         }
     }
 
-    public get controls(): FormControl<T>[] {
+    public get controls(): ControlLike<T>[] {
         return this.itemsSorted.map((it) => it.control)
     }
 

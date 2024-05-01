@@ -20,11 +20,18 @@ export interface InputParser<T> {
     toString: (x: T) => string
 }
 
-export type FormParsers<T> = {
-    [K in keyof T]: T[K] extends Array<infer V>
-        ? InputParser<V>
-        : InputParser<T[K]>
-}
+/**
+ * FormParsers<Primitive> = InputParser<Primitive>
+ * FormParsers<Primitive[]> = InputParser<Primitive>
+ * FormParsers<T extends Object> = { [k in keyof T]: FormParsers<T> }
+ */
+export type FormParsers<T> = T extends number | string
+    ? InputParser<T>
+    : T extends Array<infer V>
+      ? FormParsers<V>
+      : {
+            [K in keyof T]: FormParsers<T[K]>
+        }
 
 export const StringParser = {
     fromString: (val: string) => val,
