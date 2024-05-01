@@ -20,12 +20,14 @@ export interface InputParser<T> {
     toString: (x: T) => string
 }
 
+type Primitive = number | string | boolean
+
 /**
  * FormParsers<Primitive> = InputParser<Primitive>
  * FormParsers<Primitive[]> = InputParser<Primitive>
  * FormParsers<T extends Object> = { [k in keyof T]: FormParsers<T> }
  */
-export type FormParsers<T> = T extends number | string
+export type FormParsers<T> = T extends Primitive
     ? InputParser<T>
     : T extends Array<infer V>
       ? FormParsers<V>

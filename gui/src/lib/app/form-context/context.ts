@@ -5,6 +5,7 @@ import { FormControl } from './form-control'
 import { FormControlArray } from './form-control-array'
 import { FormControlGroup } from './form-control-group'
 import {
+    BoolParser,
     IntParser,
     StringParser,
     type ControlLike,
@@ -29,10 +30,13 @@ export type RangeAttribute = 'close' | 'mid' | 'far'
 export type DamageTypeAttribute = 'ap' | 'ad'
 
 export interface AttributeFilter {
-    cost: number[]
-    range: RangeAttribute[]
-    traitIds: string[]
-    damageType: DamageTypeAttribute[]
+    /** 1,2,3,4,5 */
+    cost: [Boolean, Boolean, Boolean, Boolean, Boolean]
+    /** close, mid, far */
+    range: [Boolean, Boolean, Boolean]
+    traitIdsExcluded: string[]
+    /** ad, ap */
+    damageType: [Boolean, Boolean]
 }
 
 export type IdFilter = string[]
@@ -166,10 +170,10 @@ export function getFilterFormContext() {
 }
 
 const DEFAULT_ATTRIBUTE_SLOT = {
-    cost: [1, 2, 3, 4, 5],
-    range: ['close', 'mid', 'far'],
-    traitIds: [],
-    damageType: ['ad', 'ap']
+    cost: [true, true, true, true, true],
+    range: [true, true, true],
+    traitIdsExcluded: [],
+    damageType: [true, true]
 } satisfies AttributeFilter
 
 export const DEFAULT_FILTER_FORM = {
@@ -184,9 +188,9 @@ export const FILTER_FORM_PARSERS = {
     teamSize: IntParser,
     slotsByAttribute: {
         // @todo: enum parsers
-        cost: IntParser,
+        cost: BoolParser,
         range: StringParser as any,
-        traitIds: StringParser,
+        traitIdsExcluded: StringParser,
         damageType: StringParser as any
     },
     slotsById: StringParser
