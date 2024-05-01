@@ -1,10 +1,12 @@
 <script lang="ts">
     import PlusIcon from '$lib/icons/plus-icon.svelte'
     import UserIcon from '$lib/icons/user-icon.svelte'
+    import { objectify } from 'radash'
     import type { ComponentType } from 'svelte'
 
-    export let variant: 'inactive' | 'active' | 'champion' =
-        'inactive'
+    export let variant: 'inactive' | 'active' | string = 'inactive'
+
+    variant = 'Ashe'
 
     let icon: ComponentType | string
     $: {
@@ -15,10 +17,24 @@
             case 'active':
                 icon = UserIcon
                 break
-            case 'champion':
-                icon = '@TODO'
-                break
+            default:
+                icon = variant
         }
+    }
+
+    let icons = import.meta.glob('$lib/assets/tft/*.png', {
+        eager: true
+    })
+    let champion_icons = objectify(
+        Object.keys(icons),
+        (path: string) =>
+            path.split('/').slice(-1)[0].replace('.png', ''),
+        (path: string) => path
+    )
+
+    function getChampionIcon(id: string) {
+        console.log(champion_icons)
+        return champion_icons[id] as string
     }
 </script>
 
@@ -32,7 +48,7 @@
             class="h-full w-full text-5xl font-extralight flex justify-center items-center"
         >
             {#if typeof icon === 'string'}
-                {icon}
+                <img src={getChampionIcon('Ashe')} />
             {:else}
                 <svelte:component this={icon} class="h-12 w-12" />
             {/if}
