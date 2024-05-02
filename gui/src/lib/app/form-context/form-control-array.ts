@@ -1,3 +1,4 @@
+import { getUuidWithFallback } from '$lib/utils/misc'
 import { range, sort, zip } from 'radash'
 import {
     type ControlLike,
@@ -78,7 +79,7 @@ export class FormControlArray<T> implements ControlLike<T[]> {
 
     private _add(initValue: T): ArrayItem<T> {
         let n = this.controls.length
-        let uuid = crypto.randomUUID()
+        let uuid = getUuidWithFallback()
 
         let control = createControl(initValue, this.parser, (val) =>
             this.setAndPublishValue(uuid, val)
