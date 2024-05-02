@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 
 use serde::{ Deserialize, Serialize };
+use wasm_bindgen::prelude::wasm_bindgen;
 
 pub type TraitId = String;
 pub type ChampionId = String;
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Trait {
     pub name: TraitId,
     pub thresholds: Vec<u8>,
@@ -49,6 +50,7 @@ impl Champion {
     }
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct GameData {
     pub traits: HashMap<TraitId, Trait>,
     pub champions: HashMap<ChampionId, Champion>,
@@ -182,3 +184,30 @@ impl GameData {
         Self { traits, champions, champions_by_trait }
     }
 }
+
+#[wasm_bindgen(typescript_custom_section)]
+const TYPES: &'static str =
+    r#"
+interface IHashMap<K, V> {
+    key: K
+    value: V
+}
+
+type ChampionId = string
+type TraitId = string
+
+interface IChampion {
+    name: ChampionId
+    cost: number
+    range: number
+    traits: TraitId[]
+    uses_ap: boolean
+}
+
+interface IGameData {
+    traits: IHashMap<TraitId, ITrait>
+    champions: IHashMap<ChampionId, IChampion>
+
+    champions_by_trait: IHashMap<TraitId, ChampionId[]>
+}
+"#;

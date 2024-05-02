@@ -33,7 +33,7 @@
                 return 'active'
             } else if (someFalse(attrs.range)) {
                 return 'active'
-            } else if (attrs.traitIdsExcluded.length > 0) {
+            } else if (attrs.traits.length > 0) {
                 return 'active'
             } else {
                 return 'inactive'

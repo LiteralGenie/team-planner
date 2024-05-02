@@ -1,10 +1,6 @@
 import { deepCopy } from '$lib/utils/misc'
 import { range } from 'radash'
-import type {
-    AttributeFilter,
-    FilterForm,
-    SlotFilter
-} from './context'
+import type { AttributeFilter, FilterForm, SlotFilter } from './types'
 import { type FormParsers } from './types'
 import { BoolParser, IntParser, StringParser } from './utils'
 
@@ -21,7 +17,7 @@ const DEFAULT_ATTRIBUTE_FILTER = {
         mid: true,
         long: true
     },
-    traitIdsExcluded: [],
+    traits: [],
     damageType: {
         ad: true,
         ap: true
@@ -60,7 +56,10 @@ export const FILTER_FORM_PARSERS = {
                 mid: BoolParser,
                 long: BoolParser
             },
-            traitIdsExcluded: StringParser,
+            traits: {
+                name: StringParser,
+                include: BoolParser
+            },
             damageType: {
                 ad: BoolParser,
                 ap: BoolParser
