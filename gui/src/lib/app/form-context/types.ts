@@ -92,6 +92,9 @@ export type FilterFormControls = {
     [K in keyof FilterForm]: FormControlWrapper<FilterForm[K]>
 }
 
-export type AttributeSlot = FormControlWrapper<
+export type AttributeSlotControls = FormControlWrapper<
     FilterForm['slots'][number]['byAttribute']
 >
+
+export type AttributeSlotValues =
+    FilterForm['slots'][number]['byAttribute']

@@ -20,7 +20,8 @@
 
     const { form, controls } = getFilterFormContext()
     $: slot = controls.slots.controls[slotIndex]
-    $: attributeSlot = slot.controls.byAttribute
+    $: attributeSlotControls = slot.controls.byAttribute
+    $: attributeSlotValues = $form.slots[slotIndex].byAttribute
 
     function handleBackdropClick(ev: MouseEvent) {
         // This will only trigger on backdrop clicks, not dialog content clicks
@@ -57,7 +58,10 @@
 
                 <hr class="my-8" />
 
-                <CostInputGroup slot={attributeSlot} />
+                <CostInputGroup
+                    slotControls={attributeSlotControls}
+                    slotValues={attributeSlotValues}
+                />
 
                 <RangeInput />
 
