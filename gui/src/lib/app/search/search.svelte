@@ -1,11 +1,9 @@
 <script lang="ts">
     import Button from '../../components/ui/button/button.svelte'
     import * as Card from '../../components/ui/card'
-    import Dialog from '../dialog/dialog.svelte'
-    import {
-        getFilterFormContext,
-        type SlotFilter
-    } from '../form-context/context'
+    import FilterDialog from '../filter-dialog/filter-dialog.svelte'
+    import { getFilterFormContext } from '../form-context/context'
+    import type { SlotFilter } from '../form-context/types'
     import FilterButton from './filter-button.svelte'
 
     let showDialog = false
@@ -53,16 +51,16 @@
 </script>
 
 <div>
-    <Dialog
+    <FilterDialog
         open={showDialog}
         slotIndex={activeDialogSlot}
         on:close={handleDialogClose}
     />
 
-    <Card.Root
-        class="w-full h-48 p-8 flex flex-col justify-center gap-4"
-    >
-        <form class="flex gap-4">
+    <Card.Root class="w-full p-8 flex flex-col justify-center gap-4">
+        <form
+            class="w-full py-4 flex justify-center items-center gap-4"
+        >
             {#each $form.slots as slot, idx}
                 <FilterButton
                     on:click={() => handleDialogOpen(idx)}

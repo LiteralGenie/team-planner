@@ -2,7 +2,7 @@ import { clone, objectify } from 'radash'
 import { getContext, setContext } from 'svelte'
 import { writable, type Readable } from 'svelte/store'
 import { DEFAULT_FILTER_FORM, FILTER_FORM_PARSERS } from './defaults'
-import { type FormControlWrapper } from './types'
+import { type FilterForm, type FilterFormControls } from './types'
 import { createControl, type ValueOf } from './utils'
 
 /**
@@ -15,44 +15,6 @@ import { createControl, type ValueOf } from './utils'
  *   - The shape of the parsed form data cannot have optional keys ({ k?: v })
  *   - The parsing logic has to be manually supplied for each field. This context doesn't do any fancy type reflection.
  */
-
-export interface AttributeFilter {
-    /** 1,2,3,4,5 */
-    cost: {
-        1: Boolean
-        2: Boolean
-        3: Boolean
-        4: Boolean
-        5: Boolean
-    }
-    range: {
-        close: Boolean
-        mid: Boolean
-        long: Boolean
-    }
-    traitIdsExcluded: string[]
-    damageType: {
-        ad: Boolean
-        ap: Boolean
-    }
-}
-
-export type IdFilter = string[]
-
-export interface SlotFilter {
-    useAttributes: boolean
-    byAttribute: AttributeFilter
-    byId: IdFilter
-}
-
-export interface FilterForm {
-    teamSize: number
-    slots: SlotFilter[]
-}
-
-export type FilterFormControls = {
-    [K in keyof FilterForm]: FormControlWrapper<FilterForm[K]>
-}
 
 export type FilterFormValue = {
     form: Readable<FilterForm>
@@ -125,6 +87,7 @@ function getDefaultControls(
             let key = k as keyof FilterForm
             const parser = FILTER_FORM_PARSERS[key]
             return createControl(v, parser, (val) =>
+                // @ts-ignore
                 onChange(key, val)
             )
         }

@@ -1,12 +1,10 @@
 <script lang="ts">
-    import { type FilterForm } from '../form-context/context'
-    import type { FormControlWrapper } from '../form-context/types'
+    import type { AttributeSlot } from '../form-context/types'
     import CostInput from './cost-input.svelte'
 
-    export let slot: FormControlWrapper<FilterForm['slots'][number]>
+    export let slot: AttributeSlot
 
-    const byAttribute = slot.controls.byAttribute
-    const costArray = byAttribute.controls.cost
+    const costArray = slot.controls.cost
 </script>
 
 <fieldset class="flex gap-4">

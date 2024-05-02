@@ -52,3 +52,46 @@ export type FormControlWrapper<T> = T extends Primitive
       : T extends Object
         ? FormControlRecord<T>
         : never
+
+/****/
+
+export interface AttributeFilter {
+    cost: {
+        1: Boolean
+        2: Boolean
+        3: Boolean
+        4: Boolean
+        5: Boolean
+    }
+    range: {
+        close: Boolean
+        mid: Boolean
+        long: Boolean
+    }
+    traitIdsExcluded: string[]
+    damageType: {
+        ad: Boolean
+        ap: Boolean
+    }
+}
+
+export type IdFilter = string[]
+
+export interface SlotFilter {
+    useAttributes: boolean
+    byAttribute: AttributeFilter
+    byId: IdFilter
+}
+
+export interface FilterForm {
+    teamSize: number
+    slots: SlotFilter[]
+}
+
+export type FilterFormControls = {
+    [K in keyof FilterForm]: FormControlWrapper<FilterForm[K]>
+}
+
+export type AttributeSlot = FormControlWrapper<
+    FilterForm['slots'][number]['byAttribute']
+>

@@ -8,7 +8,7 @@
 	},
 	"aliases": {
 		"components": "$lib/components",
-		"utils": "$lib/utils/tailwind-utils"
+		"utils": "$lib/utils/tailwind"
 	},
 	"typescript": true
 }
