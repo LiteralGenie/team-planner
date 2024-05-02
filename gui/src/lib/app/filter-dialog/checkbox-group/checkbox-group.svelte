@@ -2,7 +2,7 @@
     import type { SvelteComponent } from 'svelte'
 
     export interface CheckboxData {
-        value: boolean
+        value: boolean | Boolean
         label: string
         suffix?: typeof SvelteComponent<any>
         onChange: (update: boolean) => void

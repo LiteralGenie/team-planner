@@ -1,18 +1,32 @@
-<fieldset class="mt-4 flex gap-4">
-    <legend class="pb-2">Damage Type</legend>
+<script lang="ts">
+    import type {
+        AttributeSlotControls,
+        AttributeSlotValues
+    } from '../form-context/types'
+    import type { CheckboxData } from './checkbox-group/checkbox-group.svelte'
+    import CheckboxGroup from './checkbox-group/checkbox-group.svelte'
 
-    <div>
-        <input
-            type="radio"
-            id="damage-ad"
-            name="damage-type"
-            checked
-        />
-        <label for="damage-ad">Physical</label>
-    </div>
+    export let slotControls: AttributeSlotControls
+    export let slotValues: AttributeSlotValues
 
-    <div>
-        <input type="radio" id="damage-ap" name="damage-type" />
-        <label for="damage-ap">Magical</label>
-    </div>
-</fieldset>
+    $: options = [
+        {
+            value: slotValues.damageType.ad,
+            label: 'Physical',
+            onChange: (v: boolean) => handleChange('ad', v)
+        },
+
+        {
+            value: slotValues.damageType.ap,
+            label: 'Magical',
+            onChange: (v: boolean) => handleChange('ap', v)
+        }
+    ] satisfies CheckboxData[]
+
+    function handleChange(key: 'ad' | 'ap', value: boolean) {
+        const ctrl = slotControls.controls.damageType.controls[key]
+        ctrl.onChange(value)
+    }
+</script>
+
+<CheckboxGroup label="Damage Type" {options} />

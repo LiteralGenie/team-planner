@@ -1,34 +1,41 @@
-<fieldset class="mt-4 flex gap-4">
-    <legend class="pb-2">Range</legend>
+<script lang="ts">
+    import type {
+        AttributeSlotControls,
+        AttributeSlotValues
+    } from '../form-context/types'
+    import type { CheckboxData } from './checkbox-group/checkbox-group.svelte'
+    import CheckboxGroup from './checkbox-group/checkbox-group.svelte'
 
-    <div>
-        <input
-            type="checkbox"
-            id="range-melee"
-            name="range-melee"
-            checked
-        />
-        <!-- @TODO: ICON -->
-        <label for="range-melee"> Melee </label>
-    </div>
+    export let slotControls: AttributeSlotControls
+    export let slotValues: AttributeSlotValues
 
-    <div>
-        <input
-            type="checkbox"
-            id="range-mid"
-            name="range-mid"
-            checked
-        />
-        <label for="range-mid"> Mid-range </label>
-    </div>
+    $: options = [
+        {
+            value: slotValues.range.close,
+            label: 'Close',
+            onChange: (v: boolean) => handleChange('close', v)
+        },
 
-    <div>
-        <input
-            type="checkbox"
-            id="range-long"
-            name="range-long"
-            checked
-        />
-        <label for="range-long"> Ranged </label>
-    </div>
-</fieldset>
+        {
+            value: slotValues.range.mid,
+            label: 'Mid',
+            onChange: (v: boolean) => handleChange('mid', v)
+        },
+
+        {
+            value: slotValues.range.long,
+            label: 'Long',
+            onChange: (v: boolean) => handleChange('long', v)
+        }
+    ] satisfies CheckboxData[]
+
+    function handleChange(
+        key: 'close' | 'mid' | 'long',
+        value: boolean
+    ) {
+        const ctrl = slotControls.controls.range.controls[key]
+        ctrl.onChange(value)
+    }
+</script>
+
+<CheckboxGroup label="Range" {options} />

@@ -16,7 +16,7 @@
     export let slotValues: AttributeSlotValues
 
     $: options = (Array.from(range(1, 5)) as Cost[]).map((idx) => ({
-        value: slotValues.cost[idx] as boolean,
+        value: slotValues.cost[idx],
         label: idx.toString(),
         suffix: GoldIcon,
         onChange: (update: boolean) => {

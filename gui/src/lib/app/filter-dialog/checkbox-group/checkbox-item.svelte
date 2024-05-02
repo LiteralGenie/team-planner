@@ -4,8 +4,10 @@
 
     export let id: string
     export let label: string
-    export let value: boolean
+    export let value: boolean | Boolean
     export let suffix: typeof SvelteComponent | null = null
+
+    $: v = value as boolean // see BoolParser
 
     const dispatch = createEventDispatcher()
 </script>
@@ -17,7 +19,7 @@
     class="cursor-pointer flex justify-center items-center gap-2"
 >
     <div class="checkbox-container flex items-center">
-        <Checkbox checked={value} />
+        <Checkbox checked={v} />
     </div>
 
     <label
