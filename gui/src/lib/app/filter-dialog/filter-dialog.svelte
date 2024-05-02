@@ -4,7 +4,7 @@
     import XIcon from '$lib/icons/x-icon.svelte'
     import { createEventDispatcher } from 'svelte'
     import { getFilterFormContext } from '../form-context/context'
-    import CostInputGroup from './cost-input-group.svelte'
+    import CostInput from './cost-input.svelte'
     import DamageTypeInput from './damage-type-input.svelte'
     import RangeInput from './range-input.svelte'
     import SlotTypeInput from './slot-type-input.svelte'
@@ -58,7 +58,7 @@
 
                 <hr class="my-8" />
 
-                <CostInputGroup
+                <CostInput
                     slotControls={attributeSlotControls}
                     slotValues={attributeSlotValues}
                 />
