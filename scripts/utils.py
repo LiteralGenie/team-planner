@@ -1,23 +1,20 @@
+import shutil
 from pathlib import Path
 from typing import TypeAlias
 
+import requests
 from PIL import Image
 
 IImage: TypeAlias = Image.Image
 
 
 ROOT_DIR = Path(__file__).parent.parent
+
+DATA_DIR = ROOT_DIR / "data"
+
 GUI_ASSETS_DIR = ROOT_DIR / "gui" / "src" / "lib" / "assets"
-GUI_SPRITE_DIR = GUI_ASSETS_DIR / "tft" / "sprites"
-GUI_BANNER_DIR = GUI_ASSETS_DIR / "tft" / "banners"
 
-# https://ddragon.leagueoflegends.com/cdn/dragontail-14.8.1.tgz
-DRAGONTAIL_ASSETS_DIR = GUI_ASSETS_DIR / "dragontail-14.8.1"
-CENTERED_BANNER_DIR = DRAGONTAIL_ASSETS_DIR / "img" / "champion" / "centered"
-
-DRAGONTAIL_VERSION_DIR = DRAGONTAIL_ASSETS_DIR / "14.8.1"
-CHAMPION_SPRITE_DIR = DRAGONTAIL_VERSION_DIR / "img" / "sprite"
-CHAMPION_DATA_FILE = DRAGONTAIL_VERSION_DIR / "data" / "en_US" / "tft-champion.json"
+CDRAGON_URL = "https://raw.communitydragon.org" + "/latest"
 
 
 def read_image(fp: str | Path) -> IImage:
@@ -26,3 +23,24 @@ def read_image(fp: str | Path) -> IImage:
 
 def write_image(image: IImage, fp: str | Path):
     image.save(fp)
+
+
+# https://www.communitydragon.org/documentation/assets
+def get_cdragon_asset_url(raw: str) -> str:
+    raw_prefix = "/lol-game-data/assets/"
+    real_prefix = "/plugins/rcp-be-lol-game-data/global/default/"
+
+    path = raw
+    path = path.lower()
+    path = path.replace(raw_prefix, real_prefix)
+    return CDRAGON_URL + path
+
+
+def download_image(url: str, fp: Path):
+    resp = requests.get(url, stream=True)
+    if resp.status_code != 200:
+        raise Exception(str(resp))
+
+    with open(fp, "wb") as file:
+        resp.raw.decode_content = True
+        shutil.copyfileobj(resp.raw, file)

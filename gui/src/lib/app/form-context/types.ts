@@ -68,10 +68,10 @@ export interface AttributeFilter {
         mid: Boolean
         long: Boolean
     }
-    traits: Array<{
-        name: string
-        include: boolean
-    }>
+    traits: {
+        exclusion_mode: Boolean
+        ids: string[]
+    }
     damageType: {
         ad: Boolean
         ap: Boolean
