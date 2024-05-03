@@ -8,5 +8,12 @@
     "[rust]": {
         "editor.inlayHints.enabled": "offUnlessPressed",
         "editor.defaultFormatter": "jinxdash.prettier-rust",
-    }
+    },
+    "[css]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.autoImportCompletions": true,
+    "editor.wordBasedSuggestions": "off"
 }

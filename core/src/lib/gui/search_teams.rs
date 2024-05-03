@@ -17,9 +17,9 @@ struct SearchOptions {
 }
 
 #[wasm_bindgen]
-pub fn search_teams(options: JsValue) -> JsValue {
+pub fn search_teams(options: ISearchTeamsOptions) -> JsValue {
     let options: SearchOptions = serde_wasm_bindgen
-        ::from_value(options)
+        ::from_value(options.into())
         .unwrap_throw();
 
     let data = GameData::new();
@@ -73,4 +73,24 @@ pub fn search_teams(options: JsValue) -> JsValue {
     }
 
     to_value(&results).unwrap()
+}
+
+#[wasm_bindgen(typescript_custom_section)]
+const TYPES: &'static str =
+    r#"
+
+interface ISearchTeamsOptions {
+    team_size: number
+    champions?: IChampionFilter[]
+    debug?: boolean
+}
+
+type SearchTeams = (options: ISearchTeamsOptions) => Team[]
+
+"#;
+
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(typescript_type = "ISearchTeamsOptions")]
+    pub type ISearchTeamsOptions;
 }

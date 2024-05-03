@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 0 0% 100%;
+        --foreground: 240 10% 3.9%;
+        --card: 0 0% 100%;
+        --card-foreground: 240 10% 3.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 240 10% 3.9%;
+        --primary: 346.8 77.2% 49.8%;
+        --primary-foreground: 355.7 100% 97.3%;
+        --secondary: 240 4.8% 95.9%;
+        --secondary-foreground: 240 5.9% 10%;
+        --muted: 240 4.8% 95.9%;
+        --muted-foreground: 240 3.8% 46.1%;
+        --accent: 240 4.8% 95.9%;
+        --accent-foreground: 240 5.9% 10%;
+        --destructive: 0 72.22% 50.59%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 240 5.9% 90%;
+        --input: 240 5.9% 90%;
+        --ring: 346.8 77.2% 49.8%;
+        --radius: 0.5rem;
+    }
+
+    .dark {
+        --background: 20 14.3% 4.1%;
+        --foreground: 0 0% 95%;
+        --card: 24 9.8% 10%;
+        --card-foreground: 0 0% 95%;
+        --popover: 0 0% 9%;
+        --popover-foreground: 0 0% 95%;
+        --primary: 346.8 77.2% 49.8%;
+        --primary-foreground: 355.7 100% 97.3%;
+        --secondary: 240 3.7% 15.9%;
+        --secondary-foreground: 0 0% 98%;
+        --muted: 0 0% 15%;
+        --muted-foreground: 240 5% 64.9%;
+        --accent: 12 6.5% 15.1%;
+        --accent-foreground: 0 0% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 85.7% 97.3%;
+        --border: 240 3.7% 15.9%;
+        --input: 240 3.7% 15.9%;
+        --ring: 346.8 77.2% 49.8%;
+    }
+
+    /* For ide previews, not actually used */
+    .dark {
+        --zbackground: hsl(20 14.3% 4.1%);
+        --zforeground: hsl(0 0% 95%);
+        --zcard: hsl(24 9.8% 10%);
+        --zcard-foreground: hsl(0 0% 95%);
+        --zpopover: hsl(0 0% 9%);
+        --zpopover-foreground: hsl(0 0% 95%);
+        --zprimary: hsl(346.8 77.2% 49.8%);
+        --zprimary-foreground: hsl(355.7 100% 97.3%);
+        --zsecondary: hsl(240 3.7% 15.9%);
+        --zsecondary-foreground: hsl(0 0% 98%);
+        --zmuted: hsl(0 0% 15%);
+        --zmuted-foreground: hsl(240 5% 64.9%);
+        --zaccent: hsl(12 6.5% 15.1%);
+        --zaccent-foreground: hsl(0 0% 98%);
+        --zdestructive: hsl(0 62.8% 30.6%);
+        --zdestructive-foreground: hsl(0 85.7% 97.3%);
+        --zborder: hsl(240 3.7% 15.9%);
+        --zinput: hsl(240 3.7% 15.9%);
+        --zring: hsl(346.8 77.2% 49.8%);
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+    }
+}
+
+html,
+body {
+    height: 100%;
+}
+
+/* From shadcn site: https://www.shadcn-svelte.com/examples/dashboard */
+::-webkit-scrollbar {
+    width: 0.5rem;
+    height: 0.5rem;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: calc(var(--radius) - 4px);
+    background-color: hsl(var(--muted-foreground) / 0.3) !important;
+}
+::-webkit-scrollbar-track {
+    --tw-bg-opacity: 1 !important;
+    background-color: hsl(
+        var(--muted) / var(--tw-bg-opacity)
+    ) !important;
+}
+
+/* 
+ * Svelte doesnt understand @starting-style so this transition logic needs to be global
+ * https://github.com/sveltejs/svelte/issues/9267
+*/
+dialog::backdrop {
+    transition: background-color 0.3s;
+}
+dialog[open]::backdrop {
+    background-color: hsl(var(--background) / 75%);
+}
+@starting-style {
+    dialog[open]::backdrop {
+        background-color: hsl(var(--background) / 0%);
+    }
+}

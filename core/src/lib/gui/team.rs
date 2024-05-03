@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use serde::{ Deserialize, Serialize };
+use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::lib::data::{ ChampionId, GameData, TraitId };
 
@@ -46,3 +47,14 @@ impl Team {
         }
     }
 }
+
+#[wasm_bindgen(typescript_custom_section)]
+const TYPES: &'static str =
+    r#"
+
+interface Team {
+    champion_ids: string[]
+    trait_counts: Record<string, number>    
+}
+
+"#;
