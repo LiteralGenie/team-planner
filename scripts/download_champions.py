@@ -3,16 +3,22 @@ import time
 from typing import TypeAlias
 
 import requests
-from utils import GUI_ASSETS_DIR, LATEST_SET_ID, download_image, get_cdragon_asset_url
+from utils import (
+    GUI_ASSETS_DIR,
+    LATEST_SET_ID,
+    LATEST_SET_PREFIX,
+    download_image,
+    get_cdragon_asset_url,
+)
 
 USE_CACHED = True
 
 ###
 
-DATA_URL = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/tfttraits.json"
-DATA_FILE = GUI_ASSETS_DIR / "tft" / "tfttraits.json"
+DATA_URL = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/tftchampions.json"
+DATA_FILE = GUI_ASSETS_DIR / "tft" / "tftchampions.json"
 
-IMAGE_DIR = GUI_ASSETS_DIR / "tft" / "traits"
+IMAGE_DIR = GUI_ASSETS_DIR / "tft" / "champions"
 IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
 ###
@@ -36,10 +42,11 @@ def fetch() -> IData:
 
 
 def download_icons(data: IData):
-    for trait in data:
-        url = get_cdragon_asset_url(trait["icon_path"])
+    for champion in data:
+        record = champion["character_record"]
+        url = get_cdragon_asset_url(record["squareIconPath"])
 
-        id = trait["trait_id"]
+        id = record["character_id"]
         ext = url.split(".")[-1]
         fp_out = IMAGE_DIR / f"{id}.{ext}"
         if fp_out.exists():
@@ -52,9 +59,9 @@ def download_icons(data: IData):
 
 def main():
     data = fetch()
-    data = [d for d in data if LATEST_SET_ID in d["set"]]
+    data = [d for d in data if d["name"].startswith(LATEST_SET_PREFIX)]
 
-    print(f"Found {len(data)} traits for set {LATEST_SET_ID}")
+    print(f"Found {len(data)} champions for set {LATEST_SET_ID}")
 
     download_icons(data)
 
