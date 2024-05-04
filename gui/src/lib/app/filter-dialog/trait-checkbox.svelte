@@ -10,6 +10,7 @@
 
 <div
     class="flex flex-col justify-center items-center text-center gap-[1px]"
+    class:active={state !== null}
 >
     <button
         on:click
@@ -71,5 +72,21 @@
 
     .red {
         background-color: #eb1a26;
+    }
+
+    button {
+        transition: all 0.2s;
+    }
+
+    :not(.active) button {
+        opacity: 0.3;
+
+        &:hover {
+            opacity: 0.5;
+        }
+    }
+
+    .active span {
+        @apply text-foreground;
     }
 </style>

@@ -59,7 +59,7 @@
 
     <Card.Root class="w-full p-8 flex flex-col justify-center gap-4">
         <form
-            class="w-full py-4 flex justify-center items-center gap-4"
+            class="w-full py-4 flex justify-center items-center gap-4 flex-wrap"
         >
             {#each $form.slots as slot, idx}
                 <FilterButton

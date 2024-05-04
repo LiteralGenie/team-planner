@@ -35,7 +35,7 @@
     }
 </script>
 
-<div class="hex outer-hex-color h-24 w-24 p-1">
+<div class="hex outer-hex-color h-24 w-24 p-1 shrink-0">
     <div
         class="hex inner-hex-color h-full w-full flex justify-center items-center"
     >
