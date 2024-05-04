@@ -74,9 +74,13 @@
     }
 
     /* Show overlay on hover */
-    .inner-hex-color:hover,
-    .champion-image-hover-overlay:hover {
-        background-color: hsl(var(--background) / 40%);
+    .inner-hex-color,
+    .champion-image-hover-overlay {
+        transition: all 0.2s;
+
+        &:hover {
+            background-color: hsl(var(--background) / 40%);
+        }
     }
 
     /* Show pencil icon on hover */

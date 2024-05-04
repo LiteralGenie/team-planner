@@ -1,10 +1,12 @@
 <script lang="ts">
+    import { someFalse } from '$lib/utils/misc'
     import Button from '../../components/ui/button/button.svelte'
     import * as Card from '../../components/ui/card'
     import FilterDialog from '../filter-dialog/filter-dialog.svelte'
     import { getFilterFormContext } from '../form-context/context'
     import type { SlotFilter } from '../form-context/types'
     import FilterButton from './filter-button.svelte'
+    import FilterPreview from './filter-preview.svelte'
 
     let showDialog = false
     let activeDialogSlot = 0
@@ -24,8 +26,6 @@
     function slotState(slot: SlotFilter): string {
         if (slot.useAttributes) {
             const attrs = slot.byAttribute
-            const someFalse = (x: Record<string, Boolean>) =>
-                Object.values(x).some((v) => v === false)
 
             if (someFalse(attrs.cost)) {
                 return 'active'
@@ -59,14 +59,15 @@
 
     <Card.Root class="w-full p-8 flex flex-col justify-center gap-4">
         <form
-            class="w-full py-4 flex justify-center items-center gap-4 flex-wrap"
+            class="w-full py-4 flex justify-center items-center gap-x-12 gap-y-4 flex-wrap"
         >
             {#each $form.slots as slot, idx}
-                <div>
+                <div class="flex gap-2 justify-center items-center">
                     <FilterButton
                         on:click={() => handleDialogOpen(idx)}
                         variant={slotState(slot)}
                     />
+                    <FilterPreview {slot} />
                 </div>
             {/each}
         </form>

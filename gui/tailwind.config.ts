@@ -1,7 +1,7 @@
 import type { Config } from 'tailwindcss'
 import { fontFamily } from 'tailwindcss/defaultTheme'
 
-const config: Config = {
+export const config = {
     darkMode: ['class'],
     content: ['./src/**/*.{html,js,svelte,ts}'],
     safelist: ['dark'],
@@ -67,6 +67,6 @@ const config: Config = {
             }
         }
     }
-}
+} as const satisfies Config
 
 export default config

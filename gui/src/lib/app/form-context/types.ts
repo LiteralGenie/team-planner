@@ -62,19 +62,13 @@ export interface TraitFilter {
     state: number
 }
 
+export type CostTier = 1 | 2 | 3 | 4 | 5
+
+export type RangeType = 'close' | 'mid' | 'long'
+
 export interface AttributeFilter {
-    cost: {
-        1: Boolean
-        2: Boolean
-        3: Boolean
-        4: Boolean
-        5: Boolean
-    }
-    range: {
-        close: Boolean
-        mid: Boolean
-        long: Boolean
-    }
+    cost: { [k in CostTier]: Boolean }
+    range: { [k in RangeType]: Boolean }
     traits: Array<TraitFilter>
     damageType: {
         ad: Boolean
