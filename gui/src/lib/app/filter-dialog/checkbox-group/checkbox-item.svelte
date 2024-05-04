@@ -24,7 +24,7 @@
 
     <label
         for={id}
-        class="cursor-pointer flex items-center justify-center gap-1"
+        class="cursor-pointer flex items-center justify-center gap-1 text-[13px]"
     >
         {label}
         {#if suffix}
@@ -38,6 +38,7 @@
 <style>
     /* Manually center checkbox. Its actual bounds doesn't match visual bounds. */
     .checkbox-container {
+        padding-left: 2px;
         padding-top: 1px;
     }
 

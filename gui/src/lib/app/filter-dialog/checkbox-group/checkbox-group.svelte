@@ -16,8 +16,8 @@
     export let label: string
 </script>
 
-<fieldset class="flex gap-4">
-    <legend class="pb-2">{label}</legend>
+<fieldset class="flex">
+    <legend class="pb-[6px]">{label}</legend>
 
     <div class="flex gap-6">
         {#each options as { onChange, ...props }}

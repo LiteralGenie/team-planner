@@ -62,10 +62,12 @@
             class="w-full py-4 flex justify-center items-center gap-4 flex-wrap"
         >
             {#each $form.slots as slot, idx}
-                <FilterButton
-                    on:click={() => handleDialogOpen(idx)}
-                    variant={slotState(slot)}
-                />
+                <div>
+                    <FilterButton
+                        on:click={() => handleDialogOpen(idx)}
+                        variant={slotState(slot)}
+                    />
+                </div>
             {/each}
         </form>
 

@@ -71,8 +71,8 @@
     }
 </script>
 
-<fieldset class="mt-4">
-    <legend class="pb-4">Traits</legend>
+<fieldset>
+    <legend class="pb-2">Traits</legend>
 
     {#each zipped as [val, ctrl, trait]}
         <TraitCheckbox
