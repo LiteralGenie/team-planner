@@ -34,7 +34,7 @@ const DEFAULT_TEAM_SIZE = 7
 
 export const DEFAULT_FILTER_FORM = {
     teamSize: DEFAULT_TEAM_SIZE,
-    slots: [...range(DEFAULT_TEAM_SIZE)].map((_) =>
+    slots: [...range(1, DEFAULT_TEAM_SIZE)].map((_) =>
         deepCopy(DEFAULT_SLOT_FILTER)
     )
 } as const satisfies FilterForm

@@ -2,9 +2,12 @@
     export let activeClose = false
     export let activeMid = false
     export let activeLong = false
+    export let fill: 'muted' | 'foreground' = 'foreground'
 </script>
 
 <svg
+    class:muted={fill === 'muted'}
+    class:foreground={fill === 'foreground'}
     viewBox="-94.5 -6 100 100"
     xmlns="http://www.w3.org/2000/svg"
     {...$$props}
@@ -117,8 +120,17 @@ A 19 19 0 0 0 -19 100
         fill: hsl(var(--muted-foreground) / 40%);
     }
 
-    g.active > path,
-    .arrow {
-        fill: hsl(var(--foreground));
+    .muted {
+        & g.active > path,
+        & .arrow {
+            fill: hsl(var(--muted-foreground));
+        }
+    }
+
+    .foreground {
+        & g.active > path,
+        & .arrow {
+            fill: hsl(var(--muted));
+        }
     }
 </style>

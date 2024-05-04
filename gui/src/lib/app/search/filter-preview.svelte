@@ -76,30 +76,42 @@
     }
 </script>
 
-<div
-    class="text-xs py-1 text-muted-foreground flex flex-col gap-[2px]"
->
-    <h1 class:invisible={isEmpty}>Filters:</h1>
+<div class="w-16 text-sm py-1 text-muted-foreground flex flex-col">
+    <h1>Filters:</h1>
 
-    <div class="flex flex-col text-[11px]">
+    {#if isEmpty}
+        <span>None</span>
+    {/if}
+
+    <div class="flex flex-col gap-[2px]">
         {#if activeFilters.cost}
             <span class="flex items-center gap-[3px]">
                 <GoldIcon variant="muted" class="h-2 w-2" />
                 {humanizeCostFilters(activeFilters.cost)}
             </span>
         {/if}
-        {#if activeFilters.range}
-            <span class="flex items-center gap-[3px]">
-                <RangeIcon
-                    activeClose={!!slot.byAttribute.range.close}
-                    activeMid={!!slot.byAttribute.range.mid}
-                    activeLong={!!slot.byAttribute.range.long}
-                    class="h-4 w-4"
-                />
-            </span>
-        {/if}
+        <div class="comma-group">
+            {#if activeFilters.range}
+                <span>
+                    <RangeIcon
+                        activeClose={!!slot.byAttribute.range.close}
+                        activeMid={!!slot.byAttribute.range.mid}
+                        activeLong={!!slot.byAttribute.range.long}
+                        fill="muted"
+                        class="h-3 w-3 inline"
+                    />
+                </span>
+            {/if}
+        </div>
     </div>
 </div>
 
 <style lang="postcss">
+    .comma-group {
+        line-height: 1;
+
+        & > *:not(:last-child)::after {
+            content: ' , ';
+        }
+    }
 </style>

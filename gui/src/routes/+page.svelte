@@ -7,7 +7,7 @@
     setFilterFormContext(DEFAULT_FILTER_FORM, TRAITS)
 </script>
 
-<main class="h-full w-full p-4 flex flex-col gap-4">
+<main class="h-full w-full max-w-6xl mx-auto p-4 flex flex-col gap-4">
     <Search />
 
     <div class="h-full rounded-md overflow-y-auto">

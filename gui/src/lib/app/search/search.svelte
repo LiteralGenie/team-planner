@@ -1,7 +1,7 @@
 <script lang="ts">
+    import * as Card from '$lib/components/ui/card'
     import { someFalse } from '$lib/utils/misc'
     import Button from '../../components/ui/button/button.svelte'
-    import * as Card from '../../components/ui/card'
     import FilterDialog from '../filter-dialog/filter-dialog.svelte'
     import { getFilterFormContext } from '../form-context/context'
     import type { SlotFilter } from '../form-context/types'
@@ -57,12 +57,14 @@
         on:close={handleDialogClose}
     />
 
-    <Card.Root class="w-full p-8 flex flex-col justify-center gap-4">
-        <form
-            class="w-full py-4 flex justify-center items-center gap-x-12 gap-y-4 flex-wrap"
-        >
+    <Card.Root
+        class="w-full rounded-sm flex flex-col justify-center gap-4"
+    >
+        <form class="w-full filter-grid">
             {#each $form.slots as slot, idx}
-                <div class="flex gap-2 justify-center items-center">
+                <div
+                    class="p-4 pl-8 border cell-border rounded-md flex gap-4 items-center"
+                >
                     <FilterButton
                         on:click={() => handleDialogOpen(idx)}
                         variant={slotState(slot)}
@@ -72,8 +74,21 @@
             {/each}
         </form>
 
-        <section class="w-full flex justify-end">
+        <section class="w-full p-8 flex justify-end">
             <Button class="w-24">Search -></Button>
         </section>
     </Card.Root>
 </div>
+
+<style lang="postcss">
+    .filter-grid {
+        display: grid;
+        gap: 8px;
+        padding: 8px;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+
+    .cell-border {
+        border-color: hsl(var(--foreground) / 30%);
+    }
+</style>
