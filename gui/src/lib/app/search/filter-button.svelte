@@ -35,31 +35,33 @@
     }
 </script>
 
-<div class="hex outer-hex-color h-24 w-24 p-1">
-    <div
-        class="hex inner-hex-color h-full w-full flex justify-center items-center"
-    >
-        <button
-            on:click
-            type="button"
-            class="h-full w-full relative text-5xl font-extralight flex justify-center items-center"
+<div class="hex hex-shadow p-1">
+    <div class="hex outer-hex-color h-24 w-24 p-1">
+        <div
+            class="hex inner-hex-color h-full w-full flex justify-center items-center"
         >
-            {#if championId}
-                <div
-                    class="champion-image-hover-overlay absolute h-full w-full"
-                ></div>
+            <button
+                on:click
+                type="button"
+                class="h-full w-full relative text-5xl font-extralight flex justify-center items-center"
+            >
+                {#if championId}
+                    <div
+                        class="champion-image-hover-overlay absolute h-full w-full"
+                    ></div>
 
-                <img src={getChampionIcon(championId)} />
+                    <img src={getChampionIcon(championId)} />
 
-                <div class="pencil-icon absolute">
-                    <PencilIcon class="h-8 w-8 font-bold" />
-                </div>
-            {:else if variant === 'active'}
-                <UserGroupIcon class="h-11 w-11" />
-            {:else}
-                <PlusIcon class="h-12 w-12" />
-            {/if}
-        </button>
+                    <div class="pencil-icon absolute">
+                        <PencilIcon class="h-8 w-8 font-bold" />
+                    </div>
+                {:else if variant === 'active'}
+                    <UserGroupIcon class="h-11 w-11" />
+                {:else}
+                    <PlusIcon class="h-12 w-12" />
+                {/if}
+            </button>
+        </div>
     </div>
 </div>
 
@@ -71,6 +73,10 @@
     .inner-hex-color {
         background-color: hsl(var(--background) / 90%);
         color: hsl(var(--muted-foreground));
+    }
+
+    .hex-shadow {
+        filter: drop-shadow(5px 5px 5px hsl(var(--foreground) / 7%));
     }
 
     /* Show overlay on hover */

@@ -1,5 +1,4 @@
 <script lang="ts">
-    import * as Card from '$lib/components/ui/card'
     import { someFalse } from '$lib/utils/misc'
     import Button from '../../components/ui/button/button.svelte'
     import FilterDialog from '../filter-dialog/filter-dialog.svelte'
@@ -57,13 +56,13 @@
         on:close={handleDialogClose}
     />
 
-    <Card.Root
-        class="w-full rounded-sm flex flex-col justify-center gap-4"
+    <div
+        class="card w-full rounded-sm flex flex-col justify-center gap-4"
     >
         <form class="w-full filter-grid">
             {#each $form.slots as slot, idx}
                 <div
-                    class="p-4 pl-8 border cell-border rounded-md flex gap-4 items-center"
+                    class="cell p-4 pl-8 border rounded-md flex gap-4 items-center"
                 >
                     <FilterButton
                         on:click={() => handleDialogOpen(idx)}
@@ -77,10 +76,14 @@
         <section class="w-full p-8 flex justify-end">
             <Button class="w-24">Search -></Button>
         </section>
-    </Card.Root>
+    </div>
 </div>
 
 <style lang="postcss">
+    .card {
+        background-color: hsl(var(--card) / 60%);
+    }
+
     .filter-grid {
         display: grid;
         gap: 8px;
@@ -88,7 +91,8 @@
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     }
 
-    .cell-border {
-        border-color: hsl(var(--foreground) / 30%);
+    .cell {
+        background-color: hsl(var(--foreground) / 8%);
+        border-color: hsl(var(--foreground) / 20%);
     }
 </style>
