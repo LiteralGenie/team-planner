@@ -13,6 +13,8 @@ from utils import (
 
 USE_CACHED = True
 
+EXCLUDED = set(["TFT11_TrickshotAltruist"])
+
 ###
 
 DATA_URL = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/tfttraits.json"
@@ -61,7 +63,9 @@ def download_icons(data: IData):
 def main():
     data = fetch()
 
-    filtered = [d for d in data if LATEST_SET_ID in d["set"]]
+    filtered = [
+        d for d in data if LATEST_SET_ID in d["set"] and d["trait_id"] not in EXCLUDED
+    ]
     print(f"Found {len(filtered)} traits for set {LATEST_SET_ID}")
 
     with open(FILTERED_DATA_FILE, "w+") as file:

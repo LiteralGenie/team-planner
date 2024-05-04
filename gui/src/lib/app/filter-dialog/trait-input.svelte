@@ -85,6 +85,7 @@
 </fieldset>
 
 <style lang="postcss">
+    /* @todo how to make all rows the same height when one row has text wrap */
     fieldset {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
