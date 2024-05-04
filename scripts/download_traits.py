@@ -13,8 +13,6 @@ from utils import (
 
 USE_CACHED = True
 
-EXCLUDED = set(["TFT11_TrickshotAltruist"])
-
 ###
 
 DATA_URL = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/tfttraits.json"
@@ -27,7 +25,8 @@ IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
 ###
 
-IData: TypeAlias = list[dict]
+ITrait: TypeAlias = dict
+IData: TypeAlias = list[ITrait]
 
 
 def fetch() -> IData:
@@ -60,12 +59,15 @@ def download_icons(data: IData):
         time.sleep(1)
 
 
+def is_unique(trait: ITrait) -> bool:
+    styles = (effect["style_name"] for effect in trait["conditional_trait_sets"])
+    return any(s == "kUnique" for s in styles)
+
+
 def main():
     data = fetch()
 
-    filtered = [
-        d for d in data if LATEST_SET_ID in d["set"] and d["trait_id"] not in EXCLUDED
-    ]
+    filtered = [d for d in data if LATEST_SET_ID in d["set"] and not is_unique(d)]
     print(f"Found {len(filtered)} traits for set {LATEST_SET_ID}")
 
     with open(FILTERED_DATA_FILE, "w+") as file:
