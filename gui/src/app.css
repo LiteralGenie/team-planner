@@ -118,3 +118,29 @@ dialog[open]::backdrop {
         background-color: hsl(var(--background) / 0%);
     }
 }
+
+.hex {
+    /**
+     * Draws hex in counter-clockwise fashion, starting from bottom-most corner
+     *    
+     *   / \
+     *  /   \
+     * |     |
+     * |     |
+     *  \   /
+     *   \ /
+     *    
+     * A regular hexagon has equal interior angles which works out to 120deg each
+     * and assuming a side length of 1, that implies that the corners have
+     * x-coordinates at { 0, sqrt(3)/2, sqrt(3)  }
+     * and y-coords at { 0, 0.5, 1.5, 2 }
+     */
+    clip-path: polygon(
+        50% 0%,
+        100% 25%,
+        100% 75%,
+        50% 100%,
+        0% 75%,
+        0% 25%
+    );
+}

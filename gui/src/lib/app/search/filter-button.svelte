@@ -87,31 +87,4 @@
     .inner-hex-color:hover .pencil-icon {
         visibility: visible;
     }
-
-    .hex {
-        /**
-         * Draws hex in counter-clockwise fashion, starting from bottom corners
-         *    ________
-         *   /        \
-         *  /          \
-         * /            \
-         * \            /
-         *  \          /
-         *   \________/
-         *   x1      x2
-         *
-         * A regular hexagon has equal interior angles which works out to 120deg each
-         * and assuming a side length of 1, that works out to
-         * x1 = 0.5 or 25% of the total width (=2)
-         * so x2 is (0.5 + 1) which is 75% of the total width
-         */
-        clip-path: polygon(
-            25% 0%,
-            75% 0%,
-            100% 50%,
-            75% 100%,
-            25% 100%,
-            0% 50%
-        );
-    }
 </style>

@@ -1,7 +1,6 @@
 <script lang="ts">
     import { Button } from '$lib/components/ui/button'
     import * as Card from '$lib/components/ui/card'
-    import XIcon from '$lib/icons/x-icon.svelte'
     import { createEventDispatcher } from 'svelte'
     import { getFilterFormContext } from '../form-context/context'
     import CostInput from './cost-input.svelte'
@@ -44,44 +43,51 @@
     on:close
     class="h-full w-full max-h-[80vh] max-w-[80vw] bg-transparent"
 >
-    <button
-        class="close-icon absolute top-4 right-4 p-2"
+    <!-- <button
+        class="close-icon absolute top-2 right-2 p-2"
         on:click={handleCloseButtonClick}
     >
         <XIcon class="h-6 w-6" />
-    </button>
-    <Card.Root class="h-full w-full p-8 pb-6 flex flex-col gap-4">
-        <Card.Title class="text-xl">Champion Filters</Card.Title>
-        <Card.Description class="h-full">
-            <form>
-                <SlotTypeInput {slotIndex} />
+    </button> -->
+    <Card.Root class="h-full w-full p-4 pb-6 flex flex-col gap-4">
+        <div class="h-full overflow-auto p-4">
+            <Card.Title class="text-xl mb-4">
+                Slot #{slotIndex + 1}
+            </Card.Title>
+            <Card.Description>
+                <form>
+                    <SlotTypeInput {slotIndex} />
 
-                <hr class="my-8" />
+                    <hr class="my-8" />
 
-                <div class="flex flex-col gap-6">
-                    <CostInput
-                        slotControls={attributeControls}
-                        slotValues={attributeValues}
-                    />
+                    <div class="flex flex-col gap-6">
+                        <CostInput
+                            slotControls={attributeControls}
+                            slotValues={attributeValues}
+                        />
 
-                    <RangeInput
-                        slotControls={attributeControls}
-                        slotValues={attributeValues}
-                    />
+                        <RangeInput
+                            slotControls={attributeControls}
+                            slotValues={attributeValues}
+                        />
 
-                    <DamageTypeInput
-                        slotControls={attributeControls}
-                        slotValues={attributeValues}
-                    />
+                        <DamageTypeInput
+                            slotControls={attributeControls}
+                            slotValues={attributeValues}
+                        />
 
-                    <TraitInput />
-                </div>
+                        <TraitInput
+                            slotControls={attributeControls}
+                            slotValues={attributeValues}
+                        />
+                    </div>
 
-                <hr class="my-8" />
+                    <hr class="my-8" />
 
-                Matching champions:
-            </form>
-        </Card.Description>
+                    Matching champions:
+                </form>
+            </Card.Description>
+        </div>
         <Card.Footer class="p-0 flex justify-end">
             <Button
                 on:click={handleCloseButtonClick}

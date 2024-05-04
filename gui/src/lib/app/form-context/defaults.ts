@@ -57,8 +57,8 @@ export const FILTER_FORM_PARSERS = {
                 long: BoolParser
             },
             traits: {
-                name: StringParser,
-                include: BoolParser
+                id: StringParser,
+                state: IntParser
             },
             damageType: {
                 ad: BoolParser,
