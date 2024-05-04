@@ -4,9 +4,9 @@ from typing import TypeAlias
 
 import requests
 from utils import (
+    DATA_DIR,
     GUI_ASSETS_DIR,
     LATEST_SET_ID,
-    LATEST_SET_PREFIX,
     download_image,
     get_cdragon_asset_url,
 )
@@ -16,7 +16,9 @@ USE_CACHED = True
 ###
 
 DATA_URL = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/tftchampions.json"
-DATA_FILE = GUI_ASSETS_DIR / "tft" / "tftchampions.json"
+DATA_FILE = DATA_DIR / "tftchampions.json"
+
+FILTERED_DATA_FILE = GUI_ASSETS_DIR / "tft" / "tftchampions.json"
 
 IMAGE_DIR = GUI_ASSETS_DIR / "tft" / "champions"
 IMAGE_DIR.mkdir(parents=True, exist_ok=True)
@@ -59,11 +61,14 @@ def download_icons(data: IData):
 
 def main():
     data = fetch()
-    data = [d for d in data if d["name"].startswith(LATEST_SET_PREFIX)]
 
-    print(f"Found {len(data)} champions for set {LATEST_SET_ID}")
+    filtered = [d for d in data if LATEST_SET_ID in d["set"]]
+    print(f"Found {len(filtered)} champions for set {LATEST_SET_ID}")
 
-    download_icons(data)
+    with open(FILTERED_DATA_FILE, "w+") as file:
+        json.dump(filtered, file, indent=4)
+
+    download_icons(filtered)
 
 
 main()

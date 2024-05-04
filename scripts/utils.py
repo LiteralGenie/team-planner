@@ -12,6 +12,8 @@ LATEST_SET_PREFIX = "TFT11"
 
 ROOT_DIR = Path(__file__).parent.parent
 
+DATA_DIR = ROOT_DIR / "gui" / "src" / "lib" / "assets"
+
 GUI_ASSETS_DIR = ROOT_DIR / "gui" / "src" / "lib" / "assets"
 
 CDRAGON_URL = "https://raw.communitydragon.org" + "/latest"

@@ -3,14 +3,22 @@ import time
 from typing import TypeAlias
 
 import requests
-from utils import GUI_ASSETS_DIR, LATEST_SET_ID, download_image, get_cdragon_asset_url
+from utils import (
+    DATA_DIR,
+    GUI_ASSETS_DIR,
+    LATEST_SET_ID,
+    download_image,
+    get_cdragon_asset_url,
+)
 
 USE_CACHED = True
 
 ###
 
 DATA_URL = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/tfttraits.json"
-DATA_FILE = GUI_ASSETS_DIR / "tft" / "tfttraits.json"
+DATA_FILE = DATA_DIR / "tfttraits.json"
+
+FILTERED_DATA_FILE = GUI_ASSETS_DIR / "tft" / "tfttraits.json"
 
 IMAGE_DIR = GUI_ASSETS_DIR / "tft" / "traits"
 IMAGE_DIR.mkdir(parents=True, exist_ok=True)
@@ -52,11 +60,14 @@ def download_icons(data: IData):
 
 def main():
     data = fetch()
-    data = [d for d in data if LATEST_SET_ID in d["set"]]
 
-    print(f"Found {len(data)} traits for set {LATEST_SET_ID}")
+    filtered = [d for d in data if LATEST_SET_ID in d["set"]]
+    print(f"Found {len(filtered)} traits for set {LATEST_SET_ID}")
 
-    download_icons(data)
+    with open(FILTERED_DATA_FILE, "w+") as file:
+        json.dump(filtered, file, indent=4)
+
+    download_icons(filtered)
 
 
 main()

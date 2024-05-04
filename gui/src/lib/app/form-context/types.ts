@@ -55,6 +55,13 @@ export type FormControlWrapper<T> = T extends Primitive
 
 /****/
 
+export interface TraitFilter {
+    id: string
+    // @todo: support for form enums
+    // 0 for null, 1 for included, 2 for excluded
+    state: number
+}
+
 export interface AttributeFilter {
     cost: {
         1: Boolean
@@ -68,10 +75,7 @@ export interface AttributeFilter {
         mid: Boolean
         long: Boolean
     }
-    traits: {
-        exclusion_mode: Boolean
-        ids: string[]
-    }
+    traits: Array<TraitFilter>
     damageType: {
         ad: Boolean
         ap: Boolean

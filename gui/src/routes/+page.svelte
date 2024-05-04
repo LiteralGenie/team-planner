@@ -2,8 +2,9 @@
     import { setFilterFormContext } from '$lib/app/form-context/context'
     import { DEFAULT_FILTER_FORM } from '$lib/app/form-context/defaults'
     import Search from '$lib/app/search/search.svelte'
+    import TRAITS from '$lib/assets/tft/tfttraits.json'
 
-    setFilterFormContext(DEFAULT_FILTER_FORM)
+    setFilterFormContext(DEFAULT_FILTER_FORM, TRAITS)
 </script>
 
 <main class="h-full w-full p-4 flex flex-col gap-4">

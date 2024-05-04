@@ -16,7 +16,7 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div
     on:click={() => dispatch('change', !value)}
-    class="cursor-pointer flex justify-center items-center gap-2"
+    class="cursor-pointer flex items-center gap-2"
 >
     <div class="checkbox-container flex items-center">
         <Checkbox checked={v} />

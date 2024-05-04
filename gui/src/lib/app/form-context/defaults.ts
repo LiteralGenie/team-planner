@@ -17,10 +17,7 @@ const DEFAULT_ATTRIBUTE_FILTER = {
         mid: true,
         long: true
     },
-    traits: {
-        exclusion_mode: false,
-        ids: []
-    },
+    traits: [],
     damageType: {
         ad: true,
         ap: true
@@ -60,8 +57,8 @@ export const FILTER_FORM_PARSERS = {
                 long: BoolParser
             },
             traits: {
-                exclusion_mode: BoolParser,
-                ids: StringParser
+                id: StringParser,
+                state: IntParser
             },
             damageType: {
                 ad: BoolParser,

@@ -1,7 +1,9 @@
+import type { CDragonTrait } from '$lib/types'
+import { deepCopy } from '$lib/utils/misc'
 import { clone, objectify } from 'radash'
 import { getContext, setContext } from 'svelte'
 import { writable, type Readable } from 'svelte/store'
-import { DEFAULT_FILTER_FORM, FILTER_FORM_PARSERS } from './defaults'
+import { FILTER_FORM_PARSERS } from './defaults'
 import { type FilterForm, type FilterFormControls } from './types'
 import { createControl, type ValueOf } from './utils'
 
@@ -27,8 +29,26 @@ export type FilterFormValue = {
 
 const KEY = 'filter-form'
 
-export function setFilterFormContext(initValue: FilterForm) {
-    const controls = getDefaultControls(onChange)
+export function setFilterFormContext(
+    initValue: FilterForm,
+    traits: CDragonTrait[]
+) {
+    initValue = deepCopy(initValue)
+    const controls = getDefaultControls(initValue, onChange)
+
+    // Add traits to init value
+    const defaultTraits = traits.map((trait) => ({
+        id: trait.trait_id,
+        state: 0
+    }))
+    for (let slot of controls.slots.controls) {
+        const traitArray = slot.controls.byAttribute.controls.traits
+        traitArray.setValue(deepCopy(defaultTraits))
+    }
+    for (let slot of initValue.slots) {
+        slot.byAttribute.traits = deepCopy(defaultTraits)
+    }
+
     const form = writable(clone(initValue))
 
     const value = {
@@ -55,7 +75,7 @@ export function setFilterFormContext(initValue: FilterForm) {
     function setValue(update: FilterForm) {
         form.set(clone(update))
 
-        for (let key in DEFAULT_FILTER_FORM) {
+        for (let key in update) {
             const k = key as keyof FilterForm
             const control = controls[k]
             // @ts-ignore: @todo why ts mad
@@ -71,6 +91,7 @@ export function setFilterFormContext(initValue: FilterForm) {
 }
 
 function getDefaultControls(
+    initValue: FilterForm,
     onChange: (
         key: keyof FilterForm,
         value: ValueOf<FilterForm>
@@ -81,7 +102,7 @@ function getDefaultControls(
     // and TS cant really infer the key-value relationship here so need to sprinkle ignores
     // @ts-ignore
     return objectify(
-        Object.entries(DEFAULT_FILTER_FORM),
+        Object.entries(initValue),
         ([k, _]) => k as keyof FilterForm,
         ([k, v]) => {
             let key = k as keyof FilterForm
