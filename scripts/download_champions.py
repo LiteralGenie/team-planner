@@ -7,6 +7,7 @@ from utils import (
     DATA_DIR,
     GUI_ASSETS_DIR,
     LATEST_SET_ID,
+    LATEST_SET_PREFIX,
     download_image,
     get_cdragon_asset_url,
 )
@@ -62,7 +63,7 @@ def download_icons(data: IData):
 def main():
     data = fetch()
 
-    filtered = [d for d in data if LATEST_SET_ID in d["set"]]
+    filtered = [d for d in data if LATEST_SET_PREFIX in d["name"]]
     print(f"Found {len(filtered)} champions for set {LATEST_SET_ID}")
 
     with open(FILTERED_DATA_FILE, "w+") as file:
