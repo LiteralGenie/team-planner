@@ -1,4 +1,5 @@
 <script lang="ts">
+    import RangeIcon from '$lib/icons/range-icon.svelte'
     import type {
         AttributeSlotControls,
         AttributeSlotValues
@@ -13,19 +14,28 @@
         {
             value: slotValues.range.close,
             label: 'Close',
-            onChange: (v: boolean) => handleChange('close', v)
+            onChange: (v: boolean) => handleChange('close', v),
+            prefix: RangeIcon,
+            prefixOpts: { activeClose: true },
+            prefixClass: 'h-4 w-4'
         },
 
         {
             value: slotValues.range.mid,
             label: 'Mid',
-            onChange: (v: boolean) => handleChange('mid', v)
+            onChange: (v: boolean) => handleChange('mid', v),
+            prefix: RangeIcon,
+            prefixOpts: { activeMid: true },
+            prefixClass: 'h-4 w-4'
         },
 
         {
             value: slotValues.range.long,
             label: 'Long',
-            onChange: (v: boolean) => handleChange('long', v)
+            onChange: (v: boolean) => handleChange('long', v),
+            prefix: RangeIcon,
+            prefixOpts: { activeLong: true },
+            prefixClass: 'h-4 w-4'
         }
     ] satisfies CheckboxData[]
 
@@ -38,4 +48,12 @@
     }
 </script>
 
-<CheckboxGroup label="Range" {options} />
+<div class="root">
+    <CheckboxGroup label="Range" {options} />
+</div>
+
+<style lang="postcss">
+    .root :global(svg) {
+        margin-top: 2px;
+    }
+</style>

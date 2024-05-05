@@ -5,6 +5,11 @@
         value: boolean | Boolean
         label: string
         suffix?: typeof SvelteComponent<any>
+        suffixOpts?: any
+        suffixClass?: string
+        prefix?: typeof SvelteComponent<any>
+        prefixOpts?: any
+        prefixClass?: string
         onChange: (update: boolean) => void
     }
 </script>
