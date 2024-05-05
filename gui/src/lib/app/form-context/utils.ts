@@ -89,6 +89,5 @@ export function getActiveFilters(slot: SlotFilter): ActiveFilters {
         activeFilters.traits = traitsSelected
     }
 
-    console.log(activeFilters)
     return activeFilters
 }

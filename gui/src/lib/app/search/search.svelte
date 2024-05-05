@@ -59,7 +59,7 @@
     <div
         class="card w-full rounded-sm flex flex-col justify-center gap-4"
     >
-        <form class="w-full filter-grid">
+        <div class="w-full filter-grid">
             {#each $form.slots as slot, idx}
                 <div
                     class="cell p-4 pl-8 border rounded-md flex gap-4 items-center"
@@ -71,7 +71,7 @@
                     <FilterPreview {slot} />
                 </div>
             {/each}
-        </form>
+        </div>
 
         <section class="w-full p-8 flex justify-end">
             <Button class="w-24">Search -></Button>

@@ -83,7 +83,7 @@
         <span>None</span>
     {/if}
 
-    <div class="flex flex-col gap-[2px]">
+    <div class="flex flex-col gap-[3px]">
         {#if activeFilters.cost}
             <span class="flex items-center gap-[3px]">
                 <GoldIcon class="h-2 w-2" />
@@ -92,12 +92,28 @@
         {/if}
         {#if showRangeOrDamage}
             <div class="comma-group">
-                {#if activeFilters.range}
+                {#if activeFilters.range?.includes('close')}
                     <span>
                         <RangeIcon
                             activeClose={!!slot.byAttribute.range
                                 .close}
+                            class="h-3 w-3 inline"
+                        />
+                    </span>
+                {/if}
+
+                {#if activeFilters.range?.includes('mid')}
+                    <span>
+                        <RangeIcon
                             activeMid={!!slot.byAttribute.range.mid}
+                            class="h-3 w-3 inline"
+                        />
+                    </span>
+                {/if}
+
+                {#if activeFilters.range?.includes('long')}
+                    <span>
+                        <RangeIcon
                             activeLong={!!slot.byAttribute.range.long}
                             class="h-3 w-3 inline"
                         />
@@ -114,7 +130,7 @@
             </div>
         {/if}
         {#if activeFilters.traits}
-            <span class="mt-1">
+            <span>
                 {#each activeFilters.traits as { id, state }}
                     <TraitFilterPreview
                         trait_id={id}
