@@ -3,17 +3,18 @@
     import { someFalse } from '$lib/utils/misc'
     import Button from '../../components/ui/button/button.svelte'
     import FilterDialog from '../filter-dialog/filter-dialog.svelte'
+    import type { SlotIndex } from '../filter-dialog/slot-tabs.svelte'
     import { getFilterFormContext } from '../form-context/context'
     import type { SlotFilter } from '../form-context/types'
     import FilterButton from './filter-preview/filter-button.svelte'
     import FilterPreview from './filter-preview/filter-preview.svelte'
 
     let showDialog = false
-    let activeSlotIndex: number | 'global' = 0
+    let activeSlotIndex: SlotIndex = 0
 
     const { form, controls } = getFilterFormContext()
 
-    function handleDialogOpen(idx: number | 'global') {
+    function handleDialogOpen(idx: SlotIndex) {
         activeSlotIndex = idx
         showDialog = true
     }

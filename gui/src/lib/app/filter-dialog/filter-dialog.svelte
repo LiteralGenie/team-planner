@@ -2,10 +2,10 @@
     import XIcon from '$lib/icons/x-icon.svelte'
     import { createEventDispatcher } from 'svelte'
     import SlotFilterForm from './slot-filter-form/slot-filter-form.svelte'
-    import SlotTabs from './slot-tabs.svelte'
+    import SlotTabs, { type SlotIndex } from './slot-tabs.svelte'
 
     export let open = false
-    export let slotIndex: number | 'global'
+    export let slotIndex: SlotIndex
 
     let dispatch = createEventDispatcher()
 
@@ -45,7 +45,7 @@
     >
         <div class="h-full flex">
             <div class="hidden md:block">
-                <SlotTabs on:tabclick />
+                <SlotTabs {slotIndex} on:tabclick />
             </div>
 
             <section class="w-full min-w-0 pr-6 flex">
