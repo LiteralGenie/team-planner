@@ -47,10 +47,11 @@ def fetch() -> IData:
 def download_icons(data: IData):
     for champion in data:
         record = champion["character_record"]
+
         url = get_cdragon_asset_url(record["squareIconPath"])
+        ext = str(url).split(".")[-1]
 
         id = record["character_id"]
-        ext = url.split(".")[-1]
         fp_out = IMAGE_DIR / f"{id}.{ext}"
         if fp_out.exists():
             continue

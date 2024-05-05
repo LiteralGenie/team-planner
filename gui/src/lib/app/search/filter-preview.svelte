@@ -1,49 +1,19 @@
-<script lang="ts" context="module">
-    import GoldIcon from '$lib/icons/gold-icon.svelte'
-    import { last, sort } from 'radash'
-    import type {
-        CostTier,
-        RangeType,
-        SlotFilter
-    } from '../form-context/types'
-
-    interface ActiveFilters {
-        cost?: CostTier[]
-        range?: RangeType[]
-    }
-</script>
-
 <script lang="ts">
+    import apIcon from '$lib/assets/tft/misc/statmodsabilitypowericon.png'
+    import adIcon from '$lib/assets/tft/misc/statmodsattackdamageicon.png'
+    import GoldIcon from '$lib/icons/gold-icon.svelte'
     import RangeIcon from '$lib/icons/range-icon.svelte'
-    import { filterMap, someFalse } from '$lib/utils/misc'
+    import { last, sort } from 'radash'
+    import type { CostTier, SlotFilter } from '../form-context/types'
+    import { getActiveFilters } from '../form-context/utils'
 
     export let slot: SlotFilter
 
     $: activeFilters = getActiveFilters(slot)
     $: isEmpty = Object.entries(activeFilters ?? {}).length === 0
 
-    function getActiveFilters(slot: SlotFilter): ActiveFilters {
-        const attrFilters = slot.byAttribute
-
-        let activeFilters: ActiveFilters = {}
-
-        if (someFalse(attrFilters.cost)) {
-            activeFilters.cost = filterMap<CostTier, any>(
-                Object.entries(attrFilters.cost),
-                ([cost, val]) => (val ? cost : null)
-            )
-        }
-
-        if (someFalse(attrFilters.range)) {
-            activeFilters.range = filterMap<RangeType, any>(
-                Object.entries(attrFilters.range),
-                ([range, val]) => (val ? range : null)
-            )
-        }
-
-        console.log(activeFilters)
-        return activeFilters
-    }
+    $: showRangeOrDamage =
+        activeFilters.range || activeFilters.damageType
 
     function humanizeCostFilters(costs: CostTier[]): string {
         let bin: CostTier[] = []
@@ -86,23 +56,33 @@
     <div class="flex flex-col gap-[2px]">
         {#if activeFilters.cost}
             <span class="flex items-center gap-[3px]">
-                <GoldIcon variant="muted" class="h-2 w-2" />
+                <GoldIcon class="h-2 w-2" />
                 {humanizeCostFilters(activeFilters.cost)}
             </span>
         {/if}
-        <div class="comma-group">
-            {#if activeFilters.range}
-                <span>
-                    <RangeIcon
-                        activeClose={!!slot.byAttribute.range.close}
-                        activeMid={!!slot.byAttribute.range.mid}
-                        activeLong={!!slot.byAttribute.range.long}
-                        fill="muted"
-                        class="h-3 w-3 inline"
-                    />
-                </span>
-            {/if}
-        </div>
+        {#if showRangeOrDamage}
+            <div class="comma-group">
+                {#if activeFilters.range}
+                    <span>
+                        <RangeIcon
+                            activeClose={!!slot.byAttribute.range
+                                .close}
+                            activeMid={!!slot.byAttribute.range.mid}
+                            activeLong={!!slot.byAttribute.range.long}
+                            class="h-3 w-3 inline"
+                        />
+                    </span>
+                {/if}
+
+                {#if activeFilters.damageType?.includes('ad')}
+                    <img src={adIcon} class="h-3 w-3 inline" />
+                {/if}
+
+                {#if activeFilters.damageType?.includes('ap')}
+                    <img src={apIcon} class="h-3 w-3 inline" />
+                {/if}
+            </div>
+        {/if}
     </div>
 </div>
 

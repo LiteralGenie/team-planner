@@ -1,8 +1,17 @@
+import { filterMap, someFalse } from '$lib/utils/misc'
 import { isArray, isObject } from 'radash'
 import { FormControl } from './form-control'
 import { FormControlArray } from './form-control-array'
 import { FormControlRecord } from './form-control-record'
-import type { FormControlWrapper, InputParser } from './types'
+import type {
+    CostTier,
+    DamageType,
+    FormControlWrapper,
+    InputParser,
+    RangeType,
+    SlotFilter,
+    TraitFilter
+} from './types'
 
 export const StringParser = {
     fromString: (val: string) => val,
@@ -38,4 +47,48 @@ export function createControl<T>(
         // @ts-ignore
         return new FormControl(onChange, parser)
     }
+}
+
+export interface ActiveFilters {
+    cost?: CostTier[]
+    range?: RangeType[]
+    damageType?: DamageType[]
+    traits?: TraitFilter[]
+}
+
+export function getActiveFilters(slot: SlotFilter): ActiveFilters {
+    const attrFilters = slot.byAttribute
+
+    let activeFilters: ActiveFilters = {}
+
+    if (someFalse(attrFilters.cost)) {
+        activeFilters.cost = filterMap<CostTier, any>(
+            Object.entries(attrFilters.cost),
+            ([cost, val]) => (val ? cost : null)
+        )
+    }
+
+    if (someFalse(attrFilters.range)) {
+        activeFilters.range = filterMap<RangeType, any>(
+            Object.entries(attrFilters.range),
+            ([range, val]) => (val ? range : null)
+        )
+    }
+
+    if (someFalse(attrFilters.damageType)) {
+        activeFilters.damageType = filterMap<DamageType, any>(
+            Object.entries(attrFilters.damageType),
+            ([damageType, val]) => (val ? damageType : null)
+        )
+    }
+
+    const traitsSelected = attrFilters.traits.filter(
+        (t) => t.state !== 0
+    )
+    if (traitsSelected.length > 0) {
+        activeFilters.traits = traitsSelected
+    }
+
+    console.log(activeFilters)
+    return activeFilters
 }

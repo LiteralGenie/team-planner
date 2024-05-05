@@ -130,7 +130,7 @@ A 19 19 0 0 0 -19 100
     .foreground {
         & g.active > path,
         & .arrow {
-            fill: hsl(var(--muted));
+            fill: hsl(var(--foreground));
         }
     }
 </style>

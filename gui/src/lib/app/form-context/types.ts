@@ -66,14 +66,13 @@ export type CostTier = 1 | 2 | 3 | 4 | 5
 
 export type RangeType = 'close' | 'mid' | 'long'
 
+export type DamageType = 'ad' | 'ap'
+
 export interface AttributeFilter {
     cost: { [k in CostTier]: Boolean }
     range: { [k in RangeType]: Boolean }
-    traits: Array<TraitFilter>
-    damageType: {
-        ad: Boolean
-        ap: Boolean
-    }
+    damageType: { [k in DamageType]: Boolean }
+    traits: TraitFilter[]
 }
 
 export type IdFilter = string[]
