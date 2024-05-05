@@ -23,13 +23,13 @@
 </script>
 
 <script lang="ts">
-    import type { CDragonTrait } from '$lib/types'
-    import type { FormControlRecord } from '../form-context/form-control-record'
+    import type { FormControlRecord } from '$lib/app/form-context/form-control-record'
     import type {
         AttributeSlotControls,
         AttributeSlotValues,
         TraitFilter
-    } from '../form-context/types'
+    } from '$lib/app/form-context/types'
+    import type { CDragonTrait } from '$lib/types'
     import TraitCheckbox from './trait-checkbox.svelte'
 
     export let slotControls: AttributeSlotControls
@@ -45,28 +45,13 @@
         [TraitFilter, FormControlRecord<TraitFilter>, CDragonTrait]
     >
 
-    function getCheckboxState(val: number) {
-        switch (val) {
-            case 1:
-                return 'included'
-            case 2:
-                return 'excluded'
-            default:
-                return null
-        }
-    }
-
     function handleClick(
         current: TraitFilter,
         ctrl: FormControlRecord<TraitFilter>
     ) {
-        let update = current.state + 1
-        if (update > 2) {
-            update = 0
-        }
         ctrl.onChange({
             ...current,
-            state: update
+            included: !current.included
         })
     }
 </script>
@@ -79,7 +64,7 @@
             on:click={() => handleClick(val, ctrl)}
             src={srcs[val.id]}
             label={trait.display_name}
-            state={getCheckboxState(val.state)}
+            state={val.included ? 'included' : null}
         />
     {/each}
 </fieldset>

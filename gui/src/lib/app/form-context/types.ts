@@ -57,9 +57,7 @@ export type FormControlWrapper<T> = T extends Primitive
 
 export interface TraitFilter {
     id: string
-    // @todo: support for form enums
-    // 0 for null, 1 for included, 2 for excluded
-    state: number
+    included: boolean
 }
 
 export type CostTier = 1 | 2 | 3 | 4 | 5

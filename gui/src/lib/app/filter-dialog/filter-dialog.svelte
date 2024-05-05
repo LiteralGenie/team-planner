@@ -1,6 +1,7 @@
 <script lang="ts">
     import XIcon from '$lib/icons/x-icon.svelte'
     import { createEventDispatcher } from 'svelte'
+    import GlobalFilterForm from './global-filter-form/global-filter-form.svelte'
     import SlotFilterForm from './slot-filter-form/slot-filter-form.svelte'
     import SlotTabs, { type SlotIndex } from './slot-tabs.svelte'
 
@@ -52,7 +53,7 @@
                 {#if typeof slotIndex === 'number'}
                     <SlotFilterForm {slotIndex} />
                 {:else}
-                    global filters
+                    <GlobalFilterForm />
                 {/if}
             </section>
         </div>

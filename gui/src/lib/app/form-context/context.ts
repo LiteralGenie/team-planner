@@ -39,7 +39,7 @@ export function setFilterFormContext(
     // Add traits to init value
     const defaultTraits = traits.map((trait) => ({
         id: trait.trait_id,
-        state: 0
+        included: false
     }))
     for (let slot of controls.slots.controls) {
         const traitArray = slot.controls.byAttribute.controls.traits

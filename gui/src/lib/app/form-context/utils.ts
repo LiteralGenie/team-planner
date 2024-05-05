@@ -83,7 +83,7 @@ export function getActiveFilters(slot: SlotFilter): ActiveFilters {
     }
 
     const traitsSelected = attrFilters.traits.filter(
-        (t) => t.state !== 0
+        (t) => t.included
     )
     if (traitsSelected.length > 0) {
         activeFilters.traits = traitsSelected

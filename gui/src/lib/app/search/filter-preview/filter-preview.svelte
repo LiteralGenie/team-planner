@@ -129,10 +129,10 @@
         {/if}
         {#if activeFilters.traits}
             <span>
-                {#each activeFilters.traits as { id, state }}
+                {#each activeFilters.traits as { id, included }}
                     <TraitFilterPreview
                         trait_id={id}
-                        checked={state === 1}
+                        checked={included}
                     />
                 {/each}
             </span>
