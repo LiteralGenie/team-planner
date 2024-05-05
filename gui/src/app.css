@@ -101,6 +101,7 @@ body {
     background-color: hsl(
         var(--muted) / var(--tw-bg-opacity)
     ) !important;
+    border-radius: calc(var(--radius) - 4px);
 }
 
 /* 
@@ -146,4 +147,10 @@ dialog[open]::backdrop {
 
     /* Preserve 1:1 aspect ratio */
     flex-shrink: 0;
+}
+
+hr,
+.divider-color {
+    --divider: hsl(var(--foreground) / 10%);
+    border-color: var(--divider);
 }

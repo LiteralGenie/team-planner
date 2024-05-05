@@ -2,6 +2,7 @@
     import XIcon from '$lib/icons/x-icon.svelte'
     import { createEventDispatcher } from 'svelte'
     import FilterDialogForm from './filter-dialog-form.svelte'
+    import SlotTabs from './slot-tabs.svelte'
 
     export let open = false
     export let slotIndex: number
@@ -43,10 +44,7 @@
         class="pt-12 pb-12 card rounded-2xl h-full w-full text-muted-foreground flex flex-col"
     >
         <div class="min-h-0 flex">
-            <section class="px-6 border-r border-r-muted">
-                tabs
-            </section>
-
+            <SlotTabs />
             <FilterDialogForm {slotIndex} />
         </div>
     </div>

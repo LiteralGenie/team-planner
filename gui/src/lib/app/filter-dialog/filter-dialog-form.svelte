@@ -14,7 +14,7 @@
     $: attributeValues = $form.slots[slotIndex].byAttribute
 </script>
 
-<form class="pr-6 h-full w-full pt-4">
+<form class="pr-6 min-w-0 h-full flex-grow pt-4">
     <div class="px-6 h-full w-full overflow-auto">
         <h1 class="text-xl text-foreground font-bold mb-4">
             Slot #{slotIndex + 1}
@@ -53,7 +53,4 @@
 </form>
 
 <style lang="postcss">
-    hr {
-        border-color: hsl(var(--foreground) / 10%);
-    }
 </style>

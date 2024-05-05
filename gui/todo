@@ -4,11 +4,9 @@ random search on page load
 serialize form to / from url
     too much to be human friendly so just lzma it or smth
 
-filter
-    preview button
-    dialog
-    preview stats
-    preview icon
+dialog
+    champion preview
+    different font for titles
 
 filter pane
     search button

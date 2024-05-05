@@ -74,9 +74,7 @@
     }
 </script>
 
-<div
-    class="min-w-20 text-sm py-1 text-muted-foreground flex flex-col"
->
+<div class="min-w-20 py-1 flex flex-col">
     <h1>Filters:</h1>
 
     {#if isEmpty}

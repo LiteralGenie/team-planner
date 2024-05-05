@@ -11,7 +11,6 @@
     let activeDialogSlot = 0
 
     const { form, controls } = getFilterFormContext()
-    $: console.log('form value', $form)
 
     function handleDialogOpen(idx: number) {
         activeDialogSlot = idx
@@ -59,11 +58,9 @@
     <div
         class="card w-full rounded-sm flex flex-col justify-center gap-4"
     >
-        <div class="w-full filter-grid">
+        <div class="w-full filter-grid text-sm text-muted-foreground">
             {#each $form.slots as slot, idx}
-                <div
-                    class="cell p-4 pl-8 border rounded-md flex gap-4 items-center"
-                >
+                <div class="cell">
                     <FilterButton
                         on:click={() => handleDialogOpen(idx)}
                         variant={slotState(slot)}
@@ -74,7 +71,7 @@
         </div>
 
         <section class="w-full p-8 flex justify-end">
-            <Button class="w-24">Search -></Button>
+            <div><Button class="w-24">Search -></Button></div>
         </section>
     </div>
 </div>
@@ -92,7 +89,7 @@
     }
 
     .cell {
+        @apply p-4 pl-8 border rounded-md flex gap-4 items-center;
         background-color: hsl(var(--foreground) / 8%);
-        border-color: hsl(var(--foreground) / 20%);
     }
 </style>
