@@ -4,8 +4,8 @@
     import FilterDialog from '../filter-dialog/filter-dialog.svelte'
     import { getFilterFormContext } from '../form-context/context'
     import type { SlotFilter } from '../form-context/types'
-    import FilterButton from './filter-button.svelte'
-    import FilterPreview from './filter-preview.svelte'
+    import FilterButton from './filter-preview/filter-button.svelte'
+    import FilterPreview from './filter-preview/filter-preview.svelte'
 
     let showDialog = false
     let activeDialogSlot = 0

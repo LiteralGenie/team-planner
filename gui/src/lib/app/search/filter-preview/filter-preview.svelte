@@ -1,11 +1,39 @@
+<script lang="ts" context="module">
+    import TRAITS from '$lib/assets/tft/tfttraits.json'
+    import { objectify } from 'radash'
+
+    const files = import.meta.glob('$lib/assets/tft/traits/*.png', {
+        eager: true
+    })
+    const srcs: Record<string, string> = objectify(
+        Array.from(Object.keys(files)),
+        (path: string) => {
+            path = path.split('/').slice(-1)[0]
+            path = path.split('.')[0]
+            return path
+        },
+        (path) => path
+    )
+
+    const TRAITS_BY_ID = objectify(
+        TRAITS,
+        (t) => t.trait_id,
+        (t) => t
+    )
+</script>
+
 <script lang="ts">
+    import type {
+        CostTier,
+        SlotFilter
+    } from '$lib/app/form-context/types'
+    import { getActiveFilters } from '$lib/app/form-context/utils'
     import apIcon from '$lib/assets/tft/misc/statmodsabilitypowericon.png'
     import adIcon from '$lib/assets/tft/misc/statmodsattackdamageicon.png'
     import GoldIcon from '$lib/icons/gold-icon.svelte'
     import RangeIcon from '$lib/icons/range-icon.svelte'
     import { last, sort } from 'radash'
-    import type { CostTier, SlotFilter } from '../form-context/types'
-    import { getActiveFilters } from '../form-context/utils'
+    import TraitFilterPreview from './trait-filter-preview.svelte'
 
     export let slot: SlotFilter
 
@@ -46,7 +74,9 @@
     }
 </script>
 
-<div class="w-16 text-sm py-1 text-muted-foreground flex flex-col">
+<div
+    class="min-w-20 text-sm py-1 text-muted-foreground flex flex-col"
+>
     <h1>Filters:</h1>
 
     {#if isEmpty}
@@ -82,6 +112,16 @@
                     <img src={apIcon} class="h-3 w-3 inline" />
                 {/if}
             </div>
+        {/if}
+        {#if activeFilters.traits}
+            <span class="mt-1">
+                {#each activeFilters.traits as { id, state }}
+                    <TraitFilterPreview
+                        trait_id={id}
+                        checked={state === 1}
+                    />
+                {/each}
+            </span>
         {/if}
     </div>
 </div>
