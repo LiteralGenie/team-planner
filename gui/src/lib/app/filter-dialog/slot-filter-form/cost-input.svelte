@@ -5,9 +5,9 @@
         AttributeSlotControls,
         AttributeSlotValues,
         CostTier
-    } from '../form-context/types'
-    import type { CheckboxData } from './checkbox-group/checkbox-group.svelte'
-    import CheckboxGroup from './checkbox-group/checkbox-group.svelte'
+    } from '../../form-context/types'
+    import type { CheckboxData } from '../checkbox-group/checkbox-group.svelte'
+    import CheckboxGroup from '../checkbox-group/checkbox-group.svelte'
 
     export let slotControls: AttributeSlotControls
     export let slotValues: AttributeSlotValues

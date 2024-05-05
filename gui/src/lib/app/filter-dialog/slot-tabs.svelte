@@ -7,7 +7,7 @@
     const dispatch = createEventDispatcher()
 </script>
 
-<section class="border-r divider-color flex flex-col">
+<section class="h-full border-r divider-color flex flex-col">
     <h1 class="font-bold pb-2">Filters</h1>
 
     <button on:click={() => dispatch('tabclick', 'global')}>

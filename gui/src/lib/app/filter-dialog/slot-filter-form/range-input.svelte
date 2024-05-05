@@ -1,11 +1,11 @@
 <script lang="ts">
-    import RangeIcon from '$lib/icons/range-icon.svelte'
     import type {
         AttributeSlotControls,
         AttributeSlotValues
-    } from '../form-context/types'
-    import type { CheckboxData } from './checkbox-group/checkbox-group.svelte'
-    import CheckboxGroup from './checkbox-group/checkbox-group.svelte'
+    } from '$lib/app/form-context/types'
+    import RangeIcon from '$lib/icons/range-icon.svelte'
+    import type { CheckboxData } from '../checkbox-group/checkbox-group.svelte'
+    import CheckboxGroup from '../checkbox-group/checkbox-group.svelte'
 
     export let slotControls: AttributeSlotControls
     export let slotValues: AttributeSlotValues

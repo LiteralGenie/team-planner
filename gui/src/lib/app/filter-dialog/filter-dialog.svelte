@@ -1,7 +1,7 @@
 <script lang="ts">
     import XIcon from '$lib/icons/x-icon.svelte'
     import { createEventDispatcher } from 'svelte'
-    import FilterDialogForm from './filter-dialog-form.svelte'
+    import SlotFilterForm from './slot-filter-form/slot-filter-form.svelte'
     import SlotTabs from './slot-tabs.svelte'
 
     export let open = false
@@ -44,11 +44,13 @@
         class="pt-12 pb-12 card rounded-2xl h-full w-full text-muted-foreground flex flex-col"
     >
         <div class="h-full flex">
-            <SlotTabs on:tabclick />
+            <div class="hidden md:block">
+                <SlotTabs on:tabclick />
+            </div>
 
-            <section class="w-full pr-6 flex">
+            <section class="w-full min-w-0 pr-6 flex">
                 {#if typeof slotIndex === 'number'}
-                    <FilterDialogForm {slotIndex} />
+                    <SlotFilterForm {slotIndex} />
                 {:else}
                     global filters
                 {/if}

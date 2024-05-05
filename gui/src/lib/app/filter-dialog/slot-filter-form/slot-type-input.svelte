@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { getFilterFormContext } from '../form-context/context'
-    import type { FormControl } from '../form-context/form-control'
+    import { getFilterFormContext } from '$lib/app/form-context/context'
+    import type { FormControl } from '$lib/app/form-context/form-control'
     import BoolOption, {
         type OptionData
-    } from './bool-option/bool-option.svelte'
+    } from '../bool-option/bool-option.svelte'
 
     export let slotIndex: number
 
