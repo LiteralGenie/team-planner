@@ -90,6 +90,6 @@
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
         align-items: start;
-        gap: 12px;
+        gap: 8px;
     }
 </style>

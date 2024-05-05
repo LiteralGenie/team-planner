@@ -5,7 +5,7 @@
     import SlotTabs from './slot-tabs.svelte'
 
     export let open = false
-    export let slotIndex: number
+    export let slotIndex: number | 'global'
 
     let dispatch = createEventDispatcher()
 
@@ -43,9 +43,16 @@
     <div
         class="pt-12 pb-12 card rounded-2xl h-full w-full text-muted-foreground flex flex-col"
     >
-        <div class="min-h-0 flex">
-            <SlotTabs />
-            <FilterDialogForm {slotIndex} />
+        <div class="h-full flex">
+            <SlotTabs on:tabclick />
+
+            <section class="w-full pr-6 flex">
+                {#if typeof slotIndex === 'number'}
+                    <FilterDialogForm {slotIndex} />
+                {:else}
+                    global filters
+                {/if}
+            </section>
         </div>
     </div>
 </dialog>

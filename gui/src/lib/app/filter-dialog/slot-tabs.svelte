@@ -1,16 +1,23 @@
 <script lang="ts">
+    import { createEventDispatcher } from 'svelte'
     import { getFilterFormContext } from '../form-context/context'
 
     const { form } = getFilterFormContext()
+
+    const dispatch = createEventDispatcher()
 </script>
 
 <section class="border-r divider-color flex flex-col">
     <h1 class="font-bold pb-2">Filters</h1>
 
-    <button>Global</button>
+    <button on:click={() => dispatch('tabclick', 'global')}>
+        Global
+    </button>
 
     {#each $form.slots as slot, idx}
-        <button> Slot #{idx + 1} </button>
+        <button on:click={() => dispatch('tabclick', idx)}>
+            Slot #{idx + 1}
+        </button>
     {/each}
 </section>
 
