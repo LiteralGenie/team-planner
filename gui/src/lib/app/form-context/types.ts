@@ -81,8 +81,15 @@ export interface SlotFilter {
     byId: IdFilter
 }
 
+export interface GlobalFilter {
+    champions: IdFilter
+    cost: { [k in CostTier]: Boolean }
+    traits: TraitFilter[]
+}
+
 export interface FilterForm {
     teamSize: number
+    global: GlobalFilter
     slots: SlotFilter[]
 }
 
