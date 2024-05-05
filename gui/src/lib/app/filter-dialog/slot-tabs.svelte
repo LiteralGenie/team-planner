@@ -28,7 +28,9 @@
 </script>
 
 <section class="h-full border-r divider-color">
-    <h1 class="font-bold pb-2">Filters</h1>
+    <h1 class="font-bold pb-1">Filters</h1>
+
+    <hr class="mx-4 my-2" />
 
     <div class="relative flex">
         <!-- Tabs -->
