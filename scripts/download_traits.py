@@ -8,6 +8,7 @@ from utils import (
     GUI_ASSETS_DIR,
     LATEST_SET_ID,
     download_image,
+    fetch_json_cached,
     get_cdragon_asset_url,
 )
 
@@ -30,18 +31,11 @@ IData: TypeAlias = list[ITrait]
 
 
 def fetch() -> IData:
-    data = requests.get(DATA_URL).json()
-
-    if USE_CACHED and DATA_FILE.exists():
-        with open(DATA_FILE) as file:
-            return json.load(file)
-    else:
-        data = requests.get(DATA_URL).json()
-        print(f"Fetching {DATA_URL}")
-
-        with open(DATA_FILE, "w+") as file:
-            json.dump(data, file, indent=4)
-        return data
+    return fetch_json_cached(
+        DATA_URL,
+        DATA_FILE,
+        use_cache=USE_CACHED,
+    )
 
 
 def download_icons(data: IData):

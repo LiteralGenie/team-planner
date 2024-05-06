@@ -23,7 +23,11 @@
     ) satisfies CheckboxData[]
 </script>
 
-<CheckboxGroup label="Cost" {options} />
+<CheckboxGroup
+    label="Cost"
+    description="Teams containing a champion from unselected cost tiers will not be displayed."
+    {options}
+/>
 
 <style lang="postcss">
 </style>

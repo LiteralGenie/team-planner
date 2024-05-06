@@ -1,3 +1,4 @@
+import json
 import shutil
 from pathlib import Path
 from typing import TypeAlias
@@ -10,6 +11,7 @@ IImage: TypeAlias = Image.Image
 
 LATEST_SET_ID = "TFTSet11"
 LATEST_SET_PREFIX = "TFT11"
+LATEST_SET_NAME = "Set11"
 
 ROOT_DIR = Path(__file__).parent.parent
 
@@ -59,3 +61,16 @@ def download_image(url: URL | str, fp: Path):
     with open(fp, "wb") as file:
         resp.raw.decode_content = True
         shutil.copyfileobj(resp.raw, file)
+
+
+def fetch_json_cached(url: URL | str, fp: Path, use_cache=True):
+    if use_cache and fp.exists():
+        with open(fp) as file:
+            return json.load(file)
+    else:
+        data = requests.get(str(url)).json()
+        print(f"Fetching {url}")
+
+        with open(fp, "w+") as file:
+            json.dump(data, file, indent=4)
+        return data

@@ -19,10 +19,19 @@
 
     export let options: CheckboxData[]
     export let label: string
+    export let description: string = ''
 </script>
 
-<fieldset class="flex">
-    <legend class="pb-[6px]">{label}</legend>
+<fieldset class="flex flex-col">
+    <legend class="">{label}</legend>
+
+    {#if description}
+        <p class="text-muted-foreground text-xs pt-1">
+            {description}
+        </p>
+    {/if}
+
+    <div class="h-[6px]"></div>
 
     <div class="flex gap-6">
         {#each options as { onChange, ...props }}

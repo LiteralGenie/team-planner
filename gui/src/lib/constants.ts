@@ -1,5 +1,5 @@
 import type { CostTier } from '$lib/app/form-context/types'
-import ALL_CHAMPIONS from '$lib/assets/tft/tftchampions-teamplanner.json'
+import ALL_CHAMPIONS from '$lib/assets/tft/merged_teamplanner_data.json'
 import ALL_TRAITS from '$lib/assets/tft/tfttraits.json'
 import { alphabetical, group, objectify, sort } from 'radash'
 
@@ -95,7 +95,6 @@ export interface CDragonTrait {
 }
 
 export interface CDragonChampion {
-    path: string
     character_id: string
     tier: CostTier
     display_name: string
@@ -104,6 +103,16 @@ export interface CDragonChampion {
         id: string
         amount: number
     }>
-    squareIconPath: string
-    squareSplashIconPath: string
+    stats: {
+        armor: number
+        attackSpeed: number
+        critChance: number
+        critMultiplier: number
+        damage: number
+        hp: number
+        initialMana: number
+        magicResist: number
+        mana: number
+        range: number
+    }
 }
