@@ -4,7 +4,7 @@
     import GlobalTraitInput from './global-trait-input.svelte'
 </script>
 
-<form class="h-full w-full pt-4 px-6">
+<form class="h-full w-full pt-4 px-6 overflow-auto">
     <h1 class="text-xl text-foreground font-bold mb-4">
         Global Filters
     </h1>

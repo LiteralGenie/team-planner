@@ -106,4 +106,10 @@
     .active span {
         @apply text-foreground;
     }
+
+    /* Prevent text wrap from creating uneven row heights */
+    span {
+        overflow: hidden;
+        white-space: nowrap;
+    }
 </style>
