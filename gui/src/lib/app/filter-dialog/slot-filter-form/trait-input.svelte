@@ -3,11 +3,11 @@
     import type {
         AttributeSlotControls,
         AttributeSlotValues,
-        TraitFilter
+        IdFilter
     } from '$lib/app/form-context/types'
     import TraitCheckbox from '$lib/components/trait-checkbox.svelte'
+    import type { CDragonTrait } from '$lib/constants'
     import { TRAITS_BY_ID, TRAIT_ICONS } from '$lib/constants'
-    import type { CDragonTrait } from '$lib/types'
     import { zip } from 'radash'
 
     export let slotControls: AttributeSlotControls
@@ -19,13 +19,11 @@
         val,
         ctrl,
         TRAITS_BY_ID[val.id]
-    ]) as Array<
-        [TraitFilter, FormControlRecord<TraitFilter>, CDragonTrait]
-    >
+    ]) as Array<[IdFilter, FormControlRecord<IdFilter>, CDragonTrait]>
 
     function handleClick(
-        current: TraitFilter,
-        ctrl: FormControlRecord<TraitFilter>
+        current: IdFilter,
+        ctrl: FormControlRecord<IdFilter>
     ) {
         ctrl.onChange({
             ...current,

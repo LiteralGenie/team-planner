@@ -1,4 +1,4 @@
-import type { CDragonTrait } from '$lib/types'
+import { CHAMPIONS, TRAITS } from '$lib/constants'
 import { deepCopy } from '$lib/utils/misc'
 import { clone, objectify } from 'radash'
 import { getContext, setContext } from 'svelte'
@@ -29,33 +29,12 @@ export type FilterFormValue = {
 
 const KEY = 'filter-form'
 
-export function setFilterFormContext(
-    initValue: FilterForm,
-    traits: CDragonTrait[]
-) {
+export function setFilterFormContext(initValue: FilterForm) {
     initValue = deepCopy(initValue)
     const controls = getDefaultControls(initValue, onChange)
 
-    // Init global traits
-    const globalTraits = traits.map((trait) => ({
-        id: trait.trait_id,
-        included: true
-    }))
-    controls.global.controls.traits.setValue(deepCopy(globalTraits))
-    initValue.global.traits = deepCopy(globalTraits)
-
-    // Init slot traits
-    const slotTraits = traits.map((trait) => ({
-        id: trait.trait_id,
-        included: false
-    }))
-    for (let slot of controls.slots.controls) {
-        const traitArray = slot.controls.byAttribute.controls.traits
-        traitArray.setValue(deepCopy(slotTraits))
-    }
-    for (let slot of initValue.slots) {
-        slot.byAttribute.traits = deepCopy(slotTraits)
-    }
+    initTraits(initValue, controls)
+    initChampions(initValue, controls)
 
     const form = writable(clone(initValue))
 
@@ -121,6 +100,60 @@ function getDefaultControls(
             )
         }
     )
+}
+
+function initTraits(
+    initValue: FilterForm,
+    controls: FilterFormControls
+) {
+    // Init global traits
+    const globalTraits = TRAITS.map((trait) => ({
+        id: trait.trait_id,
+        included: true
+    }))
+    controls.global.controls.traits.setValue(deepCopy(globalTraits))
+    initValue.global.traits = deepCopy(globalTraits)
+
+    // Init slot traits
+    const slotTraits = TRAITS.map((trait) => ({
+        id: trait.trait_id,
+        included: false
+    }))
+    for (let slot of controls.slots.controls) {
+        const traitArray = slot.controls.byAttribute.controls.traits
+        traitArray.setValue(deepCopy(slotTraits))
+    }
+    for (let slot of initValue.slots) {
+        slot.byAttribute.traits = deepCopy(slotTraits)
+    }
+}
+
+function initChampions(
+    initValue: FilterForm,
+    controls: FilterFormControls
+) {
+    // Global input
+    const globalChampions = CHAMPIONS.map((c) => ({
+        id: c.character_record.character_id,
+        included: true
+    }))
+    controls.global.controls.champions.setValue(
+        deepCopy(globalChampions)
+    )
+    initValue.global.traits = deepCopy(globalChampions)
+
+    // Slot inputs
+    const slotChampions = CHAMPIONS.map((c) => ({
+        id: c.character_record.character_id,
+        included: false
+    }))
+    for (let slot of controls.slots.controls) {
+        const traitArray = slot.controls.byAttribute.controls.traits
+        traitArray.setValue(deepCopy(slotChampions))
+    }
+    for (let slot of initValue.slots) {
+        slot.byAttribute.traits = deepCopy(slotChampions)
+    }
 }
 
 export function getFilterFormContext() {

@@ -55,7 +55,7 @@ export type FormControlWrapper<T> = T extends Primitive
 
 /****/
 
-export interface TraitFilter {
+export interface IdFilter {
     id: string
     included: boolean
 }
@@ -70,21 +70,19 @@ export interface AttributeFilter {
     cost: { [k in CostTier]: Boolean }
     range: { [k in RangeType]: Boolean }
     damageType: { [k in DamageType]: Boolean }
-    traits: TraitFilter[]
+    traits: IdFilter[]
 }
-
-export type IdFilter = string[]
 
 export interface SlotFilter {
     useAttributes: boolean
     byAttribute: AttributeFilter
-    byId: IdFilter
+    byId: IdFilter[]
 }
 
 export interface GlobalFilter {
-    champions: IdFilter
+    champions: IdFilter[]
     cost: { [k in CostTier]: Boolean }
-    traits: TraitFilter[]
+    traits: IdFilter[]
 }
 
 export interface FilterForm {

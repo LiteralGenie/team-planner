@@ -1,10 +1,9 @@
 <script lang="ts">
     import { getFilterFormContext } from '$lib/app/form-context/context'
     import type { FormControlRecord } from '$lib/app/form-context/form-control-record'
-    import type { TraitFilter } from '$lib/app/form-context/types'
+    import type { IdFilter } from '$lib/app/form-context/types'
     import TraitCheckbox from '$lib/components/trait-checkbox.svelte'
-    import { TRAITS_BY_ID, TRAIT_ICONS } from '$lib/constants'
-    import type { CDragonTrait } from '$lib/types'
+    import { TRAITS_BY_ID, type CDragonTrait } from '$lib/constants'
     import { zip } from 'radash'
 
     const { form, controls } = getFilterFormContext()
@@ -15,13 +14,11 @@
         val,
         ctrl,
         TRAITS_BY_ID[val.id]
-    ]) as Array<
-        [TraitFilter, FormControlRecord<TraitFilter>, CDragonTrait]
-    >
+    ]) as Array<[IdFilter, FormControlRecord<IdFilter>, CDragonTrait]>
 
     function handleClick(
-        current: TraitFilter,
-        ctrl: FormControlRecord<TraitFilter>
+        current: IdFilter,
+        ctrl: FormControlRecord<IdFilter>
     ) {
         ctrl.onChange({
             ...current,

@@ -7,10 +7,10 @@ import type {
     CostTier,
     DamageType,
     FormControlWrapper,
+    IdFilter,
     InputParser,
     RangeType,
-    SlotFilter,
-    TraitFilter
+    SlotFilter
 } from './types'
 
 export const StringParser = {
@@ -53,7 +53,7 @@ export interface ActiveFilters {
     cost?: CostTier[]
     range?: RangeType[]
     damageType?: DamageType[]
-    traits?: TraitFilter[]
+    traits?: IdFilter[]
 }
 
 export function getActiveFilters(slot: SlotFilter): ActiveFilters {

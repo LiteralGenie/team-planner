@@ -71,7 +71,10 @@ export const FILTER_FORM_PARSERS = {
             id: StringParser,
             included: BoolParser
         },
-        champions: StringParser
+        champions: {
+            id: StringParser,
+            included: BoolParser
+        }
     },
     slots: {
         useAttributes: BoolParser,
@@ -97,6 +100,9 @@ export const FILTER_FORM_PARSERS = {
                 ap: BoolParser
             }
         },
-        byId: StringParser
+        byId: {
+            id: StringParser,
+            included: BoolParser
+        }
     }
 } satisfies FormParsers<FilterForm>
