@@ -1,9 +1,11 @@
 <script lang="ts">
+    import type { CostTier } from '$lib/app/form-context/types'
     import CheckmarkIcon from '$lib/icons/checkmark-icon.svelte'
     import XIcon from '$lib/icons/x-icon.svelte'
 
     export let src: string
     export let label: string
+    export let cost: CostTier
 
     export let state: 'included' | 'excluded' | null
 </script>
@@ -17,15 +19,18 @@
         type="button"
         class="h-12 w-12 relative select-none"
     >
-        <!-- @todo trait description tooltip -->
-        <!-- Hex icon -->
-        <div class="hex hover-fill p-[2px]">
-            <div class="hex dark-fill p-[2px]">
-                <div class="hex light-fill p-[2px]">
-                    <div class="hex dark-fill">
-                        <img class="h-[66%] w-[66%]" {src} />
-                    </div>
-                </div>
+        <!-- @todo description tooltip -->
+        <!-- Icon -->
+        <div
+            class:common={cost === 1}
+            class:uncommon={cost === 2}
+            class:rare={cost === 3}
+            class:epic={cost === 4}
+            class:legendary={cost === 5}
+            class="outer-border"
+        >
+            <div class="inner-border">
+                <img {src} />
             </div>
         </div>
 
@@ -34,12 +39,12 @@
             <div
                 class:green={state === 'included'}
                 class:red={state === 'excluded'}
-                class="mark absolute bottom-[2px] right-[3px] rounded-full p-[2px] text-foreground"
+                class="mark absolute bottom-[2px] right-[2px] rounded-full p-[2px] text-foreground"
             >
                 {#if state === 'included'}
-                    <CheckmarkIcon class="h-3 w-3" />
+                    <CheckmarkIcon class="h-[0.9em] w-[0.9em]" />
                 {:else if state === 'excluded'}
-                    <XIcon class="h-3 w-3" />
+                    <XIcon class="h-[0.9em] w-[0.9em]" />
                 {/if}
             </div>
         {/if}
@@ -50,18 +55,6 @@
 </div>
 
 <style lang="postcss">
-    .hex {
-        @apply h-full w-full flex justify-center items-center;
-
-        &.dark-fill {
-            background-color: #232323;
-        }
-
-        &.light-fill {
-            background-color: #6b6d6b;
-        }
-    }
-
     .mark {
         /* Prevent hover effect from disappearing on icon hover */
         pointer-events: none;
@@ -74,21 +67,40 @@
         }
     }
 
+    .outer-border {
+        border: 1.5px solid;
+
+        &.common {
+            border-color: hsl(0, 0%, 50%);
+        }
+        &.uncommon {
+            border-color: hsl(132, 61%, 45%);
+        }
+        &.rare {
+            border-color: hsl(200, 85%, 45%);
+        }
+        &.epic {
+            border-color: hsl(296, 85%, 45%);
+        }
+        &.legendary {
+            border-color: hsl(38, 73%, 35%);
+        }
+    }
+
+    .inner-border {
+        border: 4px solid black;
+    }
+
     /* Highlight on hover / selection */
     button {
         transition: all 0.2s;
-
-        &:hover .hover-fill,
-        &:focus .hover-fill {
-            filter: drop-shadow(0px 0px 20px rgba(255, 199, 46, 0.9));
-        }
     }
     .root:not(.active) button {
-        opacity: 0.3;
+        opacity: 0.5;
 
         &:hover,
         &:focus {
-            opacity: 0.5;
+            opacity: 0.75;
         }
     }
     .active span {
