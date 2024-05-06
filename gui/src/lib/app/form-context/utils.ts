@@ -1,9 +1,11 @@
+import { CHAMPIONS } from '$lib/constants'
 import { filterMap, someFalse } from '$lib/utils/misc'
 import { isArray, isObject } from 'radash'
 import { FormControl } from './form-control'
 import { FormControlArray } from './form-control-array'
 import { FormControlRecord } from './form-control-record'
 import type {
+    AttributeFilter,
     CostTier,
     DamageType,
     FormControlWrapper,
@@ -90,4 +92,24 @@ export function getActiveFilters(slot: SlotFilter): ActiveFilters {
     }
 
     return activeFilters
+}
+
+export function apply_attribute_filter(
+    filter: AttributeFilter
+): Set<String> {
+    const activeTraits = new Set(
+        filter.traits.filter((t) => t.included).map((t) => t.id)
+    )
+
+    return new Set(
+        CHAMPIONS.filter((c) => filter.cost[c.tier])
+            // .filter(c => filter.range[c.])
+            // .filter(c => c)
+            .filter(
+                (c) =>
+                    activeTraits.size === 0 ||
+                    c.traits.some((t) => activeTraits.has(t.id))
+            )
+            .map((c) => c.character_id)
+    )
 }

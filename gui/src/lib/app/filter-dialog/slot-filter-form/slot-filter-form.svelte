@@ -50,24 +50,24 @@
 
         <hr class="my-6" />
 
-        <div>
+        <div class="min-h-48">
             <h2 class="pb-1">Slot Preview</h2>
 
             <p class="text-muted-foreground text-xs pb-3">
-                The settings above will allow the following champions
-                for this slot.
+                Only teams containing at least one of these champions
+                will be displayed.
             </p>
 
-            <ChampionMatches filters={[]} />
+            <ChampionMatches attributeFilter={attributeValues} />
 
             <div
-                class="text-muted-foreground text-xs pt-4 flex gap-2 items-center"
+                class="text-muted-foreground text-xs pt-3 flex gap-2 items-center"
             >
                 <InfoIcon class="h-6 w-6" />
 
                 <p>
                     To exclude a champion from this slot, try
-                    switching the filter mode to champion.
+                    switching the filter mode to Champion.
                     <br /> To exclude a champion from all slots, see the
                     Global settings page.
                 </p>

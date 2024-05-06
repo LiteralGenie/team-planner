@@ -35,7 +35,8 @@
     <legend class="pb-1">Banned Champions</legend>
 
     <p class="text-muted-foreground text-xs pb-3">
-        Teams containing any of these champions are omitted.
+        Teams containing any of the selected champions will not be
+        displayed.
     </p>
 
     <div class="input-grid">

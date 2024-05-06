@@ -1,17 +1,25 @@
 <script lang="ts">
-    import type { IdFilter } from '$lib/app/form-context/types'
+    import type { AttributeFilter } from '$lib/app/form-context/types'
+    import { apply_attribute_filter } from '$lib/app/form-context/utils'
     import ChampionPortrait from '$lib/components/champion-portrait.svelte'
     import { CHAMPIONS, CHAMPION_ICONS } from '$lib/constants'
+    import { sort } from 'radash'
 
-    export let filters: IdFilter[]
+    export let attributeFilter: AttributeFilter
 
-    $: activeIds = new Set(filters.map(({ id }) => id))
+    $: activeIds = apply_attribute_filter(attributeFilter)
+
+    $: championsSorted = sort(
+        CHAMPIONS,
+        (c) => +activeIds.has(c.character_id),
+        true
+    )
 </script>
 
 <div class="icon-grid">
-    {#each CHAMPIONS as c}
+    {#each championsSorted as c}
         <div
-            class="root flex flex-col justify-center items-center text-center gap-[1px]"
+            class="cell flex flex-col justify-center items-center text-center gap-[1px]"
             class:active={activeIds.has(c.character_id)}
         >
             <div class="h-12 w-12 relative select-none">
@@ -38,5 +46,13 @@
         grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
         align-items: start;
         gap: 8px;
+    }
+
+    .cell {
+        display: none;
+
+        &.active {
+            display: block;
+        }
     }
 </style>
