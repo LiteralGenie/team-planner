@@ -1,4 +1,5 @@
 <script lang="ts">
+    import GlobalChampionInput from './global-champion-input.svelte'
     import GlobalCostInput from './global-cost-input.svelte'
     import GlobalTraitInput from './global-trait-input.svelte'
 </script>
@@ -11,6 +12,7 @@
     <div class="flex flex-col gap-6">
         <GlobalCostInput />
         <GlobalTraitInput />
+        <GlobalChampionInput />
     </div>
 </form>
 

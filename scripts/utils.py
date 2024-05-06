@@ -28,6 +28,17 @@ def write_image(image: IImage, fp: str | Path):
     image.save(fp)
 
 
+# https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/assets/characters/tft11_ahri/hud/tft11_ahri_square.tft_set11.jpg
+# https://raw.communitydragon.org/latest/lol-game-data/assets/assets/characters/tft11_aatrox/hud/tft11_aatrox_square.tft_set11.jpg
+
+
+#                        /lol-game-data/assets/ASSETS/UX/TFT/ChampionSplashes/TFT11_Ahri_Mobile.TFT_Set11.png
+# /plugins/rcp-be-lol-game-data/global/default/assets/ux/tft/championsplashes/tft11_ahri_mobile.tft_set11.png
+
+# /lol-game-data/assets/ASSETS/Characters/TFT11_Ahri/HUD/TFT11_Ahri_Square.TFT_Set11.jpg
+# /plugins/rcp-be-lol-game-data/global/default/assets/characters/tft11_ahri/hud/tft11_ahri_square.tft_set11.jpg
+
+
 # https://www.communitydragon.org/documentation/assets
 def get_cdragon_asset_url(raw: str) -> URL:
     raw_prefix = "/lol-game-data/assets/"
@@ -36,6 +47,7 @@ def get_cdragon_asset_url(raw: str) -> URL:
     path = raw
     path = path.lower()
     path = path.replace(raw_prefix, real_prefix)
+    path = path.strip("/")
     return CDRAGON_URL / path
 
 

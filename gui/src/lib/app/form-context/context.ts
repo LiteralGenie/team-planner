@@ -134,25 +134,25 @@ function initChampions(
 ) {
     // Global input
     const globalChampions = CHAMPIONS.map((c) => ({
-        id: c.character_record.character_id,
+        id: c.character_id,
         included: true
     }))
     controls.global.controls.champions.setValue(
         deepCopy(globalChampions)
     )
-    initValue.global.traits = deepCopy(globalChampions)
+    initValue.global.champions = deepCopy(globalChampions)
 
     // Slot inputs
     const slotChampions = CHAMPIONS.map((c) => ({
-        id: c.character_record.character_id,
+        id: c.character_id,
         included: false
     }))
     for (let slot of controls.slots.controls) {
-        const traitArray = slot.controls.byAttribute.controls.traits
+        const traitArray = slot.controls.byId
         traitArray.setValue(deepCopy(slotChampions))
     }
     for (let slot of initValue.slots) {
-        slot.byAttribute.traits = deepCopy(slotChampions)
+        slot.byId = deepCopy(slotChampions)
     }
 }
 

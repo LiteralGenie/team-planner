@@ -16,13 +16,16 @@ USE_CACHED = True
 
 ###
 
-DATA_URL = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/tftchampions.json"
-DATA_FILE = DATA_DIR / "tftchampions.json"
+DATA_URL = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/tftchampions-teamplanner.json"
+DATA_FILE = DATA_DIR / "tftchampions-teamplanner.json"
 
-FILTERED_DATA_FILE = GUI_ASSETS_DIR / "tft" / "tftchampions.json"
+FILTERED_DATA_FILE = GUI_ASSETS_DIR / "tft" / "tftchampions-teamplanner.json"
 
-IMAGE_DIR = GUI_ASSETS_DIR / "tft" / "champions"
-IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+ICON_DIR = GUI_ASSETS_DIR / "tft" / "champions"
+ICON_DIR.mkdir(parents=True, exist_ok=True)
+
+SPLASH_DIR = GUI_ASSETS_DIR / "tft" / "champion_splashes"
+SPLASH_DIR.mkdir(parents=True, exist_ok=True)
 
 ###
 
@@ -46,17 +49,30 @@ def fetch() -> IData:
 
 def download_icons(data: IData):
     for champion in data:
-        record = champion["character_record"]
-
-        url = get_cdragon_asset_url(record["squareIconPath"])
+        url = get_cdragon_asset_url(champion["squareIconPath"])
         ext = str(url).split(".")[-1]
 
-        id = record["character_id"]
-        fp_out = IMAGE_DIR / f"{id}.{ext}"
+        id = champion["character_id"]
+        fp_out = ICON_DIR / f"{id}.{ext}"
         if fp_out.exists():
             continue
 
-        print("Downloading", url)
+        print("Downloading icon", url)
+        download_image(url, fp_out)
+        time.sleep(1)
+
+
+def download_splashes(data: IData):
+    for champion in data:
+        url = get_cdragon_asset_url(champion["squareSplashIconPath"])
+        ext = str(url).split(".")[-1]
+
+        id = champion["character_id"]
+        fp_out = SPLASH_DIR / f"{id}.{ext}"
+        if fp_out.exists():
+            continue
+
+        print("Downloading splash", url)
         download_image(url, fp_out)
         time.sleep(1)
 
@@ -64,7 +80,7 @@ def download_icons(data: IData):
 def main():
     data = fetch()
 
-    filtered = [d for d in data if LATEST_SET_PREFIX in d["name"]]
+    filtered = [d for d in data if LATEST_SET_PREFIX in d["character_id"]]
     print(f"Found {len(filtered)} champions for set {LATEST_SET_ID}")
 
     with open(FILTERED_DATA_FILE, "w+") as file:

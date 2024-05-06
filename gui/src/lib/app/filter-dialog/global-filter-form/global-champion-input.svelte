@@ -2,23 +2,23 @@
     import { getFilterFormContext } from '$lib/app/form-context/context'
     import type { FormControlRecord } from '$lib/app/form-context/form-control-record'
     import type { IdFilter } from '$lib/app/form-context/types'
-    import TraitCheckbox from '$lib/components/trait-checkbox.svelte'
+    import ChampionCheckbox from '$lib/components/champion-checkbox.svelte'
     import {
-        TRAITS_BY_ID,
-        TRAIT_ICONS,
-        type CDragonTrait
+        CHAMPIONS_BY_ID,
+        CHAMPION_ICONS,
+        type CDragonChampion
     } from '$lib/constants'
     import { zip } from 'radash'
 
     const { form, controls } = getFilterFormContext()
 
-    $: traitValues = $form.global.traits
-    $: traitControls = controls.global.controls.traits.controls
-    $: zipped = zip(traitValues, traitControls).map(([val, ctrl]) => [
-        val,
-        ctrl,
-        TRAITS_BY_ID[val.id]
-    ]) as Array<[IdFilter, FormControlRecord<IdFilter>, CDragonTrait]>
+    $: championValues = $form.global.champions
+    $: championControls = controls.global.controls.champions.controls
+    $: zipped = zip(championValues, championControls).map(
+        ([val, ctrl]) => [val, ctrl, CHAMPIONS_BY_ID[val.id]]
+    ) as Array<
+        [IdFilter, FormControlRecord<IdFilter>, CDragonChampion]
+    >
 
     function handleClick(
         current: IdFilter,
@@ -39,12 +39,13 @@
     </p>
 
     <div class="trait-grid">
-        {#each zipped as [val, ctrl, trait]}
-            <TraitCheckbox
+        {#each zipped as [val, ctrl, c]}
+            <ChampionCheckbox
                 on:click={() => handleClick(val, ctrl)}
-                src={TRAIT_ICONS[val.id]}
-                label={trait.display_name}
+                src={CHAMPION_ICONS[val.id]}
+                label={c.display_name}
                 state={val.included ? null : 'excluded'}
+                cost={c.tier}
             />
         {/each}
     </div>

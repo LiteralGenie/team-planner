@@ -1,9 +1,23 @@
-import ALL_CHAMPIONS from '$lib/assets/tft/tftchampions.json'
+import type { CostTier } from '$lib/app/form-context/types'
+import ALL_CHAMPIONS from '$lib/assets/tft/tftchampions-teamplanner.json'
 import ALL_TRAITS from '$lib/assets/tft/tfttraits.json'
-import { objectify } from 'radash'
+import { alphabetical, group, objectify, sort } from 'radash'
 
 export const TRAITS = ALL_TRAITS
-export const CHAMPIONS = ALL_CHAMPIONS
+export const CHAMPIONS = sortChampions(
+    ALL_CHAMPIONS.map((c) => ({ ...c, tier: c.tier as CostTier }))
+)
+
+function sortChampions(champions: CDragonChampion[]) {
+    const tiersSorted = sort(
+        Object.values(group(champions, (c) => c.tier)),
+        (cs) => cs[0].tier
+    )
+
+    return tiersSorted
+        .map((cs) => alphabetical(cs, (c) => c.display_name))
+        .flatMap((cs) => cs)
+}
 
 const trait_icon_files = import.meta.glob(
     '$lib/assets/tft/traits/*.png',
@@ -31,7 +45,7 @@ export const TRAITS_BY_ID = objectify(
 ) satisfies Record<string, CDragonTrait>
 
 const champion_icon_files = import.meta.glob(
-    '$lib/assets/tft/champions/*.png',
+    '$lib/assets/tft/champions/*',
     {
         eager: true
     }
@@ -51,7 +65,7 @@ export const CHAMPION_ICONS: Record<string, string> = objectify(
 
 export const CHAMPIONS_BY_ID = objectify(
     CHAMPIONS,
-    (c) => c.character_record.character_id,
+    (c) => c.character_id,
     (c) => c
 ) satisfies Record<string, CDragonChampion>
 
@@ -81,16 +95,15 @@ export interface CDragonTrait {
 }
 
 export interface CDragonChampion {
-    name: string
-    character_record: {
-        path: string
-        character_id: string
-        rarity: number
-        display_name: string
-        traits: Array<{
-            name: string
-            id: string
-        }>
-        squareIconPath: string
-    }
+    path: string
+    character_id: string
+    tier: CostTier
+    display_name: string
+    traits: Array<{
+        name: string
+        id: string
+        amount: number
+    }>
+    squareIconPath: string
+    squareSplashIconPath: string
 }
