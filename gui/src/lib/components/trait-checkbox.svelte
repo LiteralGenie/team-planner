@@ -86,8 +86,7 @@
     .root:not(.active) button {
         opacity: 0.3;
 
-        &:hover,
-        &:focus {
+        &:hover {
             opacity: 0.5;
         }
     }
