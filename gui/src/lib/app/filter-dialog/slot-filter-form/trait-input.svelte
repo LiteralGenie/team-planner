@@ -5,10 +5,10 @@
         AttributeSlotValues,
         TraitFilter
     } from '$lib/app/form-context/types'
+    import TraitCheckbox from '$lib/components/trait-checkbox.svelte'
     import { TRAITS_BY_ID, TRAIT_ICONS } from '$lib/constants'
     import type { CDragonTrait } from '$lib/types'
     import { zip } from 'radash'
-    import TraitCheckbox from './trait-checkbox.svelte'
 
     export let slotControls: AttributeSlotControls
     export let slotValues: AttributeSlotValues

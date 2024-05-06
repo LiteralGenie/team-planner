@@ -2,10 +2,10 @@
     import { getFilterFormContext } from '$lib/app/form-context/context'
     import type { FormControlRecord } from '$lib/app/form-context/form-control-record'
     import type { TraitFilter } from '$lib/app/form-context/types'
+    import TraitCheckbox from '$lib/components/trait-checkbox.svelte'
     import { TRAITS_BY_ID, TRAIT_ICONS } from '$lib/constants'
     import type { CDragonTrait } from '$lib/types'
     import { zip } from 'radash'
-    import TraitCheckbox from '../slot-filter-form/trait-checkbox.svelte'
 
     const { form, controls } = getFilterFormContext()
 

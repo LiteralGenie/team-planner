@@ -12,6 +12,9 @@
     "[css]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
+    "[typescript]": {
+        "typescript.preferences.importModuleSpecifier": "non-relative"
+    },
 
     "python.analysis.typeCheckingMode": "basic",
     "python.analysis.autoImportCompletions": true,
