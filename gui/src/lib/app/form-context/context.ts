@@ -36,17 +36,25 @@ export function setFilterFormContext(
     initValue = deepCopy(initValue)
     const controls = getDefaultControls(initValue, onChange)
 
-    // Add traits to init value
-    const defaultTraits = traits.map((trait) => ({
+    // Init global traits
+    const globalTraits = traits.map((trait) => ({
+        id: trait.trait_id,
+        included: true
+    }))
+    controls.global.controls.traits.setValue(deepCopy(globalTraits))
+    initValue.global.traits = deepCopy(globalTraits)
+
+    // Init slot traits
+    const slotTraits = traits.map((trait) => ({
         id: trait.trait_id,
         included: false
     }))
     for (let slot of controls.slots.controls) {
         const traitArray = slot.controls.byAttribute.controls.traits
-        traitArray.setValue(deepCopy(defaultTraits))
+        traitArray.setValue(deepCopy(slotTraits))
     }
     for (let slot of initValue.slots) {
-        slot.byAttribute.traits = deepCopy(defaultTraits)
+        slot.byAttribute.traits = deepCopy(slotTraits)
     }
 
     const form = writable(clone(initValue))

@@ -1,20 +1,16 @@
 <script lang="ts">
+    import { getFilterFormContext } from '$lib/app/form-context/context'
     import type { FormControlRecord } from '$lib/app/form-context/form-control-record'
-    import type {
-        AttributeSlotControls,
-        AttributeSlotValues,
-        TraitFilter
-    } from '$lib/app/form-context/types'
+    import type { TraitFilter } from '$lib/app/form-context/types'
     import { TRAITS_BY_ID, TRAIT_ICONS } from '$lib/constants'
     import type { CDragonTrait } from '$lib/types'
     import { zip } from 'radash'
-    import TraitCheckbox from './trait-checkbox.svelte'
+    import TraitCheckbox from '../slot-filter-form/trait-checkbox.svelte'
 
-    export let slotControls: AttributeSlotControls
-    export let slotValues: AttributeSlotValues
+    const { form, controls } = getFilterFormContext()
 
-    $: traitValues = slotValues.traits
-    $: traitControls = slotControls.controls.traits.controls
+    $: traitValues = $form.global.traits
+    $: traitControls = controls.global.controls.traits.controls
     $: zipped = zip(traitValues, traitControls).map(([val, ctrl]) => [
         val,
         ctrl,
@@ -35,21 +31,27 @@
 </script>
 
 <fieldset>
-    <legend class="pb-2">Traits</legend>
+    <legend class="pb-1">Banned Traits</legend>
 
-    {#each zipped as [val, ctrl, trait]}
-        <TraitCheckbox
-            on:click={() => handleClick(val, ctrl)}
-            src={TRAIT_ICONS[val.id]}
-            label={trait.display_name}
-            state={val.included ? 'included' : null}
-        />
-    {/each}
+    <p class="text-muted-foreground text-xs pb-2">
+        Select traits to exclude from results
+    </p>
+
+    <div class="trait-grid">
+        {#each zipped as [val, ctrl, trait]}
+            <TraitCheckbox
+                on:click={() => handleClick(val, ctrl)}
+                src={TRAIT_ICONS[val.id]}
+                label={trait.display_name}
+                state={val.included ? null : 'excluded'}
+            />
+        {/each}
+    </div>
 </fieldset>
 
 <style lang="postcss">
     /* @todo how to make all rows the same height when one row has text wrap */
-    fieldset {
+    .trait-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
         align-items: start;

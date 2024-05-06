@@ -91,7 +91,5 @@
         &:hover .hover-fill {
             filter: drop-shadow(0px 0px 20px rgba(255, 199, 46, 0.9));
         }
-
-        @apply text-foreground;
     }
 </style>

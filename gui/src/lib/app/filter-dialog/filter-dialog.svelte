@@ -42,10 +42,10 @@
     </button>
 
     <div
-        class="pt-12 pb-12 card rounded-2xl h-full w-full text-muted-foreground flex flex-col"
+        class="pt-12 pb-12 card rounded-2xl h-full w-full text-foreground text-sm flex flex-col"
     >
         <div class="h-full flex">
-            <div class="hidden md:block">
+            <div class="hidden md:block text-muted-foreground">
                 <SlotTabs {slotIndex} on:tabclick />
             </div>
 

@@ -10,10 +10,11 @@
     export let slotControls: AttributeSlotControls
     export let slotValues: AttributeSlotValues
 
+    // @todo hint tooltip with range "Units with an attack range of 1 / 2 / 3+"
     $: options = [
         {
             value: slotValues.range.close,
-            label: 'Close',
+            label: 'Melee',
             onChange: (v: boolean) => handleChange('close', v),
             prefix: RangeIcon,
             prefixOpts: { activeClose: true },

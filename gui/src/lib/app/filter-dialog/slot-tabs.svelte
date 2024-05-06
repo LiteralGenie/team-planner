@@ -70,7 +70,7 @@
     }
 
     button {
-        @apply text-sm h-8;
+        @apply min-w-max text-sm h-8;
 
         &.active {
             @apply text-primary;
