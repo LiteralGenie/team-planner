@@ -1,5 +1,6 @@
 <script lang="ts">
     import type { CostTier } from '$lib/app/form-context/types'
+    import ChampionPortrait from '$lib/components/champion-portrait.svelte'
     import CheckmarkIcon from '$lib/icons/checkmark-icon.svelte'
     import XIcon from '$lib/icons/x-icon.svelte'
 
@@ -20,19 +21,7 @@
         class="h-12 w-12 relative select-none"
     >
         <!-- @todo description tooltip -->
-        <!-- Icon -->
-        <div
-            class:common={cost === 1}
-            class:uncommon={cost === 2}
-            class:rare={cost === 3}
-            class:epic={cost === 4}
-            class:legendary={cost === 5}
-            class="outer-border"
-        >
-            <div class="inner-border">
-                <img {src} />
-            </div>
-        </div>
+        <ChampionPortrait {src} {cost} />
 
         <!-- Selection indicator -->
         {#if state === 'included' || state === 'excluded'}
@@ -51,7 +40,9 @@
     </button>
 
     <!-- Label -->
-    <span class="text-xs text-muted-foreground">{label}</span>
+    <span class="text-xs text-muted-foreground whitespace-nowrap">
+        {label}
+    </span>
 </div>
 
 <style lang="postcss">
@@ -65,30 +56,6 @@
         &.red {
             background-color: #eb1a26;
         }
-    }
-
-    .outer-border {
-        border: 1.5px solid;
-
-        &.common {
-            border-color: hsl(0, 0%, 50%);
-        }
-        &.uncommon {
-            border-color: hsl(132, 61%, 45%);
-        }
-        &.rare {
-            border-color: hsl(200, 85%, 45%);
-        }
-        &.epic {
-            border-color: hsl(296, 85%, 45%);
-        }
-        &.legendary {
-            border-color: hsl(38, 73%, 35%);
-        }
-    }
-
-    .inner-border {
-        border: 4px solid black;
     }
 
     /* Highlight on hover / selection */

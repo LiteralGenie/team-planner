@@ -16,8 +16,8 @@
 
     const options: OptionData[] = [
         {
-            label: 'Property',
-            id: 'property',
+            label: 'Characteristic',
+            id: 'attribute',
             value: true
         },
         {

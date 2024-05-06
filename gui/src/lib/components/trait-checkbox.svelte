@@ -46,7 +46,9 @@
     </button>
 
     <!-- Label -->
-    <span class="text-xs text-muted-foreground">{label}</span>
+    <span class="text-xs text-muted-foreground whitespace-nowrap">
+        {label}
+    </span>
 </div>
 
 <style lang="postcss">

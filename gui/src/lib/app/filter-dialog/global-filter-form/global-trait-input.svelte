@@ -35,7 +35,7 @@
     <legend class="pb-1">Banned Traits</legend>
 
     <p class="text-muted-foreground text-xs pb-2">
-        Select traits to exclude from results
+        Teams containing any of these traits are omitted.
     </p>
 
     <div class="trait-grid">

@@ -1,17 +1,14 @@
 <script lang="ts">
     import { getFilterFormContext } from '$lib/app/form-context/context'
     import type { FormControlRecord } from '$lib/app/form-context/form-control-record'
-    import type {
-        CostTier,
-        IdFilter
-    } from '$lib/app/form-context/types'
+    import type { IdFilter } from '$lib/app/form-context/types'
     import ChampionCheckbox from '$lib/components/champion-checkbox.svelte'
     import {
         CHAMPIONS_BY_ID,
         CHAMPION_ICONS,
         type CDragonChampion
     } from '$lib/constants'
-    import { group, zip } from 'radash'
+    import { zip } from 'radash'
 
     const { form, controls } = getFilterFormContext()
 
@@ -22,18 +19,6 @@
     ) as Array<
         [IdFilter, FormControlRecord<IdFilter>, CDragonChampion]
     >
-    $: byTier = Object.values(
-        group(zipped, (c) => c[2].tier) as Record<
-            CostTier,
-            Array<
-                [
-                    IdFilter,
-                    FormControlRecord<IdFilter>,
-                    CDragonChampion
-                ]
-            >
-        >
-    )
 
     function handleClick(
         current: IdFilter,
@@ -50,7 +35,7 @@
     <legend class="pb-1">Banned Champions</legend>
 
     <p class="text-muted-foreground text-xs pb-3">
-        Select champions to exclude from results
+        Teams containing any of these champions are omitted.
     </p>
 
     <div class="input-grid">
