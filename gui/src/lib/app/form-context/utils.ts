@@ -103,8 +103,11 @@ export function apply_attribute_filter(
 
     return new Set(
         CHAMPIONS.filter((c) => filter.cost[c.tier])
-            // .filter(c => filter.range[c.])
-            // .filter(c => c)
+            .filter(
+                (c) =>
+                    filter.range[mapRangeValueToType(c.stats.range)]
+            )
+            // .filter((c) => filter.damageType)
             .filter(
                 (c) =>
                     activeTraits.size === 0 ||
@@ -112,4 +115,14 @@ export function apply_attribute_filter(
             )
             .map((c) => c.character_id)
     )
+}
+
+export function mapRangeValueToType(value: number): RangeType {
+    if (value <= 1.0) {
+        return 'close'
+    } else if (value < 3) {
+        return 'mid'
+    } else {
+        return 'long'
+    }
 }

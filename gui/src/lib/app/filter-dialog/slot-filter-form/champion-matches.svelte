@@ -52,7 +52,7 @@
         display: none;
 
         &.active {
-            display: block;
+            display: flex;
         }
     }
 </style>
