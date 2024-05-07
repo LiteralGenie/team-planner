@@ -1,33 +1,9 @@
-<script lang="ts" context="module">
-    import TRAITS from '$lib/assets/tft/tfttraits.json'
-    import { objectify } from 'radash'
-
-    const files = import.meta.glob('$lib/assets/tft/traits/*.png', {
-        eager: true
-    })
-    const srcs: Record<string, string> = objectify(
-        Array.from(Object.keys(files)),
-        (path: string) => {
-            path = path.split('/').slice(-1)[0]
-            path = path.split('.')[0]
-            return path
-        },
-        (path) => path
-    )
-
-    const TRAITS_BY_ID = objectify(
-        TRAITS,
-        (t) => t.trait_id,
-        (t) => t
-    )
-</script>
-
 <script lang="ts">
     import type {
         CostTier,
         SlotFilter
     } from '$lib/app/form-context/types'
-    import { getActiveFilters } from '$lib/app/form-context/utils'
+    import { getActiveSlotFilters } from '$lib/app/form-context/utils'
     import apIcon from '$lib/assets/tft/misc/statmodsabilitypowericon.png'
     import adIcon from '$lib/assets/tft/misc/statmodsattackdamageicon.png'
     import GoldIcon from '$lib/icons/gold-icon.svelte'
@@ -37,7 +13,7 @@
 
     export let slot: SlotFilter
 
-    $: activeFilters = getActiveFilters(slot)
+    $: activeFilters = getActiveSlotFilters(slot)
     $: isEmpty = Object.entries(activeFilters ?? {}).length === 0
 
     $: showRangeOrDamage =

@@ -58,7 +58,9 @@ export interface ActiveFilters {
     traits?: IdFilter[]
 }
 
-export function getActiveFilters(slot: SlotFilter): ActiveFilters {
+export function getActiveSlotFilters(
+    slot: SlotFilter
+): ActiveFilters {
     const attrFilters = slot.byAttribute
 
     let activeFilters: ActiveFilters = {}

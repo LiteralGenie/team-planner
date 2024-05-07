@@ -1,14 +1,13 @@
 <script lang="ts">
     import { CHAMPIONS } from '$lib/constants'
-    import CogIcon from '$lib/icons/cog-icon.svelte'
-    import Button from '../../components/ui/button/button.svelte'
     import FilterDialog from '../filter-dialog/filter-dialog.svelte'
     import type { SlotIndex } from '../filter-dialog/slot-tabs.svelte'
     import { getFilterFormContext } from '../form-context/context'
     import type { SlotFilter } from '../form-context/types'
     import { applyAttributeFilter } from '../form-context/utils'
-    import FilterButton from './filter-preview/filter-button.svelte'
-    import FilterPreview from './filter-preview/filter-preview.svelte'
+    import FilterButton from './filter-button/filter-button.svelte'
+    import FilterPreview from './filter-button/filter-preview.svelte'
+    import GlobalFilterButton from './global-filter-button/global-filter-button.svelte'
 
     let showDialog = false
     let activeSlotIndex: SlotIndex = 0
@@ -81,15 +80,9 @@
             <div
                 class="cell !p-1 text-muted-foreground text-sm flex gap-2 items-center"
             >
-                <Button
+                <GlobalFilterButton
                     on:click={() => handleDialogOpen('global')}
-                    class="settings-button text-foreground px-3 flex gap-2"
-                    variant="outline"
-                >
-                    <span class="flex gap-1 items-center">
-                        <CogIcon class="h-4 w-4" />
-                    </span>
-                </Button>
+                />
 
                 <div>Global Filters: None</div>
             </div>
