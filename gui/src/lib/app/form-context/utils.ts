@@ -94,7 +94,7 @@ export function getActiveFilters(slot: SlotFilter): ActiveFilters {
     return activeFilters
 }
 
-export function apply_attribute_filter(
+export function applyAttributeFilter(
     filter: AttributeFilter
 ): Set<String> {
     const activeTraits = new Set(

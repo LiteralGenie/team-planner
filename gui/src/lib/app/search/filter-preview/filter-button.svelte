@@ -1,8 +1,8 @@
 <script lang="ts">
+    import { CHAMPION_ICONS } from '$lib/constants'
     import PencilIcon from '$lib/icons/pencil-icon.svelte'
     import PlusIcon from '$lib/icons/plus-icon.svelte'
     import UserGroupIcon from '$lib/icons/user-group-icon.svelte'
-    import { objectify } from 'radash'
 
     export let variant: 'inactive' | 'active' | string = 'inactive'
 
@@ -18,20 +18,6 @@
             default:
                 championId = variant
         }
-    }
-
-    let icons = import.meta.glob('$lib/assets/tft/icons/*.png', {
-        eager: true
-    })
-    let champion_icons = objectify(
-        Object.keys(icons),
-        (path: string) =>
-            path.split('/').slice(-1)[0].replace('.png', ''),
-        (path: string) => path
-    )
-
-    function getChampionIcon(id: string) {
-        return champion_icons[id] as string
     }
 </script>
 
@@ -50,7 +36,7 @@
                         class="champion-image-hover-overlay absolute h-full w-full"
                     ></div>
 
-                    <img src={getChampionIcon(championId)} />
+                    <img src={CHAMPION_ICONS[championId]} />
 
                     <div class="pencil-icon absolute">
                         <PencilIcon class="h-8 w-8 font-bold" />

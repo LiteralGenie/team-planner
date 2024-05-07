@@ -50,9 +50,26 @@ const champion_icon_files = import.meta.glob(
         eager: true
     }
 )
-
 export const CHAMPION_ICONS: Record<string, string> = objectify(
     Array.from(Object.keys(champion_icon_files)),
+    // Trait ID as key (ie filename minus extension)
+    (path: string) => {
+        const name = path.split('/').slice(-1)[0]
+        const stem = name.split('.')[0]
+        return stem
+    },
+    // Path as value
+    (path) => path
+)
+
+const champion_splash_files = import.meta.glob(
+    '$lib/assets/tft/champion_splashes/*',
+    {
+        eager: true
+    }
+)
+export const CHAMPION_SPLASHES: Record<string, string> = objectify(
+    Array.from(Object.keys(champion_splash_files)),
     // Trait ID as key (ie filename minus extension)
     (path: string) => {
         const name = path.split('/').slice(-1)[0]

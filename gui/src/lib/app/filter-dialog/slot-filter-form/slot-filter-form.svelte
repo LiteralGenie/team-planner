@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { apply_attribute_filter as applyAttributeFilter } from '$lib/app/form-context/utils'
+    import { applyAttributeFilter } from '$lib/app/form-context/utils'
     import AlertIcon from '$lib/icons/alert-icon.svelte'
     import InfoIcon from '$lib/icons/info-icon.svelte'
     import { getFilterFormContext } from '../../form-context/context'

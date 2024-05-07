@@ -1,13 +1,13 @@
 <script lang="ts">
     import type { AttributeFilter } from '$lib/app/form-context/types'
-    import { apply_attribute_filter } from '$lib/app/form-context/utils'
+    import { applyAttributeFilter } from '$lib/app/form-context/utils'
     import ChampionPortrait from '$lib/components/champion-portrait.svelte'
     import { CHAMPIONS, CHAMPION_ICONS } from '$lib/constants'
     import { sort } from 'radash'
 
     export let attributeFilter: AttributeFilter
 
-    $: activeIds = apply_attribute_filter(attributeFilter)
+    $: activeIds = applyAttributeFilter(attributeFilter)
 
     $: championsSorted = sort(
         CHAMPIONS,

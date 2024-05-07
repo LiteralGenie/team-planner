@@ -1,11 +1,12 @@
 <script lang="ts">
+    import { CHAMPIONS } from '$lib/constants'
     import CogIcon from '$lib/icons/cog-icon.svelte'
-    import { someFalse } from '$lib/utils/misc'
     import Button from '../../components/ui/button/button.svelte'
     import FilterDialog from '../filter-dialog/filter-dialog.svelte'
     import type { SlotIndex } from '../filter-dialog/slot-tabs.svelte'
     import { getFilterFormContext } from '../form-context/context'
     import type { SlotFilter } from '../form-context/types'
+    import { applyAttributeFilter } from '../form-context/utils'
     import FilterButton from './filter-preview/filter-button.svelte'
     import FilterPreview from './filter-preview/filter-preview.svelte'
 
@@ -25,24 +26,25 @@
 
     function slotState(slot: SlotFilter): string {
         if (slot.useAttributes) {
-            const attrs = slot.byAttribute
+            const matches = applyAttributeFilter(slot.byAttribute)
 
-            if (someFalse(attrs.cost)) {
+            if (matches.size === 0) {
                 return 'active'
-            } else if (someFalse(attrs.damageType)) {
+            } else if (matches.size === 1) {
+                // showing champion icon is possible but looks janky due to how large the container is + how zoomed in the image is
+                // return matches.values().next().value
                 return 'active'
-            } else if (someFalse(attrs.range)) {
-                return 'active'
-            } else if (attrs.traits.some((t) => t.state !== 0)) {
-                return 'active'
-            } else {
+            } else if (matches.size === CHAMPIONS.length) {
                 return 'inactive'
+            } else {
+                return 'active'
             }
         } else {
             if (slot.byId.length > 1) {
                 return 'active'
             } else if (slot.byId.length === 1) {
-                return slot.byId[0]
+                // return slot.byId[0].id
+                return 'active'
             } else {
                 return 'inactive'
             }
@@ -93,9 +95,9 @@
             </div>
         </div>
 
-        <section class="w-full p-8 flex justify-end">
+        <!-- <section class="w-full p-8 flex justify-end">
             <div><Button class="w-24">Search -></Button></div>
-        </section>
+        </section> -->
     </div>
 </div>
 

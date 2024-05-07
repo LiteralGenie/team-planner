@@ -28,6 +28,9 @@ TEAM_PLANNER_DATA_FILE = DATA_DIR / "tftchampions-teamplanner.json"
 SET_DATA_URL = CDRAGON_URL / "cdragon/tft/en_us.json"
 SET_DATA_FILE = DATA_DIR / "en_us.json"
 
+CHARACTERS_DATA_URL = CDRAGON_URL / "game/data/tftteamplanner/characters.bin.json"
+CHARACTERS_DATA_FILE = DATA_DIR / "characters.bin.json"
+
 MERGED_DATA_FILE = GUI_ASSETS_DIR / "tft" / "merged_teamplanner_data.json"
 
 ICON_DIR = GUI_ASSETS_DIR / "tft" / "champions"
@@ -40,6 +43,7 @@ SPLASH_DIR.mkdir(parents=True, exist_ok=True)
 
 ITeamPlannerData: TypeAlias = list[dict]
 ISetData: TypeAlias = dict
+ICharactersData: TypeAlias = dict
 IMergedData: TypeAlias = list[dict]
 
 
@@ -59,11 +63,23 @@ def fetch_unit_data() -> ISetData:
     )
 
 
+def fetch_characters_data() -> ISetData:
+    return fetch_json_cached(
+        CHARACTERS_DATA_URL,
+        CHARACTERS_DATA_FILE,
+        use_cache=USE_CACHED,
+    )
+
+
 def filter_team_planner_data(tp_data: ITeamPlannerData) -> ITeamPlannerData:
     return [d for d in tp_data if LATEST_SET_PREFIX in d["character_id"]]
 
 
-def build_merged_data(tp_data: ITeamPlannerData, set_data: ISetData) -> IMergedData:
+def build_merged_data(
+    tp_data: ITeamPlannerData,
+    set_data: ISetData,
+    char_data: ICharactersData,
+) -> IMergedData:
     """
     Append the stats (ad, range, etc) from set data to the team planner data for each champion
     """
@@ -81,6 +97,9 @@ def build_merged_data(tp_data: ITeamPlannerData, set_data: ISetData) -> IMergedD
             for u in latest_set["champions"]
             if u["characterName"] == c["character_id"]
         )
+
+        role = find_role_for_champion(c["character_id"], char_data)
+
         merged.append(
             dict(
                 # from teamplanner data
@@ -89,26 +108,43 @@ def build_merged_data(tp_data: ITeamPlannerData, set_data: ISetData) -> IMergedD
                 display_name=c["display_name"],
                 traits=c["traits"],
                 # from set data
-                damage_type=infer_damage_type(unit),
                 stats=unit["stats"],
+                # from character data
+                damage_type=get_damage_type(role),
             )
         )
 
     return merged
 
 
-# @todo: ideally this would come from role type (eg "attack caster" vs "magic caster")
-#        but cant seem to info on which champions have which roles
-#        can only find the role definitions in characters.bin.json
-def infer_damage_type(set_data):
-    is_ad = "<physicalDamage>" in set_data["ability"]["desc"]
-    is_ap = "<magicDamage>" in set_data["ability"]["desc"]
-    # print(f'{set_data["characterName"]:<20}', is_ad, is_ap)
-
-    return dict(
-        is_ad=is_ad,
-        is_ap=is_ap,
+def find_role_for_champion(id: str, char_data: ICharactersData) -> dict:
+    char = next(c for c in char_data.values() if c.get("mCharacterName") == id)
+    role = next(
+        data for name, data in char_data.items() if name == char["CharacterRole"]
     )
+    return role
+
+
+def get_damage_type(role: dict) -> dict:
+    if role["name"].startswith("AP"):
+        return dict(
+            is_ad=False,
+            is_ap=True,
+        )
+    elif role["name"].startswith("AD"):
+        return dict(
+            is_ad=True,
+            is_ap=False,
+        )
+    else:
+        raise Exception(role["name"])
+
+
+# def infer_damage_type(set_data):
+#     is_ad = "<physicalDamage>" in set_data["ability"]["desc"]
+#     is_ap = "<magicDamage>" in set_data["ability"]["desc"]
+
+#     return dict(is_ad=is_ad, is_ap=is_ap,)
 
 
 def download_icons(data: ITeamPlannerData):
@@ -129,7 +165,9 @@ def download_icons(data: ITeamPlannerData):
 
 
 def download_splashes(data: ITeamPlannerData):
-    for champion in data:
+    filtered = filter_team_planner_data(data)
+
+    for champion in filtered:
         url = get_cdragon_asset_url(champion["squareSplashIconPath"])
         ext = str(url).split(".")[-1]
 
@@ -146,11 +184,13 @@ def download_splashes(data: ITeamPlannerData):
 def main():
     tp_data = fetch_teamplanner_data()
     set_data = fetch_unit_data()
+    char_data = fetch_characters_data()
 
-    merged = build_merged_data(tp_data, set_data)
+    merged = build_merged_data(tp_data, set_data, char_data)
     print(f"Found {len(merged)} champions for set {LATEST_SET_ID}")
 
     download_icons(tp_data)
+    download_splashes(tp_data)
 
     print("Creating", MERGED_DATA_FILE)
     with open(MERGED_DATA_FILE, "w+") as file:
