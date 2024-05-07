@@ -83,15 +83,32 @@ def build_merged_data(tp_data: ITeamPlannerData, set_data: ISetData) -> IMergedD
         )
         merged.append(
             dict(
+                # from teamplanner data
                 character_id=c["character_id"],
                 tier=c["tier"],
                 display_name=c["display_name"],
                 traits=c["traits"],
+                # from set data
+                damage_type=infer_damage_type(unit),
                 stats=unit["stats"],
             )
         )
 
     return merged
+
+
+# @todo: ideally this would come from role type (eg "attack caster" vs "magic caster")
+#        but cant seem to info on which champions have which roles
+#        can only find the role definitions in characters.bin.json
+def infer_damage_type(set_data):
+    is_ad = "<physicalDamage>" in set_data["ability"]["desc"]
+    is_ap = "<magicDamage>" in set_data["ability"]["desc"]
+    # print(f'{set_data["characterName"]:<20}', is_ad, is_ap)
+
+    return dict(
+        is_ad=is_ad,
+        is_ap=is_ap,
+    )
 
 
 def download_icons(data: ITeamPlannerData):

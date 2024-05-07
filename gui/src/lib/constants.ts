@@ -103,6 +103,10 @@ export interface CDragonChampion {
         id: string
         amount: number
     }>
+    damage_type: {
+        is_ad: boolean
+        is_ap: boolean
+    }
     stats: {
         armor: number
         attackSpeed: number

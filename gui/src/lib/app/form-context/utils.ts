@@ -107,7 +107,18 @@ export function apply_attribute_filter(
                 (c) =>
                     filter.range[mapRangeValueToType(c.stats.range)]
             )
-            // .filter((c) => filter.damageType)
+            .filter((c) => {
+                if (filter.damageType.ad && filter.damageType.ap) {
+                    return true
+                } else if (filter.damageType.ad) {
+                    return c.damage_type.is_ad
+                } else if (filter.damageType.ap) {
+                    return c.damage_type.is_ap
+                } else {
+                    // User unchecked both damage type filters for whatever reason
+                    return false
+                }
+            })
             .filter(
                 (c) =>
                     activeTraits.size === 0 ||
