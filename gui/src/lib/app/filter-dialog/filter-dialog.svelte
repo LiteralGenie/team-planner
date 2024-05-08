@@ -32,7 +32,7 @@
     bind:this={dialogEl}
     on:click={handleBackdropClick}
     on:close
-    class="h-full w-full max-h-[80vh] max-w-[80vw] bg-transparent"
+    class="h-full w-full max-h-[85vh] max-w-[85vw] bg-transparent"
 >
     <button
         class="close-icon absolute top-3 right-3 p-2"

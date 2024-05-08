@@ -30,9 +30,7 @@
             </div>
 
             <!-- Label -->
-            <span
-                class="text-xs text-muted-foreground whitespace-nowrap"
-            >
+            <span class="text-xs whitespace-nowrap">
                 {c.display_name}
             </span>
         </div>
@@ -45,7 +43,7 @@
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
         align-items: start;
-        gap: 8px;
+        gap: 6px;
     }
 
     .cell {

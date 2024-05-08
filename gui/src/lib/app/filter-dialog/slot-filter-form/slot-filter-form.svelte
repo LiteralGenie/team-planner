@@ -21,74 +21,109 @@
 </script>
 
 <form class="w-full pt-4">
-    <div class="px-6 h-full w-full overflow-auto">
-        <h1 class="text-xl text-foreground font-bold mb-4">
-            Slot #{slotIndex + 1}
-        </h1>
+    <div class="conditional-grid px-6 h-full w-full overflow-auto">
+        <!-- Filters -->
+        <div class="filters">
+            <h1 class="text-xl text-foreground font-bold mb-2">
+                Filters
+            </h1>
 
-        <SlotTypeInput {slotIndex} />
+            <SlotTypeInput {slotIndex} />
 
-        <hr class="my-6" />
+            <hr class="my-6" />
 
-        <div class="flex flex-col gap-6">
-            <CostInput
-                slotControls={attributeControls}
-                slotValues={attributeValues}
-            />
+            <div class="flex flex-col gap-6">
+                <CostInput
+                    slotControls={attributeControls}
+                    slotValues={attributeValues}
+                />
 
-            <RangeInput
-                slotControls={attributeControls}
-                slotValues={attributeValues}
-            />
+                <RangeInput
+                    slotControls={attributeControls}
+                    slotValues={attributeValues}
+                />
 
-            <DamageTypeInput
-                slotControls={attributeControls}
-                slotValues={attributeValues}
-            />
+                <DamageTypeInput
+                    slotControls={attributeControls}
+                    slotValues={attributeValues}
+                />
 
-            <TraitInput
-                slotControls={attributeControls}
-                slotValues={attributeValues}
-            />
+                <TraitInput
+                    slotControls={attributeControls}
+                    slotValues={attributeValues}
+                />
+            </div>
         </div>
 
-        <hr class="my-6" />
+        <hr class="my-6 conditional-divider" />
 
-        <div class="min-h-48 flex flex-col">
-            <h2 class="pb-1">Slot Preview</h2>
+        <!-- Preview -->
+        <div class="preview min-h-48 flex flex-col">
+            <h1 class="pb-1 text-xl font-bold">Slot Preview</h1>
 
             <p class="text-muted-foreground text-xs pb-3">
                 Only teams containing at least one of these champions
                 will be displayed.
             </p>
 
-            {#if slotMatches.size > 0}
-                <ChampionMatches attributeFilter={attributeValues} />
+            <div class="flex-grow">
+                {#if slotMatches.size > 0}
+                    <ChampionMatches
+                        attributeFilter={attributeValues}
+                    />
+                {:else}
+                    <div
+                        class="text-muted-foreground pt-3 flex gap-2 items-center"
+                    >
+                        <AlertIcon class="h-6 w-6 text-destructive" />
 
-                <div
-                    class="text-muted-foreground pt-3 flex gap-2 items-center flex-grow"
-                >
-                    <InfoIcon class="h-6 w-6" />
+                        <p>
+                            No champions match the specified filters!
+                        </p>
+                    </div>
+                {/if}
+            </div>
 
-                    <p class="text-xs">
-                        To exclude a champion from this slot, try
-                        switching the filter mode to Champion.
-                        <br /> To exclude a champion from all slots, see
-                        the Global settings page.
-                    </p>
-                </div>
-            {:else}
-                <div
-                    class="text-muted-foreground pt-3 flex gap-2 items-center"
-                >
-                    <AlertIcon class="h-6 w-6 text-destructive" />
+            <div
+                class="hint text-muted-foreground pt-6 flex gap-2 items-center"
+            >
+                <InfoIcon class="h-6 w-6" />
 
-                    <p>No champions match the specified filters.</p>
-                </div>
-            {/if}
+                <p class="text-xs">
+                    To exclude a champion from this slot, try
+                    switching the filter mode to Champion.
+                    <br /> To exclude a champion from all slots, see the
+                    Global filter tab.
+                </p>
+            </div>
         </div>
     </div>
 </form>
 
 <style lang="postcss">
+    @media screen(lg) {
+        .conditional-grid {
+            display: grid;
+            grid-template-columns: minmax(350px, 50%) 1fr;
+            grid-template-rows: 1fr max-content;
+        }
+
+        .filters {
+            display: flex;
+            flex-flow: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 1em;
+        }
+
+        .conditional-divider {
+            display: none;
+        }
+
+        .preview {
+            overflow: auto;
+            margin: 0 1em;
+            padding: 0 1em;
+        }
+    }
 </style>

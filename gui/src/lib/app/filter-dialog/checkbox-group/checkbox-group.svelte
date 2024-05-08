@@ -33,7 +33,7 @@
 
     <div class="h-[6px]"></div>
 
-    <div class="flex gap-6">
+    <div class="flex gap-6 flex-wrap">
         {#each options as { onChange, ...props }}
             <CheckboxItem
                 on:change={(ev) => onChange(ev.detail)}
