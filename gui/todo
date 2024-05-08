@@ -5,12 +5,11 @@ serialize form to / from url
     too much to be human friendly so just lzma it or smth
 
 dialog
-    champion preview
     different font for titles
-    clear button
-
-filter pane
-    search button
+    tooltips
+        "disabled by global filter"
+        "champion info"
+    group champions picker by cost / trait 
 
 dream
     pick rate stats

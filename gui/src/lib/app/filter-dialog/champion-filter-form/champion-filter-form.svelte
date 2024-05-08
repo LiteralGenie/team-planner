@@ -1,17 +1,16 @@
 <script lang="ts">
     import type { FormControlRecord } from '$lib/app/form-context/form-control-record'
     import type { IdFilter } from '$lib/app/form-context/types'
-    import ChampionCheckbox from '$lib/components/champion-checkbox.svelte'
     import Button from '$lib/components/ui/button/button.svelte'
     import {
         CHAMPIONS_BY_ID,
-        CHAMPION_ICONS,
         type CDragonChampion
     } from '$lib/constants'
     import { zip } from 'radash'
     import { derived } from 'svelte/store'
     import { getFilterFormContext } from '../../form-context/context'
     import SlotTypeInput from '../slot-type-input.svelte'
+    import ChampionPicker from './champion-picker.svelte'
 
     export let slotIndex: number
 
@@ -68,26 +67,7 @@
 
         <hr class="my-6" />
 
-        <fieldset>
-            <legend class="pb-1">Champions</legend>
-
-            <p class="text-muted-foreground text-xs pb-3">
-                Select champions to allow for this slot.
-            </p>
-
-            <div class="champion-grid">
-                {#each zipped as [val, ctrl, c]}
-                    <ChampionCheckbox
-                        on:click={() => handleClick(val, ctrl)}
-                        src={CHAMPION_ICONS[val.id]}
-                        label={c.display_name}
-                        value={val.included ? 'included' : null}
-                        cost={c.tier}
-                        disabled={isDisabledGlobally(val.id)}
-                    />
-                {/each}
-            </div>
-        </fieldset>
+        <ChampionPicker {slotIndex} />
     </div>
 </form>
 

@@ -74,7 +74,7 @@
     }
     .root:not(.active) button,
     button[disabled] {
-        opacity: 0.5;
+        opacity: 0.4;
 
         &:hover {
             opacity: 0.75;

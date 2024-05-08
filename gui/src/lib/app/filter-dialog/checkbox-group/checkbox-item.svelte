@@ -23,6 +23,7 @@
 <button
     {disabled}
     on:click={() => dispatch('change', !value)}
+    type="button"
     class="cursor-pointer flex items-center gap-2"
 >
     <div class="h-5 w-5 flex items-center justify-center">
