@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { getFilterFormContext } from '$lib/app/form-context/context'
     import type { FormControlRecord } from '$lib/app/form-context/form-control-record'
     import type {
         AttributeSlotControls,
@@ -12,6 +13,8 @@
 
     export let slotControls: AttributeSlotControls
     export let slotValues: AttributeSlotValues
+
+    const { form } = getFilterFormContext()
 
     $: traitValues = slotValues.traits
     $: traitControls = slotControls.controls.traits.controls
@@ -30,6 +33,13 @@
             included: !current.included
         })
     }
+
+    function isDisabledGlobally(id_trait: string) {
+        const trait = $form.global.traits.find(
+            ({ id, included }) => id === id_trait
+        )!
+        return !trait.included
+    }
 </script>
 
 <fieldset>
@@ -40,7 +50,8 @@
             on:click={() => handleClick(val, ctrl)}
             src={TRAIT_ICONS[val.id]}
             label={trait.display_name}
-            state={val.included ? 'included' : null}
+            value={val.included ? 'included' : null}
+            disabled={isDisabledGlobally(val.id)}
         />
     {/each}
 </fieldset>

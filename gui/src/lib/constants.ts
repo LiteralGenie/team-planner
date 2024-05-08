@@ -3,7 +3,9 @@ import ALL_CHAMPIONS from '$lib/assets/tft/merged_teamplanner_data.json'
 import ALL_TRAITS from '$lib/assets/tft/tfttraits.json'
 import { alphabetical, group, objectify, sort } from 'radash'
 
-export const TRAITS = ALL_TRAITS
+export const TRAITS = ALL_TRAITS.filter(
+    (t) => t.display_name !== 'Exalted'
+)
 export const CHAMPIONS = sortChampions(
     ALL_CHAMPIONS.map((c) => ({ ...c, tier: c.tier as CostTier }))
 )

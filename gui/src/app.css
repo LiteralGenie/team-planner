@@ -157,3 +157,8 @@ hr,
     --divider: hsl(var(--foreground) / 10%);
     border-color: var(--divider);
 }
+
+button[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+}

@@ -21,7 +21,6 @@
 </script>
 
 <button
-    class:disabled
     {disabled}
     on:click={() => dispatch('change', !value)}
     class="cursor-pointer flex items-center gap-2"
@@ -57,10 +56,5 @@
 <style>
     label {
         color: hsl(var(--foreground));
-    }
-
-    .disabled {
-        opacity: 0.5;
-        pointer-events: none;
     }
 </style>

@@ -94,9 +94,12 @@ export function getActiveSlotFilters(
             )
         }
 
-        const traitsSelected = attrFilters.traits.filter(
-            (t) => t.included
-        )
+        const traitsSelected = attrFilters.traits.filter((t) => {
+            const globalTrait = global.traits.find(
+                ({ id }) => id === t.id
+            )
+            return t.included && globalTrait?.included
+        })
         if (traitsSelected.length > 0) {
             activeFilters.traits = traitsSelected
         }
