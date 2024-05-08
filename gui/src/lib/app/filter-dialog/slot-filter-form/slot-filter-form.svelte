@@ -3,6 +3,7 @@
     import Button from '$lib/components/ui/button/button.svelte'
     import AlertIcon from '$lib/icons/alert-icon.svelte'
     import InfoIcon from '$lib/icons/info-icon.svelte'
+    import { onMount } from 'svelte'
     import { getFilterFormContext } from '../../form-context/context'
     import SlotTypeInput from '../slot-type-input.svelte'
     import ChampionMatches from './champion-matches.svelte'
@@ -13,18 +14,39 @@
 
     export let slotIndex: number
 
+    $: {
+        slotIndex && resetScroll()
+    }
+
+    let mainScrollEl: HTMLElement
+    let mobileFilterScrollEl: HTMLElement
+    let mobilePreviewScrollEl: HTMLElement
+
     const { form, controls } = getFilterFormContext()
     $: slot = controls.slots.controls[slotIndex]
     $: attributeControls = slot.controls.byAttribute
     $: attributeValues = $form.slots[slotIndex].byAttribute
 
     $: slotMatches = applyAttributeFilter(attributeValues)
+
+    function resetScroll() {
+        mainScrollEl?.scrollTo({ top: 0 })
+        mobileFilterScrollEl?.scrollTo({ top: 0 })
+        mobilePreviewScrollEl?.scrollTo({ top: 0 })
+    }
+
+    onMount(() => {
+        resetScroll()
+    })
 </script>
 
 <form class="w-full pt-4">
-    <div class="conditional-grid px-6 h-full w-full overflow-auto">
+    <div
+        bind:this={mainScrollEl}
+        class="conditional-grid px-6 h-full w-full overflow-auto"
+    >
         <!-- Filters -->
-        <div class="filters">
+        <div bind:this={mobileFilterScrollEl} class="filters">
             <div class="flex items-center justify-between">
                 <div>
                     <h1
@@ -67,7 +89,10 @@
         <hr class="my-6 conditional-divider" />
 
         <!-- Preview -->
-        <div class="preview min-h-48 flex flex-col">
+        <div
+            bind:this={mobilePreviewScrollEl}
+            class="preview min-h-48 flex flex-col"
+        >
             <h1 class="pb-1 text-xl font-bold">Slot Preview</h1>
 
             <p class="text-muted-foreground text-xs pb-3">
