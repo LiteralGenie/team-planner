@@ -25,7 +25,7 @@
 
 <CheckboxGroup
     label="Cost"
-    description="Teams containing a champion from unselected cost tiers will not be displayed."
+    description="Deselect a cost tier to disable it for all slots."
     {options}
 />
 

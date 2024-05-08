@@ -8,6 +8,7 @@
     import FilterButton from './filter-button/filter-button.svelte'
     import FilterPreview from './filter-button/filter-preview.svelte'
     import GlobalFilterButton from './global-filter-button/global-filter-button.svelte'
+    import GlobalFilterPreview from './global-filter-button/global-filter-preview.svelte'
 
     let showDialog = false
     let activeSlotIndex: SlotIndex = 0
@@ -84,7 +85,7 @@
                     on:click={() => handleDialogOpen('global')}
                 />
 
-                <div>Global Filters: None</div>
+                <GlobalFilterPreview />
             </div>
         </div>
 
