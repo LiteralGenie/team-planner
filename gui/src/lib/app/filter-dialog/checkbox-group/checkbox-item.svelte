@@ -1,10 +1,13 @@
 <script lang="ts">
-    import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte'
+    import CheckboxIcon from '$lib/components/checkbox-icon.svelte'
     import { SvelteComponent, createEventDispatcher } from 'svelte'
 
     export let id: string
     export let label: string
     export let value: boolean | Boolean
+    export let disabled = false
+    export let disabledValue = false
+
     export let suffix: typeof SvelteComponent | null = null
     export let suffixOpts: any = null
     export let suffixClass: string = 'h-3 w-3'
@@ -12,19 +15,19 @@
     export let prefixOpts: any = null
     export let prefixClass: string = 'h-3 w-3'
 
-    $: v = value as boolean // see BoolParser
+    $: v = disabled ? disabledValue : (value as boolean) // see BoolParser comment
 
     const dispatch = createEventDispatcher()
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<!-- svelte-ignore a11y-no-static-element-interactions -->
-<div
+<button
+    class:disabled
+    {disabled}
     on:click={() => dispatch('change', !value)}
     class="cursor-pointer flex items-center gap-2"
 >
-    <div class="checkbox-container flex items-center">
-        <Checkbox checked={v} />
+    <div class="h-5 w-5 flex items-center justify-center">
+        <CheckboxIcon checked={v} />
     </div>
 
     <label
@@ -49,16 +52,15 @@
     </label>
 
     <input type="hidden" {id} name={id} {value} />
-</div>
+</button>
 
 <style>
-    /* Manually center checkbox. Its actual bounds doesn't match visual bounds. */
-    .checkbox-container {
-        padding-left: 2px;
-        padding-top: 1px;
-    }
-
     label {
         color: hsl(var(--foreground));
+    }
+
+    .disabled {
+        opacity: 0.5;
+        pointer-events: none;
     }
 </style>

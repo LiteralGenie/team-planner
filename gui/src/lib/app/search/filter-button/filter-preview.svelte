@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { getFilterFormContext } from '$lib/app/form-context/context'
     import type {
         CostTier,
         SlotFilter
@@ -16,7 +17,9 @@
 
     export let slot: SlotFilter
 
-    $: activeFilters = getActiveSlotFilters(slot)
+    const { form } = getFilterFormContext()
+
+    $: activeFilters = getActiveSlotFilters($form.global, slot)
     $: isEmpty = Object.entries(activeFilters ?? {}).length === 0
 
     $: showRangeOrDamage =

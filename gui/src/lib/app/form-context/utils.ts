@@ -9,6 +9,7 @@ import type {
     CostTier,
     DamageType,
     FormControlWrapper,
+    GlobalFilter,
     IdFilter,
     InputParser,
     RangeType,
@@ -60,6 +61,7 @@ export interface ActiveFilters {
 }
 
 export function getActiveSlotFilters(
+    global: GlobalFilter,
     slot: SlotFilter
 ): ActiveFilters {
     let activeFilters: ActiveFilters = {}
@@ -67,10 +69,14 @@ export function getActiveSlotFilters(
     if (slot.useAttributes) {
         const attrFilters = slot.byAttribute
 
-        if (someFalse(attrFilters.cost)) {
-            activeFilters.cost = filterMap<CostTier, any>(
-                Object.entries(attrFilters.cost),
-                ([cost, val]) => (val ? cost : null)
+        // If some cost filters disabled (excluding those disabled by global filter), mark cost as active filter
+        const costFilters = Object.entries(attrFilters.cost).filter(
+            ([cost, _]) => global.cost[cost as any as CostTier]
+        ) as any as Array<[CostTier, boolean]>
+        if (costFilters.some(([c, included]) => !included)) {
+            activeFilters.cost = filterMap(
+                costFilters,
+                ([cost, included]) => (included ? cost : null)
             )
         }
 

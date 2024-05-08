@@ -68,6 +68,7 @@
                 >
                     {#each $form.slots as slot, idx}
                         <div class="cell flex gap-4 items-center">
+                            <!-- @todo: error state on no champions -->
                             <FilterButton
                                 on:click={() => handleDialogOpen(idx)}
                                 variant={slotState(slot)}
