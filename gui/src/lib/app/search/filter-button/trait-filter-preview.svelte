@@ -16,6 +16,7 @@
 </script>
 
 <script lang="ts">
+    import TraitIcon from '$lib/components/trait-icon.svelte'
     import CheckmarkIcon from '$lib/icons/checkmark-icon.svelte'
     import XIcon from '$lib/icons/x-icon.svelte'
 
@@ -34,15 +35,7 @@
         class="h-[28px] w-[28px] relative select-none"
     >
         <!-- Hex icon -->
-        <div class="hex hover-fill p-[1px]">
-            <div class="hex dark-fill p-[1px]">
-                <div class="hex light-fill p-[1px]">
-                    <div class="hex dark-fill">
-                        <img class="h-[66%] w-[66%]" {src} />
-                    </div>
-                </div>
-            </div>
-        </div>
+        <TraitIcon {src} />
 
         <!-- Selection indicator -->
         <div
@@ -60,18 +53,6 @@
 </span>
 
 <style lang="postcss">
-    .hex {
-        @apply h-full w-full flex justify-center items-center;
-
-        &.dark-fill {
-            background-color: #232323;
-        }
-
-        &.light-fill {
-            background-color: #6b6d6b;
-        }
-    }
-
     .mark {
         /* Prevent hover effect from disappearing on icon hover */
         pointer-events: none;

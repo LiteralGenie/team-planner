@@ -3,6 +3,7 @@
 
     export let src: string
     export let cost: CostTier
+    export let hideInnerBorder = false
 </script>
 
 <div
@@ -13,7 +14,7 @@
     class:legendary={cost === 5}
     class="outer-border"
 >
-    <div class="inner-border">
+    <div class:inner-border={!hideInnerBorder}>
         <img {src} />
     </div>
 </div>
