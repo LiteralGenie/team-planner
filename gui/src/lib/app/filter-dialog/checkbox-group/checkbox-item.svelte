@@ -6,6 +6,11 @@
     export let label: string
     export let value: boolean | Boolean
     export let suffix: typeof SvelteComponent | null = null
+    export let suffixOpts: any = null
+    export let suffixClass: string = 'h-3 w-3'
+    export let prefix: typeof SvelteComponent | null = null
+    export let prefixOpts: any = null
+    export let prefixClass: string = 'h-3 w-3'
 
     $: v = value as boolean // see BoolParser
 
@@ -24,11 +29,22 @@
 
     <label
         for={id}
-        class="cursor-pointer flex items-center justify-center gap-1"
+        class="cursor-pointer flex items-center justify-center gap-1 text-[13px]"
     >
+        {#if prefix}
+            <svelte:component
+                this={prefix}
+                class={prefixClass}
+                {...prefixOpts}
+            />
+        {/if}
         {label}
         {#if suffix}
-            <svelte:component this={suffix} class="w-3 h-3" />
+            <svelte:component
+                this={suffix}
+                class={suffixClass}
+                {...suffixOpts}
+            />
         {/if}
     </label>
 
@@ -38,6 +54,7 @@
 <style>
     /* Manually center checkbox. Its actual bounds doesn't match visual bounds. */
     .checkbox-container {
+        padding-left: 2px;
         padding-top: 1px;
     }
 

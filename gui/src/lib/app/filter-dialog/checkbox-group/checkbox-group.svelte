@@ -5,6 +5,11 @@
         value: boolean | Boolean
         label: string
         suffix?: typeof SvelteComponent<any>
+        suffixOpts?: any
+        suffixClass?: string
+        prefix?: typeof SvelteComponent<any>
+        prefixOpts?: any
+        prefixClass?: string
         onChange: (update: boolean) => void
     }
 </script>
@@ -14,12 +19,21 @@
 
     export let options: CheckboxData[]
     export let label: string
+    export let description: string = ''
 </script>
 
-<fieldset class="flex gap-4">
-    <legend class="pb-2">{label}</legend>
+<fieldset class="flex flex-col">
+    <legend class="">{label}</legend>
 
-    <div class="flex gap-6">
+    {#if description}
+        <p class="text-muted-foreground text-xs pt-1">
+            {description}
+        </p>
+    {/if}
+
+    <div class="h-[6px]"></div>
+
+    <div class="flex gap-6 flex-wrap">
         {#each options as { onChange, ...props }}
             <CheckboxItem
                 on:change={(ev) => onChange(ev.detail)}

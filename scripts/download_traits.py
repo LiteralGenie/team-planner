@@ -8,12 +8,11 @@ from utils import (
     GUI_ASSETS_DIR,
     LATEST_SET_ID,
     download_image,
+    fetch_json_cached,
     get_cdragon_asset_url,
 )
 
 USE_CACHED = True
-
-EXCLUDED = set(["TFT11_TrickshotAltruist"])
 
 ###
 
@@ -27,30 +26,24 @@ IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
 ###
 
-IData: TypeAlias = list[dict]
+ITrait: TypeAlias = dict
+IData: TypeAlias = list[ITrait]
 
 
 def fetch() -> IData:
-    data = requests.get(DATA_URL).json()
-
-    if USE_CACHED and DATA_FILE.exists():
-        with open(DATA_FILE) as file:
-            return json.load(file)
-    else:
-        data = requests.get(DATA_URL).json()
-        print(f"Fetching {DATA_URL}")
-
-        with open(DATA_FILE, "w+") as file:
-            json.dump(data, file, indent=4)
-        return data
+    return fetch_json_cached(
+        DATA_URL,
+        DATA_FILE,
+        use_cache=USE_CACHED,
+    )
 
 
 def download_icons(data: IData):
     for trait in data:
         url = get_cdragon_asset_url(trait["icon_path"])
+        ext = str(url).split(".")[-1]
 
         id = trait["trait_id"]
-        ext = url.split(".")[-1]
         fp_out = IMAGE_DIR / f"{id}.{ext}"
         if fp_out.exists():
             continue
@@ -60,12 +53,15 @@ def download_icons(data: IData):
         time.sleep(1)
 
 
+def is_unique(trait: ITrait) -> bool:
+    styles = (effect["style_name"] for effect in trait["conditional_trait_sets"])
+    return any(s == "kUnique" for s in styles)
+
+
 def main():
     data = fetch()
 
-    filtered = [
-        d for d in data if LATEST_SET_ID in d["set"] and d["trait_id"] not in EXCLUDED
-    ]
+    filtered = [d for d in data if LATEST_SET_ID in d["set"] and not is_unique(d)]
     print(f"Found {len(filtered)} traits for set {LATEST_SET_ID}")
 
     with open(FILTERED_DATA_FILE, "w+") as file:

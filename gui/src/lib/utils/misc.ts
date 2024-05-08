@@ -50,3 +50,13 @@ export function getUuidWithFallback(): string {
         return result.toString()
     }
 }
+
+export function someFalse(x: Record<string, Boolean>): boolean {
+    return Object.values(x).some((v) => v === false)
+}
+
+export function filterMap<V, T>(xs: T[], filter: (x: T) => V | null) {
+    const mapped = xs.map((x) => filter(x))
+    const filtered = mapped.filter((x) => x !== null)
+    return filtered as V[]
+}

@@ -55,43 +55,39 @@ export type FormControlWrapper<T> = T extends Primitive
 
 /****/
 
-export interface TraitFilter {
+export interface IdFilter {
     id: string
-    // @todo: support for form enums
-    // 0 for null, 1 for included, 2 for excluded
-    state: number
+    included: boolean
 }
+
+export type CostTier = 1 | 2 | 3 | 4 | 5
+
+export type RangeType = 'close' | 'mid' | 'long'
+
+export type DamageType = 'ad' | 'ap'
 
 export interface AttributeFilter {
-    cost: {
-        1: Boolean
-        2: Boolean
-        3: Boolean
-        4: Boolean
-        5: Boolean
-    }
-    range: {
-        close: Boolean
-        mid: Boolean
-        long: Boolean
-    }
-    traits: Array<TraitFilter>
-    damageType: {
-        ad: Boolean
-        ap: Boolean
-    }
+    cost: { [k in CostTier]: Boolean }
+    range: { [k in RangeType]: Boolean }
+    damageType: { [k in DamageType]: Boolean }
+    traits: IdFilter[]
 }
-
-export type IdFilter = string[]
 
 export interface SlotFilter {
     useAttributes: boolean
     byAttribute: AttributeFilter
-    byId: IdFilter
+    byId: IdFilter[]
+}
+
+export interface GlobalFilter {
+    champions: IdFilter[]
+    cost: { [k in CostTier]: Boolean }
+    traits: IdFilter[]
 }
 
 export interface FilterForm {
     teamSize: number
+    global: GlobalFilter
     slots: SlotFilter[]
 }
 

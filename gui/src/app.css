@@ -24,6 +24,9 @@
         --input: 240 5.9% 90%;
         --ring: 346.8 77.2% 49.8%;
         --radius: 0.5rem;
+
+        --checked-color: #39b549;
+        --unchecked-color: #eb1a26;
     }
 
     .dark {
@@ -101,6 +104,7 @@ body {
     background-color: hsl(
         var(--muted) / var(--tw-bg-opacity)
     ) !important;
+    border-radius: calc(var(--radius) - 4px);
 }
 
 /* 
@@ -143,4 +147,13 @@ dialog[open]::backdrop {
         0% 75%,
         0% 25%
     );
+
+    /* Preserve 1:1 aspect ratio */
+    flex-shrink: 0;
+}
+
+hr,
+.divider-color {
+    --divider: hsl(var(--foreground) / 10%);
+    border-color: var(--divider);
 }

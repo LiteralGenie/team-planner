@@ -1,8 +1,19 @@
+import { CHAMPIONS } from '$lib/constants'
+import { deepCopy, filterMap, someFalse } from '$lib/utils/misc'
 import { isArray, isObject } from 'radash'
 import { FormControl } from './form-control'
 import { FormControlArray } from './form-control-array'
 import { FormControlRecord } from './form-control-record'
-import type { FormControlWrapper, InputParser } from './types'
+import type {
+    AttributeFilter,
+    CostTier,
+    DamageType,
+    FormControlWrapper,
+    IdFilter,
+    InputParser,
+    RangeType,
+    SlotFilter
+} from './types'
 
 export const StringParser = {
     fromString: (val: string) => val,
@@ -37,5 +48,103 @@ export function createControl<T>(
     } else {
         // @ts-ignore
         return new FormControl(onChange, parser)
+    }
+}
+
+export interface ActiveFilters {
+    cost?: CostTier[]
+    range?: RangeType[]
+    damageType?: DamageType[]
+    traits?: IdFilter[]
+    champions?: IdFilter[]
+}
+
+export function getActiveSlotFilters(
+    slot: SlotFilter
+): ActiveFilters {
+    let activeFilters: ActiveFilters = {}
+
+    if (slot.useAttributes) {
+        const attrFilters = slot.byAttribute
+
+        if (someFalse(attrFilters.cost)) {
+            activeFilters.cost = filterMap<CostTier, any>(
+                Object.entries(attrFilters.cost),
+                ([cost, val]) => (val ? cost : null)
+            )
+        }
+
+        if (someFalse(attrFilters.range)) {
+            activeFilters.range = filterMap<RangeType, any>(
+                Object.entries(attrFilters.range),
+                ([range, val]) => (val ? range : null)
+            )
+        }
+
+        if (someFalse(attrFilters.damageType)) {
+            activeFilters.damageType = filterMap<DamageType, any>(
+                Object.entries(attrFilters.damageType),
+                ([damageType, val]) => (val ? damageType : null)
+            )
+        }
+
+        const traitsSelected = attrFilters.traits.filter(
+            (t) => t.included
+        )
+        if (traitsSelected.length > 0) {
+            activeFilters.traits = traitsSelected
+        }
+    } else {
+        const activeIds = slot.byId.filter(({ included }) => included)
+
+        if (activeIds.length) {
+            activeFilters.champions = deepCopy(activeIds)
+        }
+    }
+
+    return activeFilters
+}
+
+export function applyAttributeFilter(
+    filter: AttributeFilter
+): Set<String> {
+    const activeTraits = new Set(
+        filter.traits.filter((t) => t.included).map((t) => t.id)
+    )
+
+    return new Set(
+        CHAMPIONS.filter((c) => filter.cost[c.tier])
+            .filter(
+                (c) =>
+                    filter.range[mapRangeValueToType(c.stats.range)]
+            )
+            .filter((c) => {
+                if (filter.damageType.ad && filter.damageType.ap) {
+                    return true
+                } else if (filter.damageType.ad) {
+                    return c.damage_type.is_ad
+                } else if (filter.damageType.ap) {
+                    return c.damage_type.is_ap
+                } else {
+                    // User unchecked both damage type filters for whatever reason
+                    return false
+                }
+            })
+            .filter(
+                (c) =>
+                    activeTraits.size === 0 ||
+                    c.traits.some((t) => activeTraits.has(t.id))
+            )
+            .map((c) => c.character_id)
+    )
+}
+
+export function mapRangeValueToType(value: number): RangeType {
+    if (value <= 1.0) {
+        return 'close'
+    } else if (value < 3) {
+        return 'mid'
+    } else {
+        return 'long'
     }
 }

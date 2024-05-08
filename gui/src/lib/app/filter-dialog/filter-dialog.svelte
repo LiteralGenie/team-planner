@@ -1,26 +1,21 @@
 <script lang="ts">
-    import { Button } from '$lib/components/ui/button'
-    import * as Card from '$lib/components/ui/card'
+    import XIcon from '$lib/icons/x-icon.svelte'
     import { createEventDispatcher } from 'svelte'
     import { getFilterFormContext } from '../form-context/context'
-    import CostInput from './cost-input.svelte'
-    import DamageTypeInput from './damage-type-input.svelte'
-    import RangeInput from './range-input.svelte'
-    import SlotTypeInput from './slot-type-input.svelte'
-    import TraitInput from './trait-input.svelte'
+    import ChampionFilterForm from './champion-filter-form/champion-filter-form.svelte'
+    import GlobalFilterForm from './global-filter-form/global-filter-form.svelte'
+    import SlotFilterForm from './slot-filter-form/slot-filter-form.svelte'
+    import SlotTabs, { type SlotIndex } from './slot-tabs.svelte'
 
     export let open = false
-    export let slotIndex: number
+    export let slotIndex: SlotIndex
 
     let dispatch = createEventDispatcher()
 
+    const { form } = getFilterFormContext()
+
     let dialogEl: HTMLDialogElement
     $: open ? dialogEl?.showModal() : dialogEl?.close()
-
-    const { form, controls } = getFilterFormContext()
-    $: slot = controls.slots.controls[slotIndex]
-    $: attributeControls = slot.controls.byAttribute
-    $: attributeValues = $form.slots[slotIndex].byAttribute
 
     function handleBackdropClick(ev: MouseEvent) {
         // This will only trigger on backdrop clicks, not dialog content clicks
@@ -41,60 +36,36 @@
     bind:this={dialogEl}
     on:click={handleBackdropClick}
     on:close
-    class="h-full w-full max-h-[80vh] max-w-[80vw] bg-transparent"
+    class="h-full w-full max-h-[85vh] max-w-[85vw] bg-transparent"
 >
-    <!-- <button
-        class="close-icon absolute top-2 right-2 p-2"
+    <button
+        class="close-icon absolute top-3 right-3 p-2"
         on:click={handleCloseButtonClick}
     >
-        <XIcon class="h-6 w-6" />
-    </button> -->
-    <Card.Root class="h-full w-full p-4 pb-6 flex flex-col gap-4">
-        <div class="h-full overflow-auto p-4">
-            <Card.Title class="text-xl mb-4">
-                Slot #{slotIndex + 1}
-            </Card.Title>
-            <Card.Description>
-                <form>
-                    <SlotTypeInput {slotIndex} />
+        <XIcon class="h-5 w-5" />
+    </button>
 
-                    <hr class="my-8" />
+    <div
+        class="pt-12 pb-12 card rounded-2xl h-full w-full text-foreground text-sm flex flex-col"
+    >
+        <div class="h-full flex">
+            <div class="hidden md:block text-muted-foreground">
+                <SlotTabs {slotIndex} on:tabclick />
+            </div>
 
-                    <div class="flex flex-col gap-6">
-                        <CostInput
-                            slotControls={attributeControls}
-                            slotValues={attributeValues}
-                        />
-
-                        <RangeInput
-                            slotControls={attributeControls}
-                            slotValues={attributeValues}
-                        />
-
-                        <DamageTypeInput
-                            slotControls={attributeControls}
-                            slotValues={attributeValues}
-                        />
-
-                        <TraitInput
-                            slotControls={attributeControls}
-                            slotValues={attributeValues}
-                        />
-                    </div>
-
-                    <hr class="my-8" />
-
-                    Matching champions:
-                </form>
-            </Card.Description>
+            <section class="w-full min-w-0 pr-6 flex">
+                {#if typeof slotIndex === 'number'}
+                    {#if $form.slots[slotIndex].useAttributes}
+                        <SlotFilterForm {slotIndex} />
+                    {:else}
+                        <ChampionFilterForm {slotIndex} />
+                    {/if}
+                {:else}
+                    <GlobalFilterForm />
+                {/if}
+            </section>
         </div>
-        <Card.Footer class="p-0 flex justify-end">
-            <Button
-                on:click={handleCloseButtonClick}
-                class="min-w-24 min-h-10">Close</Button
-            >
-        </Card.Footer>
-    </Card.Root>
+    </div>
 </dialog>
 
 <style lang="postcss">
@@ -102,7 +73,7 @@
         color: hsl(var(--foreground));
     }
 
-    hr {
-        border-color: hsl(var(--foreground) / 10%);
+    .card {
+        background-color: hsl(var(--card));
     }
 </style>

@@ -9,7 +9,8 @@
 </script>
 
 <div
-    class="flex flex-col justify-center items-center text-center gap-[1px]"
+    class="root flex flex-col justify-center items-center text-center gap-[1px]"
+    class:active={state !== null}
 >
     <button
         on:click
@@ -33,7 +34,7 @@
             <div
                 class:green={state === 'included'}
                 class:red={state === 'excluded'}
-                class="absolute bottom-[0px] right-[0px] rounded-full p-[2px] text-foreground"
+                class="mark absolute bottom-[2px] right-[3px] rounded-full p-[2px] text-foreground"
             >
                 {#if state === 'included'}
                     <CheckmarkIcon class="h-3 w-3" />
@@ -45,7 +46,9 @@
     </button>
 
     <!-- Label -->
-    <span class="text-xs">{label}</span>
+    <span class="text-xs text-muted-foreground whitespace-nowrap">
+        {label}
+    </span>
 </div>
 
 <style lang="postcss">
@@ -59,17 +62,37 @@
         &.light-fill {
             background-color: #6b6d6b;
         }
+    }
 
-        &.hover-fill:hover {
-            filter: drop-shadow(0px 0px 20px rgba(255, 199, 46, 0.9));
+    .mark {
+        /* Prevent hover effect from disappearing on icon hover */
+        pointer-events: none;
+
+        &.green {
+            background-color: var(--checked-color);
+        }
+        &.red {
+            background-color: var(--unchecked-color);
         }
     }
 
-    .green {
-        background-color: #39b549;
-    }
+    /* Highlight on hover / selection */
+    button {
+        transition: all 0.2s;
 
-    .red {
-        background-color: #eb1a26;
+        &:hover .hover-fill,
+        &:focus .hover-fill {
+            filter: drop-shadow(0px 0px 20px rgba(255, 199, 46, 0.9));
+        }
+    }
+    .root:not(.active) button {
+        opacity: 0.3;
+
+        &:hover {
+            opacity: 0.5;
+        }
+    }
+    .active span {
+        @apply text-foreground;
     }
 </style>
