@@ -1,13 +1,14 @@
 <script lang="ts">
     import { applyAttributeFilter } from '$lib/app/form-context/utils'
+    import Button from '$lib/components/ui/button/button.svelte'
     import AlertIcon from '$lib/icons/alert-icon.svelte'
     import InfoIcon from '$lib/icons/info-icon.svelte'
     import { getFilterFormContext } from '../../form-context/context'
+    import SlotTypeInput from '../slot-type-input.svelte'
     import ChampionMatches from './champion-matches.svelte'
     import CostInput from './cost-input.svelte'
     import DamageTypeInput from './damage-type-input.svelte'
     import RangeInput from './range-input.svelte'
-    import SlotTypeInput from './slot-type-input.svelte'
     import TraitInput from './trait-input.svelte'
 
     export let slotIndex: number
@@ -24,11 +25,19 @@
     <div class="conditional-grid px-6 h-full w-full overflow-auto">
         <!-- Filters -->
         <div class="filters">
-            <h1 class="text-xl text-foreground font-bold mb-2">
-                Filters
-            </h1>
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1
+                        class="text-xl text-foreground font-bold mb-2"
+                    >
+                        Filters
+                    </h1>
 
-            <SlotTypeInput {slotIndex} />
+                    <SlotTypeInput {slotIndex} />
+                </div>
+
+                <Button class="px-6 lg:hidden">Reset</Button>
+            </div>
 
             <hr class="my-6" />
 
@@ -96,6 +105,10 @@
                     Global filter tab.
                 </p>
             </div>
+        </div>
+
+        <div class="pt-6 pr-2 col-span-2 hidden lg:flex justify-end">
+            <Button class="px-6">Reset</Button>
         </div>
     </div>
 </form>

@@ -6,6 +6,9 @@
     import { getActiveSlotFilters } from '$lib/app/form-context/utils'
     import apIcon from '$lib/assets/tft/misc/statmodsabilitypowericon.png'
     import adIcon from '$lib/assets/tft/misc/statmodsattackdamageicon.png'
+    import ChampionPortrait from '$lib/components/champion-portrait.svelte'
+    import { CHAMPIONS_BY_ID, CHAMPION_ICONS } from '$lib/constants'
+    import CheckmarkIcon from '$lib/icons/checkmark-icon.svelte'
     import GoldIcon from '$lib/icons/gold-icon.svelte'
     import RangeIcon from '$lib/icons/range-icon.svelte'
     import { last, sort } from 'radash'
@@ -113,6 +116,25 @@
                 {/each}
             </span>
         {/if}
+        {#if activeFilters.champions}
+            <div class="champion-grid pt-1">
+                {#each activeFilters.champions as { id }}
+                    <div class="relative">
+                        <ChampionPortrait
+                            cost={CHAMPIONS_BY_ID[id].tier}
+                            src={CHAMPION_ICONS[id]}
+                            hideInnerBorder={true}
+                        />
+
+                        <div
+                            class="mark absolute bottom-[-0px] right-[-0px] rounded-full p-[2px] text-foreground"
+                        >
+                            <CheckmarkIcon class="h-[6px] w-[6px]" />
+                        </div>
+                    </div>
+                {/each}
+            </div>
+        {/if}
     </div>
 </div>
 
@@ -123,5 +145,16 @@
         & > *:not(:last-child)::after {
             content: ' , ';
         }
+    }
+
+    .champion-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, 1.75em);
+        align-items: start;
+        gap: 6px 6px;
+    }
+
+    .mark {
+        background-color: var(--checked-color);
     }
 </style>

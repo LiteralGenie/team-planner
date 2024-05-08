@@ -1,6 +1,8 @@
 <script lang="ts">
     import XIcon from '$lib/icons/x-icon.svelte'
     import { createEventDispatcher } from 'svelte'
+    import { getFilterFormContext } from '../form-context/context'
+    import ChampionFilterForm from './champion-filter-form/champion-filter-form.svelte'
     import GlobalFilterForm from './global-filter-form/global-filter-form.svelte'
     import SlotFilterForm from './slot-filter-form/slot-filter-form.svelte'
     import SlotTabs, { type SlotIndex } from './slot-tabs.svelte'
@@ -9,6 +11,8 @@
     export let slotIndex: SlotIndex
 
     let dispatch = createEventDispatcher()
+
+    const { form } = getFilterFormContext()
 
     let dialogEl: HTMLDialogElement
     $: open ? dialogEl?.showModal() : dialogEl?.close()
@@ -51,7 +55,11 @@
 
             <section class="w-full min-w-0 pr-6 flex">
                 {#if typeof slotIndex === 'number'}
-                    <SlotFilterForm {slotIndex} />
+                    {#if $form.slots[slotIndex].useAttributes}
+                        <SlotFilterForm {slotIndex} />
+                    {:else}
+                        <ChampionFilterForm {slotIndex} />
+                    {/if}
                 {:else}
                     <GlobalFilterForm />
                 {/if}

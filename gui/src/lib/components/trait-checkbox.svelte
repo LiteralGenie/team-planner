@@ -69,10 +69,10 @@
         pointer-events: none;
 
         &.green {
-            background-color: #39b549;
+            background-color: var(--checked-color);
         }
         &.red {
-            background-color: #eb1a26;
+            background-color: var(--unchecked-color);
         }
     }
 
