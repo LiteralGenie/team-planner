@@ -1,5 +1,7 @@
 import { getUuidWithFallback } from '$lib/utils/misc'
 import { range, sort, zip } from 'radash'
+import type { Readable } from 'svelte/motion'
+import { derived, get, writable, type Writable } from 'svelte/store'
 import {
     type ControlLike,
     type FormControlWrapper,
@@ -18,7 +20,11 @@ interface ArrayItem<T> {
 }
 
 export class FormControlArray<T> implements ControlLike<T[]> {
-    private items: Record<Id, ArrayItem<T>> = {}
+    // @jank: making the form control stuff dependent on svelte stores is kinda lame
+    //        its only necessary because this is the only form class where controls can be added / removed and callers need to be notified
+    //        but is there at least a way to isolate this notification logic?
+    //        like instead of making items a store, can we add a itemsStore prop?
+    private items: Writable<Record<Id, ArrayItem<T>>> = writable({})
 
     constructor(
         public onChange: OnChangeHandler<T>,
@@ -41,7 +47,7 @@ export class FormControlArray<T> implements ControlLike<T[]> {
                 this._add(vals[idx])
             }
         } else if (diff < 0) {
-            const toRemove = this.itemsSorted.slice(diff)
+            const toRemove = get(this.itemsSorted).slice(diff)
 
             for (let it of toRemove) {
                 this._remove(it.id)
@@ -49,7 +55,7 @@ export class FormControlArray<T> implements ControlLike<T[]> {
         }
 
         // Update item values
-        const zipped = zip(this.itemsSorted, vals)
+        const zipped = zip(get(this.itemsSorted), vals)
         for (let [it, val] of zipped) {
             this.setSingleValue(it.id, val)
         }
@@ -66,15 +72,23 @@ export class FormControlArray<T> implements ControlLike<T[]> {
     }
 
     public get controls(): FormControlWrapper<T>[] {
-        return this.itemsSorted.map((it) => it.control)
+        return get(this.controlsStore)
+    }
+
+    public get controlsStore(): Readable<FormControlWrapper<T>[]> {
+        return derived(this.itemsSorted, (current) =>
+            current.map(({ control }) => control)
+        )
     }
 
     public get values(): T[] {
-        return this.itemsSorted.map((it) => it.value)
+        return get(this.itemsSorted).map((it) => it.value)
     }
 
-    private get itemsSorted(): ArrayItem<T>[] {
-        return sort(Object.values(this.items), (it) => it.index)
+    private get itemsSorted(): Readable<ArrayItem<T>[]> {
+        return derived(this.items, (current) =>
+            sort(Object.values(current), (it) => it.index)
+        )
     }
 
     private _add(initValue: T): ArrayItem<T> {
@@ -85,37 +99,44 @@ export class FormControlArray<T> implements ControlLike<T[]> {
             this.setAndPublishValue(uuid, val)
         )
 
-        this.items[uuid] = {
-            id: uuid,
-            control,
-            index: n,
-            value: initValue
-        }
+        this.items.update((current) => ({
+            ...current,
+            [uuid]: {
+                id: uuid,
+                control,
+                index: n,
+                value: initValue
+            }
+        }))
 
-        return this.items[uuid]
+        return get(this.items)[uuid]
     }
 
     public _remove(id: Id) {
-        let items = this.itemsSorted
-        let idx = this.items[id].index
+        let items = get(this.itemsSorted)
+        let idx = get(this.items)[id].index
 
         // Decrement index of all items to the right
         for (let item of items.slice(idx + 1)) {
             item.index += 1
         }
 
-        delete this.items[id]
+        this.items.update((current) => {
+            const update = { ...current }
+            delete update[id]
+            return update
+        })
     }
 
     private setSingleValue(id: Id, val: T) {
-        let item = this.items[id]
+        let item = get(this.items)[id]
         // @ts-ignore
         item.control.setValue(val)
         item.value = val
     }
 
     private setAndPublishValue(id: Id, val: T) {
-        if (!this.items[id]) {
+        if (!get(this.items)[id]) {
             console.warn(
                 'FormArray received update from a deleted FormControl'
             )
@@ -124,7 +145,7 @@ export class FormControlArray<T> implements ControlLike<T[]> {
 
         this.setSingleValue(id, val)
 
-        const vals = this.itemsSorted.map((it) => it.value)
+        const vals = get(this.itemsSorted).map((it) => it.value)
 
         this.onChange(vals)
     }

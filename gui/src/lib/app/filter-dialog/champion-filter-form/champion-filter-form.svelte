@@ -9,16 +9,19 @@
         type CDragonChampion
     } from '$lib/constants'
     import { zip } from 'radash'
+    import { derived } from 'svelte/store'
     import { getFilterFormContext } from '../../form-context/context'
     import SlotTypeInput from '../slot-type-input.svelte'
 
     export let slotIndex: number
 
-    const { form, controls } = getFilterFormContext()
+    const { form, controls, resetSlotFilter } = getFilterFormContext()
     $: slotValues = $form.slots[slotIndex].byId
-    $: slotControls =
-        controls.slots.controls[slotIndex].controls.byId.controls
-    $: zipped = zip(slotValues, slotControls).map(([val, ctrl]) => [
+    $: slotControls = derived(
+        controls.slots.controlsStore,
+        (controls) => controls[slotIndex].controls.byId.controls
+    )
+    $: zipped = zip(slotValues, $slotControls).map(([val, ctrl]) => [
         val,
         ctrl,
         CHAMPIONS_BY_ID[val.id]
@@ -35,6 +38,10 @@
             included: !current.included
         })
     }
+
+    function handleReset() {
+        resetSlotFilter(slotIndex)
+    }
 </script>
 
 <form class="w-full pt-4">
@@ -48,7 +55,7 @@
                 <SlotTypeInput {slotIndex} />
             </div>
 
-            <Button class="px-6">Reset</Button>
+            <Button on:click={handleReset} class="px-6">Reset</Button>
         </div>
 
         <hr class="my-6" />

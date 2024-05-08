@@ -1,3 +1,4 @@
+import { CHAMPIONS, TRAITS } from '$lib/constants'
 import { deepCopy } from '$lib/utils/misc'
 import { range } from 'radash'
 import type {
@@ -22,23 +23,32 @@ const DEFAULT_ATTRIBUTE_FILTER = {
         mid: true,
         long: true
     },
-    traits: [],
+    traits: TRAITS.map((t) => ({
+        id: t.trait_id,
+        included: false
+    })),
     damageType: {
         ad: true,
         ap: true
     }
 } satisfies AttributeFilter
 
-const DEFAULT_SLOT_FILTER = {
+export const DEFAULT_SLOT_FILTER = {
     useAttributes: true,
     byAttribute: DEFAULT_ATTRIBUTE_FILTER,
-    byId: []
+    byId: CHAMPIONS.map((c) => ({
+        id: c.character_id,
+        included: false
+    }))
 } satisfies SlotFilter
 
 const DEFAULT_TEAM_SIZE = 7
 
-const DEFAULT_GLOBAL_FILTER = {
-    champions: [],
+export const DEFAULT_GLOBAL_FILTER = {
+    champions: CHAMPIONS.map((c) => ({
+        id: c.character_id,
+        included: true
+    })),
     cost: {
         1: true,
         2: true,
@@ -46,7 +56,10 @@ const DEFAULT_GLOBAL_FILTER = {
         4: true,
         5: true
     },
-    traits: []
+    traits: TRAITS.map((t) => ({
+        id: t.trait_id,
+        included: true
+    }))
 } satisfies GlobalFilter
 
 export const DEFAULT_FILTER_FORM = {

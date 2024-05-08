@@ -4,6 +4,7 @@
     import AlertIcon from '$lib/icons/alert-icon.svelte'
     import InfoIcon from '$lib/icons/info-icon.svelte'
     import { onMount } from 'svelte'
+    import { derived } from 'svelte/store'
     import { getFilterFormContext } from '../../form-context/context'
     import SlotTypeInput from '../slot-type-input.svelte'
     import ChampionMatches from './champion-matches.svelte'
@@ -22,9 +23,12 @@
     let mobileFilterScrollEl: HTMLElement
     let mobilePreviewScrollEl: HTMLElement
 
-    const { form, controls } = getFilterFormContext()
-    $: slot = controls.slots.controls[slotIndex]
-    $: attributeControls = slot.controls.byAttribute
+    const { form, controls, resetSlotFilter } = getFilterFormContext()
+    $: slot = derived(
+        controls.slots.controlsStore,
+        (controls) => controls[slotIndex]
+    )
+    $: attributeControls = $slot.controls.byAttribute
     $: attributeValues = $form.slots[slotIndex].byAttribute
 
     $: slotMatches = applyAttributeFilter(attributeValues)
@@ -33,6 +37,10 @@
         mainScrollEl?.scrollTo({ top: 0 })
         mobileFilterScrollEl?.scrollTo({ top: 0 })
         mobilePreviewScrollEl?.scrollTo({ top: 0 })
+    }
+
+    function handleReset() {
+        resetSlotFilter(slotIndex)
     }
 
     onMount(() => {
@@ -58,7 +66,10 @@
                     <SlotTypeInput {slotIndex} />
                 </div>
 
-                <Button class="px-6 lg:hidden">Reset</Button>
+                <Button
+                    on:click={() => handleReset()}
+                    class="px-6 lg:hidden">Reset</Button
+                >
             </div>
 
             <hr class="my-6" />
@@ -133,7 +144,9 @@
         </div>
 
         <div class="pt-6 pr-2 col-span-2 hidden lg:flex justify-end">
-            <Button class="px-6">Reset</Button>
+            <Button on:click={() => handleReset()} class="px-6">
+                Reset
+            </Button>
         </div>
     </div>
 </form>

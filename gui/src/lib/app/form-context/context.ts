@@ -1,9 +1,12 @@
-import { CHAMPIONS, TRAITS } from '$lib/constants'
 import { deepCopy } from '$lib/utils/misc'
-import { clone, objectify } from 'radash'
+import { objectify } from 'radash'
 import { getContext, setContext } from 'svelte'
-import { writable, type Readable } from 'svelte/store'
-import { FILTER_FORM_PARSERS } from './defaults'
+import { get, writable, type Readable } from 'svelte/store'
+import {
+    DEFAULT_GLOBAL_FILTER,
+    DEFAULT_SLOT_FILTER,
+    FILTER_FORM_PARSERS
+} from './defaults'
 import { type FilterForm, type FilterFormControls } from './types'
 import { createControl, type ValueOf } from './utils'
 
@@ -24,6 +27,8 @@ export type FilterFormValue = {
     controls: FilterFormControls
 
     setValue: (value: FilterForm) => void
+    resetGlobalFilter: () => void
+    resetSlotFilter: (idx: number) => void
     destroy: () => void
 }
 
@@ -33,16 +38,15 @@ export function setFilterFormContext(initValue: FilterForm) {
     initValue = deepCopy(initValue)
     const controls = getDefaultControls(initValue, onChange)
 
-    initTraits(initValue, controls)
-    initChampions(initValue, controls)
-
-    const form = writable(clone(initValue))
+    const form = writable(deepCopy(initValue))
 
     const value = {
         form,
         formInitial: initValue,
         controls,
         setValue,
+        resetGlobalFilter,
+        resetSlotFilter,
         destroy
     }
     setContext<FilterFormValue>(KEY, value)
@@ -59,8 +63,31 @@ export function setFilterFormContext(initValue: FilterForm) {
         }))
     }
 
+    function resetSlotFilter(idx: number) {
+        const slotsUpdate = [...get(form).slots]
+
+        slotsUpdate[idx] = {
+            ...deepCopy(DEFAULT_SLOT_FILTER),
+            useAttributes: slotsUpdate[idx].useAttributes
+        }
+
+        setValue({
+            ...get(form),
+            slots: slotsUpdate
+        })
+    }
+
+    function resetGlobalFilter() {
+        const current = deepCopy(get(form))
+
+        setValue({
+            ...current,
+            global: deepCopy(DEFAULT_GLOBAL_FILTER)
+        })
+    }
+
     function setValue(update: FilterForm) {
-        form.set(clone(update))
+        form.set(deepCopy(update))
 
         for (let key in update) {
             const k = key as keyof FilterForm
@@ -100,60 +127,6 @@ function getDefaultControls(
             )
         }
     )
-}
-
-function initTraits(
-    initValue: FilterForm,
-    controls: FilterFormControls
-) {
-    // Init global traits
-    const globalTraits = TRAITS.map((trait) => ({
-        id: trait.trait_id,
-        included: true
-    }))
-    controls.global.controls.traits.setValue(deepCopy(globalTraits))
-    initValue.global.traits = deepCopy(globalTraits)
-
-    // Init slot traits
-    const slotTraits = TRAITS.map((trait) => ({
-        id: trait.trait_id,
-        included: false
-    }))
-    for (let slot of controls.slots.controls) {
-        const traitArray = slot.controls.byAttribute.controls.traits
-        traitArray.setValue(deepCopy(slotTraits))
-    }
-    for (let slot of initValue.slots) {
-        slot.byAttribute.traits = deepCopy(slotTraits)
-    }
-}
-
-function initChampions(
-    initValue: FilterForm,
-    controls: FilterFormControls
-) {
-    // Global input
-    const globalChampions = CHAMPIONS.map((c) => ({
-        id: c.character_id,
-        included: true
-    }))
-    controls.global.controls.champions.setValue(
-        deepCopy(globalChampions)
-    )
-    initValue.global.champions = deepCopy(globalChampions)
-
-    // Slot inputs
-    const slotChampions = CHAMPIONS.map((c) => ({
-        id: c.character_id,
-        included: false
-    }))
-    for (let slot of controls.slots.controls) {
-        const traitArray = slot.controls.byId
-        traitArray.setValue(deepCopy(slotChampions))
-    }
-    for (let slot of initValue.slots) {
-        slot.byId = deepCopy(slotChampions)
-    }
 }
 
 export function getFilterFormContext() {
