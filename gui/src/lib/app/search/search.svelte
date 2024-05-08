@@ -13,7 +13,7 @@
     let showDialog = false
     let activeSlotIndex: SlotIndex = 0
 
-    const { form, controls } = getFilterFormContext()
+    const { form } = getFilterFormContext()
 
     function handleDialogOpen(idx: SlotIndex) {
         activeSlotIndex = idx
@@ -26,7 +26,10 @@
 
     function slotState(slot: SlotFilter): string {
         if (slot.useAttributes) {
-            const matches = applyAttributeFilter(slot.byAttribute)
+            const matches = applyAttributeFilter(
+                $form.global,
+                slot.byAttribute
+            )
 
             if (matches.size === 0) {
                 return 'active'

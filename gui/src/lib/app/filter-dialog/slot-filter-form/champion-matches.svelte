@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { getFilterFormContext } from '$lib/app/form-context/context'
     import type { AttributeFilter } from '$lib/app/form-context/types'
     import { applyAttributeFilter } from '$lib/app/form-context/utils'
     import ChampionPortrait from '$lib/components/champion-portrait.svelte'
@@ -7,7 +8,9 @@
 
     export let attributeFilter: AttributeFilter
 
-    $: activeIds = applyAttributeFilter(attributeFilter)
+    const { form } = getFilterFormContext()
+
+    $: activeIds = applyAttributeFilter($form.global, attributeFilter)
 
     $: championsSorted = sort(
         CHAMPIONS,

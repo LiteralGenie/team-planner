@@ -104,7 +104,13 @@ export function getActiveSlotFilters(
             activeFilters.traits = traitsSelected
         }
     } else {
-        const activeIds = slot.byId.filter(({ included }) => included)
+        const activeIds = slot.byId.filter((c) => {
+            const globalChampion = global.champions.find(
+                ({ id }) => id === c.id
+            )!
+
+            return c.included && globalChampion.included
+        })
 
         if (activeIds.length) {
             activeFilters.champions = deepCopy(activeIds)
@@ -115,10 +121,19 @@ export function getActiveSlotFilters(
 }
 
 export function applyAttributeFilter(
+    global: GlobalFilter,
     filter: AttributeFilter
 ): Set<String> {
     const activeTraits = new Set(
-        filter.traits.filter((t) => t.included).map((t) => t.id)
+        filter.traits
+            .filter((t) => t.included)
+            .filter((t) => {
+                const globalTrait = global.traits.find(
+                    ({ id }) => id === t.id
+                )!
+                return globalTrait.included
+            })
+            .map((t) => t.id)
     )
 
     return new Set(
@@ -139,11 +154,19 @@ export function applyAttributeFilter(
                     return false
                 }
             })
-            .filter(
-                (c) =>
-                    activeTraits.size === 0 ||
-                    c.traits.some((t) => activeTraits.has(t.id))
-            )
+            .filter((c) => {
+                const isEmpty = activeTraits.size === 0
+                const isActive = c.traits.some((t) =>
+                    activeTraits.has(t.id)
+                )
+                return isEmpty || isActive
+            })
+            .filter((c) => {
+                const globalChampionFilter = global.champions.find(
+                    ({ id }) => id === c.character_id
+                )!
+                return globalChampionFilter.included
+            })
             .map((c) => c.character_id)
     )
 }

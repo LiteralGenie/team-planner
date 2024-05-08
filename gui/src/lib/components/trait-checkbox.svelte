@@ -17,6 +17,7 @@
 </script>
 
 <div
+    class:disabled
     class="root flex flex-col justify-center items-center text-center gap-[1px]"
     class:active={actualValue !== null}
 >
@@ -94,14 +95,15 @@
             filter: drop-shadow(0px 0px 20px rgba(255, 199, 46, 0.9));
         }
     }
-    .root:not(.active) button {
+    .root:not(.active) button,
+    button[disabled] {
         opacity: 0.3;
 
         &:hover {
             opacity: 0.5;
         }
     }
-    .active span {
+    root:not(.disabled) .active span {
         @apply text-foreground;
     }
 </style>

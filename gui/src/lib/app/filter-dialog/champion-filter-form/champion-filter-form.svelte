@@ -42,6 +42,14 @@
     function handleReset() {
         resetSlotFilter(slotIndex)
     }
+
+    function isDisabledGlobally(id_champion: string) {
+        const globalChampion = $form.global.champions.find(
+            ({ id }) => id === id_champion
+        )!
+
+        return !globalChampion.included
+    }
 </script>
 
 <form class="w-full pt-4">
@@ -73,8 +81,9 @@
                         on:click={() => handleClick(val, ctrl)}
                         src={CHAMPION_ICONS[val.id]}
                         label={c.display_name}
-                        state={val.included ? 'included' : null}
+                        value={val.included ? 'included' : null}
                         cost={c.tier}
+                        disabled={isDisabledGlobally(val.id)}
                     />
                 {/each}
             </div>
