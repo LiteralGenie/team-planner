@@ -157,3 +157,37 @@ hr,
     --divider: hsl(var(--foreground) / 10%);
     border-color: var(--divider);
 }
+
+button[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* custom select styles */
+.dark {
+    --sv-bg: hsl(var(--background));
+    --sv-border: 0;
+    --sv-border-radius: var(--radius);
+    --sv-dropdown-offset: 0;
+    --sv-dropdown-active-bg: hsl(var(--foreground) / 10%);
+    --sv-dropdown-selected-bg: hsl(var(--foreground) / 10%);
+}
+.svelecte.is-open .sv-control {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+.svelecte.is-open .sv_dropdown {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+}
+.sv-dropdown-content {
+    @apply text-xs;
+}
+.sv-input--sizer {
+    /* Disable invisible input causing text to ellipsis */
+    width: 0;
+}
+.sv-dd-item-active {
+    /* Disable selection of already-selected items */
+    pointer-events: none;
+}

@@ -4,6 +4,7 @@
     export interface CheckboxData {
         value: boolean | Boolean
         label: string
+        disabled?: boolean
         suffix?: typeof SvelteComponent<any>
         suffixOpts?: any
         suffixClass?: string

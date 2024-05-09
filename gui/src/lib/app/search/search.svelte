@@ -13,7 +13,7 @@
     let showDialog = false
     let activeSlotIndex: SlotIndex = 0
 
-    const { form, controls } = getFilterFormContext()
+    const { form } = getFilterFormContext()
 
     function handleDialogOpen(idx: SlotIndex) {
         activeSlotIndex = idx
@@ -26,24 +26,30 @@
 
     function slotState(slot: SlotFilter): string {
         if (slot.useAttributes) {
-            const matches = applyAttributeFilter(slot.byAttribute)
+            const n = applyAttributeFilter(
+                $form.global,
+                slot.byAttribute
+            ).size
 
-            if (matches.size === 0) {
+            if (n === 0) {
                 return 'active'
-            } else if (matches.size === 1) {
+            } else if (n === 1) {
                 // showing champion icon is possible but looks janky due to how large the container is + how zoomed in the image is
                 // return matches.values().next().value
                 return 'active'
-            } else if (matches.size === CHAMPIONS.length) {
+            } else if (n === CHAMPIONS.length) {
                 return 'inactive'
             } else {
                 return 'active'
             }
         } else {
-            if (slot.byId.length > 1) {
-                return 'active'
-            } else if (slot.byId.length === 1) {
+            const n = slot.byChampion.champions.length
+            if (n === 1) {
                 // return slot.byId[0].id
+                return 'active'
+            } else if (n === CHAMPIONS.length) {
+                return 'inactive'
+            } else if (n > 1) {
                 return 'active'
             } else {
                 return 'inactive'
@@ -68,6 +74,7 @@
                 >
                     {#each $form.slots as slot, idx}
                         <div class="cell flex gap-4 items-center">
+                            <!-- @todo: error state on no champions -->
                             <FilterButton
                                 on:click={() => handleDialogOpen(idx)}
                                 variant={slotState(slot)}

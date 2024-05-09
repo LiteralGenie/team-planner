@@ -73,10 +73,17 @@ export interface AttributeFilter {
     traits: IdFilter[]
 }
 
+export type ChampionGroupingType = 'cost' | 'trait'
+
+export interface ChampionFilter {
+    champions: IdFilter[]
+    groupBy: ChampionGroupingType
+}
+
 export interface SlotFilter {
     useAttributes: boolean
     byAttribute: AttributeFilter
-    byId: IdFilter[]
+    byChampion: ChampionFilter
 }
 
 export interface GlobalFilter {

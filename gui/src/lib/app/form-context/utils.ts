@@ -9,6 +9,7 @@ import type {
     CostTier,
     DamageType,
     FormControlWrapper,
+    GlobalFilter,
     IdFilter,
     InputParser,
     RangeType,
@@ -60,6 +61,7 @@ export interface ActiveFilters {
 }
 
 export function getActiveSlotFilters(
+    global: GlobalFilter,
     slot: SlotFilter
 ): ActiveFilters {
     let activeFilters: ActiveFilters = {}
@@ -67,10 +69,14 @@ export function getActiveSlotFilters(
     if (slot.useAttributes) {
         const attrFilters = slot.byAttribute
 
-        if (someFalse(attrFilters.cost)) {
-            activeFilters.cost = filterMap<CostTier, any>(
-                Object.entries(attrFilters.cost),
-                ([cost, val]) => (val ? cost : null)
+        // If some cost filters disabled (excluding those disabled by global filter), mark cost as active filter
+        const costFilters = Object.entries(attrFilters.cost).filter(
+            ([cost, _]) => global.cost[cost as any as CostTier]
+        ) as any as Array<[CostTier, boolean]>
+        if (costFilters.some(([c, included]) => !included)) {
+            activeFilters.cost = filterMap(
+                costFilters,
+                ([cost, included]) => (included ? cost : null)
             )
         }
 
@@ -88,14 +94,23 @@ export function getActiveSlotFilters(
             )
         }
 
-        const traitsSelected = attrFilters.traits.filter(
-            (t) => t.included
-        )
+        const traitsSelected = attrFilters.traits.filter((t) => {
+            const globalTrait = global.traits.find(
+                ({ id }) => id === t.id
+            )
+            return t.included && globalTrait?.included
+        })
         if (traitsSelected.length > 0) {
             activeFilters.traits = traitsSelected
         }
     } else {
-        const activeIds = slot.byId.filter(({ included }) => included)
+        const activeIds = slot.byChampion.champions.filter((c) => {
+            const globalChampion = global.champions.find(
+                ({ id }) => id === c.id
+            )!
+
+            return c.included && globalChampion.included
+        })
 
         if (activeIds.length) {
             activeFilters.champions = deepCopy(activeIds)
@@ -106,10 +121,19 @@ export function getActiveSlotFilters(
 }
 
 export function applyAttributeFilter(
+    global: GlobalFilter,
     filter: AttributeFilter
 ): Set<String> {
     const activeTraits = new Set(
-        filter.traits.filter((t) => t.included).map((t) => t.id)
+        filter.traits
+            .filter((t) => t.included)
+            .filter((t) => {
+                const globalTrait = global.traits.find(
+                    ({ id }) => id === t.id
+                )!
+                return globalTrait.included
+            })
+            .map((t) => t.id)
     )
 
     return new Set(
@@ -130,11 +154,19 @@ export function applyAttributeFilter(
                     return false
                 }
             })
-            .filter(
-                (c) =>
-                    activeTraits.size === 0 ||
-                    c.traits.some((t) => activeTraits.has(t.id))
-            )
+            .filter((c) => {
+                const isEmpty = activeTraits.size === 0
+                const isActive = c.traits.some((t) =>
+                    activeTraits.has(t.id)
+                )
+                return isEmpty || isActive
+            })
+            .filter((c) => {
+                const globalChampionFilter = global.champions.find(
+                    ({ id }) => id === c.character_id
+                )!
+                return globalChampionFilter.included
+            })
             .map((c) => c.character_id)
     )
 }

@@ -1,3 +1,7 @@
+<script lang="ts" context="module">
+    export type ChampionCheckboxValue = 'included' | 'excluded' | null
+</script>
+
 <script lang="ts">
     import type { CostTier } from '$lib/app/form-context/types'
     import ChampionPortrait from '$lib/components/champion-portrait.svelte'
@@ -8,14 +12,20 @@
     export let label: string
     export let cost: CostTier
 
-    export let state: 'included' | 'excluded' | null
+    export let value: ChampionCheckboxValue
+    export let disabled = false
+    export let disabledValue: ChampionCheckboxValue = 'excluded'
+
+    $: actualValue = disabled ? disabledValue : value
 </script>
 
 <div
+    class:disabled
     class="root flex flex-col justify-center items-center text-center gap-[1px]"
-    class:active={state !== null}
+    class:active={actualValue !== null}
 >
     <button
+        {disabled}
         on:click
         type="button"
         class="h-12 w-12 relative select-none"
@@ -24,15 +34,15 @@
         <ChampionPortrait {src} {cost} />
 
         <!-- Selection indicator -->
-        {#if state === 'included' || state === 'excluded'}
+        {#if actualValue === 'included' || actualValue === 'excluded'}
             <div
-                class:green={state === 'included'}
-                class:red={state === 'excluded'}
+                class:green={actualValue === 'included'}
+                class:red={actualValue === 'excluded'}
                 class="mark absolute bottom-[2px] right-[2px] rounded-full p-[2px] text-foreground"
             >
-                {#if state === 'included'}
+                {#if actualValue === 'included'}
                     <CheckmarkIcon class="h-[0.9em] w-[0.9em]" />
-                {:else if state === 'excluded'}
+                {:else if actualValue === 'excluded'}
                     <XIcon class="h-[0.9em] w-[0.9em]" />
                 {/if}
             </div>
@@ -62,14 +72,15 @@
     button {
         transition: all 0.2s;
     }
-    .root:not(.active) button {
-        opacity: 0.5;
+    .root:not(.active) button,
+    button[disabled] {
+        opacity: 0.4;
 
         &:hover {
             opacity: 0.75;
         }
     }
-    .active span {
+    root:not(.disabled) .active span {
         @apply text-foreground;
     }
 

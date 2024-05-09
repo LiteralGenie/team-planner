@@ -45,7 +45,7 @@
                 on:click={() => handleClick(val, ctrl)}
                 src={CHAMPION_ICONS[val.id]}
                 label={c.display_name}
-                state={val.included ? null : 'excluded'}
+                value={val.included ? null : 'excluded'}
                 cost={c.tier}
             />
         {/each}

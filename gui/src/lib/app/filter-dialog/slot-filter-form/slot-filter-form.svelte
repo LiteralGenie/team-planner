@@ -31,7 +31,10 @@
     $: attributeControls = $slot.controls.byAttribute
     $: attributeValues = $form.slots[slotIndex].byAttribute
 
-    $: slotMatches = applyAttributeFilter(attributeValues)
+    $: slotMatches = applyAttributeFilter(
+        $form.global,
+        attributeValues
+    )
 
     function resetScroll() {
         mainScrollEl?.scrollTo({ top: 0 })

@@ -10,6 +10,7 @@
     class:foreground={fill === 'foreground'}
     viewBox="-94.5 -6 100 100"
     xmlns="http://www.w3.org/2000/svg"
+    class="range-icon-root"
     {...$$props}
 >
     <path

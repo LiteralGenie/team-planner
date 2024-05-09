@@ -54,7 +54,7 @@
 </div>
 
 <style lang="postcss">
-    .root :global(svg) {
+    .root :global(.range-icon-root) {
         margin-top: 2px;
     }
 </style>

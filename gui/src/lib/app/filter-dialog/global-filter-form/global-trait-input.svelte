@@ -45,7 +45,7 @@
                 on:click={() => handleClick(val, ctrl)}
                 src={TRAIT_ICONS[val.id]}
                 label={trait.display_name}
-                state={val.included ? null : 'excluded'}
+                value={val.included ? null : 'excluded'}
             />
         {/each}
     </div>

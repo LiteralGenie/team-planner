@@ -1,18 +1,28 @@
+<script lang="ts" context="module">
+    export type TraitCheckboxValue = 'included' | 'excluded' | null
+</script>
+
 <script lang="ts">
     import CheckmarkIcon from '$lib/icons/checkmark-icon.svelte'
     import XIcon from '$lib/icons/x-icon.svelte'
 
     export let src: string
     export let label: string
+    export let disabled = false
+    export let disabledValue: TraitCheckboxValue = 'excluded'
 
-    export let state: 'included' | 'excluded' | null
+    export let value: TraitCheckboxValue
+
+    $: actualValue = disabled ? disabledValue : value
 </script>
 
 <div
+    class:disabled
     class="root flex flex-col justify-center items-center text-center gap-[1px]"
-    class:active={state !== null}
+    class:active={actualValue !== null}
 >
     <button
+        {disabled}
         on:click
         type="button"
         class="h-12 w-12 relative select-none"
@@ -30,15 +40,15 @@
         </div>
 
         <!-- Selection indicator -->
-        {#if state === 'included' || state === 'excluded'}
+        {#if actualValue === 'included' || actualValue === 'excluded'}
             <div
-                class:green={state === 'included'}
-                class:red={state === 'excluded'}
+                class:green={actualValue === 'included'}
+                class:red={actualValue === 'excluded'}
                 class="mark absolute bottom-[2px] right-[3px] rounded-full p-[2px] text-foreground"
             >
-                {#if state === 'included'}
+                {#if actualValue === 'included'}
                     <CheckmarkIcon class="h-3 w-3" />
-                {:else if state === 'excluded'}
+                {:else if actualValue === 'excluded'}
                     <XIcon class="h-3 w-3" />
                 {/if}
             </div>
@@ -85,14 +95,15 @@
             filter: drop-shadow(0px 0px 20px rgba(255, 199, 46, 0.9));
         }
     }
-    .root:not(.active) button {
+    .root:not(.active) button,
+    button[disabled] {
         opacity: 0.3;
 
         &:hover {
             opacity: 0.5;
         }
     }
-    .active span {
+    root:not(.disabled) .active span {
         @apply text-foreground;
     }
 </style>

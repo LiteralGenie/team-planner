@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { getFilterFormContext } from '$lib/app/form-context/context'
     import GoldIcon from '$lib/icons/gold-icon.svelte'
     import { range } from 'radash'
     import type {
@@ -12,10 +13,13 @@
     export let slotControls: AttributeSlotControls
     export let slotValues: AttributeSlotValues
 
+    const { form } = getFilterFormContext()
+
     $: options = (Array.from(range(1, 5)) as CostTier[]).map(
         (idx) => ({
             value: slotValues.cost[idx],
             label: idx.toString(),
+            disabled: !$form.global.cost[idx],
             suffix: GoldIcon,
             onChange: (update: boolean) => {
                 const ctrl = slotControls.controls.cost.controls[idx]
