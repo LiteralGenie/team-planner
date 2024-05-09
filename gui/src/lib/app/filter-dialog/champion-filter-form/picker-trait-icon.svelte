@@ -3,7 +3,6 @@
     import { TRAITS_BY_ID, TRAIT_ICONS } from '$lib/constants'
 
     export let id: string
-    $: console.log(id)
 </script>
 
 <div

@@ -23,13 +23,23 @@
         disabled: boolean
         included: boolean
     }
+
+    const groupByOptions = [
+        { value: 'cost', text: 'Group by cost' },
+        { value: 'trait', text: 'Group by trait' }
+    ]
 </script>
 
 <script lang="ts">
+    import type { FormControl } from '$lib/app/form-context/form-control'
     import type { FormControlRecord } from '$lib/app/form-context/form-control-record'
-    import type { IdFilter } from '$lib/app/form-context/types'
+    import type {
+        ChampionGroupingType,
+        IdFilter
+    } from '$lib/app/form-context/types'
     import ChampionCheckbox from '$lib/components/champion-checkbox.svelte'
     import { alphabetical, group, sort } from 'radash'
+    import Svelecte from 'svelecte'
     import type { SvelteComponent } from 'svelte'
     import { derived } from 'svelte/store'
     import { getFilterFormContext } from '../../form-context/context'
@@ -65,6 +75,13 @@
             return acc
         },
         {} as Record<string, SelectionState>
+    )
+
+    $: groupByValue = $form.slots[slotIndex].byChampion.groupBy
+    $: groupByControl = derived(
+        controls.slots.controlsStore,
+        (controls) =>
+            controls[slotIndex].controls.byChampion.controls.groupBy
     )
 
     function getGroups(criteria: 'cost' | 'trait'): ChampionGroup[] {
@@ -131,6 +148,10 @@
             included: !included
         })
     }
+
+    function handleGroupBy(value: ChampionGroupingType) {
+        ;($groupByControl as FormControl<string>).onChange(value)
+    }
 </script>
 
 <fieldset>
@@ -142,16 +163,20 @@
             </p>
         </div>
 
-        <select class="">
-            <option>a dsafs </option>
-            <option>afds</option>
-            <option>afsdaf</option>
-            <option>a fsdfa sd</option>
-        </select>
+        <Svelecte
+            on:change={(ev) => handleGroupBy(ev.detail.value)}
+            options={groupByOptions}
+            value={groupByValue}
+            searchable={false}
+            keepSelectionInList={true}
+            highlightFirstItem={false}
+            clearable={false}
+            class="max-w-40"
+        />
     </div>
 
     <div>
-        {#each getGroups('trait') as group}
+        {#each getGroups(groupByValue) as group}
             <div class="row flex items-center justify-center">
                 <div class="h-full pr-4 flex gap-2">
                     {#if group.prefix}
@@ -198,11 +223,31 @@
         @apply border-t-2;
     }
 
-    select {
-        @apply rounded-md;
-
-        background-color: hsl(var(--background));
-        color: hsl(var(--foreground));
-        padding: 0.25em 0.5em;
+    :global(.dark) {
+        --sv-bg: hsl(var(--background));
+        --sv-border: 0;
+        --sv-border-radius: var(--radius);
+        --sv-dropdown-offset: 0;
+        --sv-dropdown-active-bg: hsl(var(--foreground) / 10%);
+        --sv-dropdown-selected-bg: hsl(var(--foreground) / 10%);
+    }
+    :global(.svelecte.is-open .sv-control) {
+        border-bottom-left-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+    }
+    :global(.svelecte.is-open .sv_dropdown) {
+        border-top-left-radius: 0 !important;
+        border-top-right-radius: 0 !important;
+    }
+    :global(.sv-dropdown-content) {
+        @apply text-xs;
+    }
+    :global(.sv-input--sizer) {
+        /* Disable invisible input causing text to ellipsis */
+        width: 0;
+    }
+    :global(.sv-dd-item-active) {
+        /* Disable selection of already-selected items */
+        pointer-events: none;
     }
 </style>
