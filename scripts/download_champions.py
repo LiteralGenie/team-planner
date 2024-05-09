@@ -109,6 +109,7 @@ def build_merged_data(
                 traits=c["traits"],
                 # from set data
                 stats=unit["stats"],
+                ability=unit["ability"],
                 # from character data
                 damage_type=get_damage_type(role),
             )
