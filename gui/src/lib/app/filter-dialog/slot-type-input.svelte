@@ -33,8 +33,8 @@
     }
 </script>
 
-<fieldset class="flex gap-4">
-    <legend class="">Filter by:</legend>
+<fieldset class="flex gap-4 flex-wrap">
+    <legend>Filter by:</legend>
 
     <BoolOption on:select={handleSelect} {value} {options} />
 </fieldset>

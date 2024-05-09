@@ -15,7 +15,9 @@
 
 <form class="w-full pt-4">
     <div class="px-6 h-full overflow-auto">
-        <div class="flex items-center justify-between">
+        <div
+            class="flex items-center justify-between flex-wrap gap-8"
+        >
             <div>
                 <h1 class="text-xl text-foreground font-bold mb-2">
                     Filters
@@ -27,7 +29,7 @@
             <Button
                 variant="secondary"
                 on:click={handleReset}
-                class="px-6">Reset</Button
+                class="px-6 min-w-full sm:min-w-max">Reset</Button
             >
         </div>
 

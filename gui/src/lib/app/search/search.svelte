@@ -35,7 +35,6 @@
                 slot.byAttribute
             ).size
 
-            console.log('here', n)
             if (n === 0) {
                 return 'error'
             } else if (n === 1) {

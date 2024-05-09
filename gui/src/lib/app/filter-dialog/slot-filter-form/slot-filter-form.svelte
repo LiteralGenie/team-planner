@@ -58,7 +58,9 @@
     >
         <!-- Filters -->
         <div bind:this={mobileFilterScrollEl} class="filters">
-            <div class="flex items-center justify-between">
+            <div
+                class="flex items-center justify-between flex-wrap gap-8"
+            >
                 <div>
                     <h1
                         class="text-xl text-foreground font-bold mb-2"
@@ -72,8 +74,10 @@
                 <Button
                     variant="secondary"
                     on:click={() => handleReset()}
-                    class="px-6 lg:hidden">Reset</Button
+                    class="px-6 min-w-full sm:min-w-max lg:hidden"
                 >
+                    Reset
+                </Button>
             </div>
 
             <hr class="my-6" />

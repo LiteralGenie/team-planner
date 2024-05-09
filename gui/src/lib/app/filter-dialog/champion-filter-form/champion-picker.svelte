@@ -155,7 +155,9 @@
 </script>
 
 <fieldset>
-    <div class="pb-5 flex items-center justify-between">
+    <div
+        class="pb-12 sm:pb-5 flex items-center justify-between gap-4"
+    >
         <div class="flex flex-col justify-center">
             <legend class="pb-1">Champions</legend>
             <p class="text-muted-foreground text-xs">
