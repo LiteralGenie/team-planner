@@ -24,7 +24,6 @@
         current: IdFilter,
         ctrl: FormControlRecord<IdFilter>
     ) {
-        console.log(current, ctrl)
         ctrl.onChange({
             ...current,
             included: !current.included
