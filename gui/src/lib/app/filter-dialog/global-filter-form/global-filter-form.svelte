@@ -23,9 +23,9 @@
         <Button
             variant="secondary"
             on:click={resetGlobalFilter}
-            class="px-6"
+            class="min-w-full lg:min-w-max px-6"
         >
-            Reset
+            Clear
         </Button>
     </div>
 </form>

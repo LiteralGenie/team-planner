@@ -58,26 +58,12 @@
     >
         <!-- Filters -->
         <div bind:this={mobileFilterScrollEl} class="filters">
-            <div
-                class="flex items-center justify-between flex-wrap gap-8"
-            >
-                <div>
-                    <h1
-                        class="text-xl text-foreground font-bold mb-2"
-                    >
-                        Filters
-                    </h1>
+            <div>
+                <h1 class="text-xl text-foreground font-bold mb-2">
+                    Filters
+                </h1>
 
-                    <SlotTypeInput {slotIndex} />
-                </div>
-
-                <Button
-                    variant="secondary"
-                    on:click={() => handleReset()}
-                    class="px-6 min-w-full sm:min-w-max lg:hidden"
-                >
-                    Reset
-                </Button>
+                <SlotTypeInput {slotIndex} />
             </div>
 
             <hr class="my-6" />
@@ -151,13 +137,13 @@
             </div>
         </div>
 
-        <div class="pt-6 pr-2 col-span-2 hidden lg:flex justify-end">
+        <div class="pt-8 pr-2 col-span-2 flex justify-end">
             <Button
                 variant="secondary"
                 on:click={() => handleReset()}
-                class="px-6"
+                class="min-w-full lg:min-w-max px-6"
             >
-                Reset
+                Clear
             </Button>
         </div>
     </div>
