@@ -222,32 +222,4 @@
     .row:not(:first-child) {
         @apply border-t-2;
     }
-
-    :global(.dark) {
-        --sv-bg: hsl(var(--background));
-        --sv-border: 0;
-        --sv-border-radius: var(--radius);
-        --sv-dropdown-offset: 0;
-        --sv-dropdown-active-bg: hsl(var(--foreground) / 10%);
-        --sv-dropdown-selected-bg: hsl(var(--foreground) / 10%);
-    }
-    :global(.svelecte.is-open .sv-control) {
-        border-bottom-left-radius: 0 !important;
-        border-bottom-right-radius: 0 !important;
-    }
-    :global(.svelecte.is-open .sv_dropdown) {
-        border-top-left-radius: 0 !important;
-        border-top-right-radius: 0 !important;
-    }
-    :global(.sv-dropdown-content) {
-        @apply text-xs;
-    }
-    :global(.sv-input--sizer) {
-        /* Disable invisible input causing text to ellipsis */
-        width: 0;
-    }
-    :global(.sv-dd-item-active) {
-        /* Disable selection of already-selected items */
-        pointer-events: none;
-    }
 </style>
