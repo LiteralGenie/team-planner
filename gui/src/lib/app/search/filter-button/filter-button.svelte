@@ -1,10 +1,12 @@
 <script lang="ts">
     import { CHAMPION_ICONS } from '$lib/constants'
+    import AlertIcon from '$lib/icons/alert-icon.svelte'
     import PencilIcon from '$lib/icons/pencil-icon.svelte'
     import PlusIcon from '$lib/icons/plus-icon.svelte'
     import UserGroupIcon from '$lib/icons/user-group-icon.svelte'
 
-    export let variant: 'inactive' | 'active' | string = 'inactive'
+    export let variant: 'inactive' | 'active' | 'error' | string =
+        'inactive'
 
     let championId: string | null = null
     $: {
@@ -15,13 +17,16 @@
             case 'active':
                 championId = null
                 break
+            case 'error':
+                championId = null
+                break
             default:
                 championId = variant
         }
     }
 </script>
 
-<div class="hex hex-shadow p-1">
+<div class:error={variant === 'error'} class="hex hex-shadow p-1">
     <div class="hex outer-hex-color h-24 w-24 p-1">
         <div
             class="hex inner-hex-color h-full w-full flex justify-center items-center"
@@ -43,8 +48,10 @@
                     </div>
                 {:else if variant === 'active'}
                     <UserGroupIcon class="h-11 w-11" />
-                {:else}
+                {:else if variant === 'inactive'}
                     <PlusIcon class="h-12 w-12" />
+                {:else}
+                    <AlertIcon class="h-10 w-10" />
                 {/if}
             </button>
         </div>
@@ -82,5 +89,15 @@
     }
     .inner-hex-color:hover .pencil-icon {
         visibility: visible;
+    }
+
+    .error button {
+        color: hsl(0, 100%, 30%);
+    }
+    .error .outer-hex-color {
+        background-color: hsl(0, 100%, 10%);
+    }
+    .error.hex-shadow {
+        filter: drop-shadow(5px 5px 5px hsl(var(--destructive) / 7%));
     }
 </style>

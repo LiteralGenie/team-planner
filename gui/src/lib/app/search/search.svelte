@@ -26,7 +26,7 @@
         showDialog = false
     }
 
-    function slotState(slot: SlotFilter): string {
+    function getSlotState(slot: SlotFilter): string {
         const numTotal = applyGlobalFilter($form.global).size
 
         if (slot.useAttributes) {
@@ -35,8 +35,9 @@
                 slot.byAttribute
             ).size
 
+            console.log('here', n)
             if (n === 0) {
-                return 'active'
+                return 'error'
             } else if (n === 1) {
                 // showing champion icon is possible but looks janky due to how large the container is + how zoomed in the image is
                 // return matches.values().next().value
@@ -82,9 +83,16 @@
                             <!-- @todo: error state on no champions -->
                             <FilterButton
                                 on:click={() => handleDialogOpen(idx)}
-                                variant={slotState(slot)}
+                                variant={getSlotState(slot)}
                             />
-                            <FilterPreview {slot} />
+                            {#if getSlotState(slot) !== 'error'}
+                                <FilterPreview {slot} />
+                            {:else}
+                                <span>
+                                    No champions match the configured
+                                    filters
+                                </span>
+                            {/if}
                         </div>
                     {/each}
                 </div>
