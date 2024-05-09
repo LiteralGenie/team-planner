@@ -1,7 +1,7 @@
 <script lang="ts">
     import { getFilterFormContext } from '$lib/app/form-context/context'
     import type { AttributeFilter } from '$lib/app/form-context/types'
-    import { applyAttributeFilter } from '$lib/app/form-context/utils'
+    import { applyAttributeFilterWithGlobal } from '$lib/app/form-context/utils'
     import ChampionPortrait from '$lib/components/champion-portrait.svelte'
     import { CHAMPIONS, CHAMPION_ICONS } from '$lib/constants'
     import { sort } from 'radash'
@@ -10,7 +10,10 @@
 
     const { form } = getFilterFormContext()
 
-    $: activeIds = applyAttributeFilter($form.global, attributeFilter)
+    $: activeIds = applyAttributeFilterWithGlobal(
+        $form.global,
+        attributeFilter
+    )
 
     $: championsSorted = sort(
         CHAMPIONS,

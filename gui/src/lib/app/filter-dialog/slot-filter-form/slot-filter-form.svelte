@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { applyAttributeFilter } from '$lib/app/form-context/utils'
+    import { applyAttributeFilterWithGlobal } from '$lib/app/form-context/utils'
     import Button from '$lib/components/ui/button/button.svelte'
     import AlertIcon from '$lib/icons/alert-icon.svelte'
     import InfoIcon from '$lib/icons/info-icon.svelte'
@@ -31,7 +31,7 @@
     $: attributeControls = $slot.controls.byAttribute
     $: attributeValues = $form.slots[slotIndex].byAttribute
 
-    $: slotMatches = applyAttributeFilter(
+    $: slotMatches = applyAttributeFilterWithGlobal(
         $form.global,
         attributeValues
     )
