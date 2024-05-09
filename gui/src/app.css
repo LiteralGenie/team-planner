@@ -165,7 +165,7 @@ button[disabled] {
 
 /* custom select styles */
 .dark {
-    --sv-bg: hsl(var(--background));
+    --sv-bg: hsl(var(--muted));
     --sv-border: 0;
     --sv-border-radius: var(--radius);
     --sv-dropdown-offset: 0;

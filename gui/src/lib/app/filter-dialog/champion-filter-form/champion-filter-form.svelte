@@ -24,7 +24,11 @@
                 <SlotTypeInput {slotIndex} />
             </div>
 
-            <Button on:click={handleReset} class="px-6">Reset</Button>
+            <Button
+                variant="secondary"
+                on:click={handleReset}
+                class="px-6">Reset</Button
+            >
         </div>
 
         <hr class="my-6" />

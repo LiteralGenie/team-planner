@@ -20,7 +20,11 @@
     </div>
 
     <div class="pt-8 flex justify-end">
-        <Button on:click={resetGlobalFilter} class="px-6">
+        <Button
+            variant="secondary"
+            on:click={resetGlobalFilter}
+            class="px-6"
+        >
             Reset
         </Button>
     </div>

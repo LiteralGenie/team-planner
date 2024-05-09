@@ -70,6 +70,7 @@
                 </div>
 
                 <Button
+                    variant="secondary"
                     on:click={() => handleReset()}
                     class="px-6 lg:hidden">Reset</Button
                 >
@@ -147,7 +148,11 @@
         </div>
 
         <div class="pt-6 pr-2 col-span-2 hidden lg:flex justify-end">
-            <Button on:click={() => handleReset()} class="px-6">
+            <Button
+                variant="secondary"
+                on:click={() => handleReset()}
+                class="px-6"
+            >
                 Reset
             </Button>
         </div>
