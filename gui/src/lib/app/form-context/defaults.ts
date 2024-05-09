@@ -3,8 +3,10 @@ import { deepCopy } from '$lib/utils/misc'
 import { range } from 'radash'
 import type {
     AttributeFilter,
+    ChampionFilter,
     FilterForm,
     GlobalFilter,
+    InputParser,
     SlotFilter
 } from './types'
 import { type FormParsers } from './types'
@@ -33,13 +35,18 @@ const DEFAULT_ATTRIBUTE_FILTER = {
     }
 } satisfies AttributeFilter
 
+export const DEFAULT_CHAMPION_FILTER = {
+    champions: CHAMPIONS.map((c) => ({
+        id: c.character_id,
+        included: false
+    })),
+    groupBy: 'cost'
+} satisfies ChampionFilter
+
 export const DEFAULT_SLOT_FILTER = {
     useAttributes: true,
     byAttribute: DEFAULT_ATTRIBUTE_FILTER,
-    byId: CHAMPIONS.map((c) => ({
-        id: c.character_id,
-        included: false
-    }))
+    byChampion: DEFAULT_CHAMPION_FILTER
 } satisfies SlotFilter
 
 const DEFAULT_TEAM_SIZE = 7
@@ -113,9 +120,11 @@ export const FILTER_FORM_PARSERS = {
                 ap: BoolParser
             }
         },
-        byId: {
-            id: StringParser,
-            included: BoolParser
+        byChampion: {
+            champions: { id: StringParser, included: BoolParser },
+            groupBy: StringParser as
+                | InputParser<'cost'>
+                | InputParser<'trait'>
         }
     }
 } satisfies FormParsers<FilterForm>

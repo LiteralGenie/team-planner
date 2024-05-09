@@ -104,7 +104,7 @@ export function getActiveSlotFilters(
             activeFilters.traits = traitsSelected
         }
     } else {
-        const activeIds = slot.byId.filter((c) => {
+        const activeIds = slot.byChampion.champions.filter((c) => {
             const globalChampion = global.champions.find(
                 ({ id }) => id === c.id
             )!

@@ -39,10 +39,12 @@
     export let slotIndex: number
 
     const { form, controls } = getFilterFormContext()
-    $: slotValues = $form.slots[slotIndex].byId
+    $: slotValues = $form.slots[slotIndex].byChampion.champions
     $: slotControls = derived(
         controls.slots.controlsStore,
-        (controls) => controls[slotIndex].controls.byId.controls
+        (controls) =>
+            controls[slotIndex].controls.byChampion.controls.champions
+                .controls
     )
 
     $: states = slotValues.reduce(
@@ -132,11 +134,21 @@
 </script>
 
 <fieldset>
-    <legend class="pb-1">Champions</legend>
+    <div class="pb-5 flex items-center justify-between">
+        <div class="flex flex-col justify-center">
+            <legend class="pb-1">Champions</legend>
+            <p class="text-muted-foreground text-xs">
+                Select champions to allow for this slot.
+            </p>
+        </div>
 
-    <p class="text-muted-foreground text-xs pb-5">
-        Select champions to allow for this slot.
-    </p>
+        <select class="">
+            <option>a dsafs </option>
+            <option>afds</option>
+            <option>afsdaf</option>
+            <option>a fsdfa sd</option>
+        </select>
+    </div>
 
     <div>
         {#each getGroups('trait') as group}
@@ -184,5 +196,13 @@
 
     .row:not(:first-child) {
         @apply border-t-2;
+    }
+
+    select {
+        @apply rounded-md;
+
+        background-color: hsl(var(--background));
+        color: hsl(var(--foreground));
+        padding: 0.25em 0.5em;
     }
 </style>
