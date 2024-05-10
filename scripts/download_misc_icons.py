@@ -1,7 +1,7 @@
 import time
 
+from lib.utils import CDRAGON_URL, DATA_DIR, GUI_ASSETS_DIR, download_image
 from PIL import Image
-from utils import CDRAGON_URL, DATA_DIR, GUI_ASSETS_DIR, download_image
 from yarl import URL
 
 OUT_DIR = GUI_ASSETS_DIR / "tft" / "misc"

@@ -13,7 +13,7 @@ LATEST_SET_ID = "TFTSet11"
 LATEST_SET_PREFIX = "TFT11"
 LATEST_SET_NAME = "Set11"
 
-ROOT_DIR = Path(__file__).parent.parent
+ROOT_DIR = Path(__file__).parent.parent.parent
 
 DATA_DIR = ROOT_DIR / "data"
 

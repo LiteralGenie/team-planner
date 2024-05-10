@@ -138,4 +138,12 @@ export interface CDragonChampion {
         mana: number
         range: number
     }
+    ability: {
+        desc: string
+        name: string
+        variables: Array<{
+            name: string
+            value: number[] | null
+        }>
+    }
 }

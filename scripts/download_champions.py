@@ -2,8 +2,8 @@ import json
 import time
 from typing import TypeAlias
 
-import requests
-from utils import (
+from lib.interpolate_ability import interpolate_all, interpolate_expression
+from lib.utils import (
     CDRAGON_URL,
     DATA_DIR,
     GUI_ASSETS_DIR,
@@ -99,6 +99,16 @@ def build_merged_data(
         )
 
         role = find_role_for_champion(c["character_id"], char_data)
+
+        print()
+        print(c["display_name"])
+        tooltip = interpolate_all(
+            c["character_id"],
+            unit["stats"],
+            unit["ability"]["variables"],
+            unit["ability"]["desc"],
+        )
+        print(tooltip)
 
         merged.append(
             dict(

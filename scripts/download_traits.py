@@ -2,8 +2,7 @@ import json
 import time
 from typing import TypeAlias
 
-import requests
-from utils import (
+from lib.utils import (
     DATA_DIR,
     GUI_ASSETS_DIR,
     LATEST_SET_ID,

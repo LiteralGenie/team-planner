@@ -4,6 +4,10 @@
     "editor.codeActionsOnSave": {
         "source.organizeImports": "always"
     },
+    "editor.wordBasedSuggestions": "off",
+
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.autoImportCompletions": true,
 
     "[rust]": {
         "editor.inlayHints.enabled": "offUnlessPressed",
@@ -15,8 +19,4 @@
     "[typescript]": {
         "typescript.preferences.importModuleSpecifier": "non-relative"
     },
-
-    "python.analysis.typeCheckingMode": "basic",
-    "python.analysis.autoImportCompletions": true,
-    "editor.wordBasedSuggestions": "off"
 }
