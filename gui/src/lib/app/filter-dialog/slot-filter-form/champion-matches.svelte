@@ -6,6 +6,7 @@
     import SpellTooltip from '$lib/components/spell-tooltip.svelte'
     import Button from '$lib/components/ui/button/button.svelte'
     import * as Popover from '$lib/components/ui/popover/index.js'
+    import * as Tooltip from '$lib/components/ui/tooltip/index.js'
     import { CHAMPIONS, CHAMPION_ICONS } from '$lib/constants'
     import { sort } from 'radash'
 
@@ -25,17 +26,41 @@
     )
 </script>
 
-<div class="icon-grid gap-2">
+<div class="matches-portal icon-grid gap-2">
     {#each championsSorted as c}
         <div
             class="cell flex flex-col justify-center items-center text-center gap-[1px]"
             class:active={activeIds.has(c.character_id)}
         >
             <div class="h-12 w-12 relative select-none">
-                <ChampionPortrait
-                    src={CHAMPION_ICONS[c.character_id]}
-                    cost={c.tier}
-                />
+                <div class="hidden md:block">
+                    <Tooltip.Root
+                        group="spell"
+                        closeOnPointerDown={true}
+                        portal={'dialog'}
+                    >
+                        <Tooltip.Trigger class="cursor-default">
+                            <ChampionPortrait
+                                src={CHAMPION_ICONS[c.character_id]}
+                                cost={c.tier}
+                            />
+                        </Tooltip.Trigger>
+                        <Tooltip.Content
+                            class="spell-tooltip-container"
+                        >
+                            <SpellTooltip
+                                champion_id={c.character_id}
+                            />
+                        </Tooltip.Content>
+                    </Tooltip.Root>
+                </div>
+
+                <div class="md:hidden">
+                    <ChampionPortrait
+                        src={CHAMPION_ICONS[c.character_id]}
+                        cost={c.tier}
+                    />
+                </div>
             </div>
 
             <!-- Label -->
@@ -55,7 +80,7 @@
                             {c.display_name}
                         </Button>
                     </Popover.Trigger>
-                    <Popover.Content class="w-full max-w-[500px]">
+                    <Popover.Content class="spell-tooltip-container">
                         <SpellTooltip champion_id={c.character_id} />
                     </Popover.Content>
                 </Popover.Root>
@@ -78,5 +103,10 @@
         &.active {
             display: flex;
         }
+    }
+
+    :global(.spell-tooltip-container) {
+        @apply w-full max-w-[500px];
+        background-color: hsl(var(--popover) / var(--tw-bg-opacity));
     }
 </style>

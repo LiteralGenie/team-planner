@@ -31,6 +31,7 @@
             'icon  title title title title title'
             'desc  desc  desc  desc  desc  desc'
             'left  left  left  right right right';
+        grid-template-columns: max-content 1fr;
         gap: 1em;
 
         @apply text-sm;
@@ -39,8 +40,10 @@
     .root :global(.spell-icon) {
         grid-area: icon;
 
-        width: 100%;
         height: 100%;
+        width: 100%;
+        max-height: 100px;
+        max-width: 100px;
     }
 
     .root :global(.spell-name) {
