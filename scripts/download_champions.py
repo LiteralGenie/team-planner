@@ -2,7 +2,6 @@ import json
 import time
 from typing import TypeAlias
 
-from lib.build_tooltip_html import build_tooltip_html
 from lib.compute_spell_variables import compute_spell_variables
 from lib.utils import (
     CDRAGON_URL,
@@ -15,6 +14,8 @@ from lib.utils import (
     get_cdragon_asset_url,
 )
 from yarl import URL
+
+from scripts.lib.build_spell_html import build_spell_html
 
 USE_CACHED = True
 
@@ -114,7 +115,7 @@ def build_merged_data(
             f'generatedtip_spelltft_{c["character_id"].lower()}spell_tooltipextended'
         )
         spell_tooltip = string_data["entries"][spell]
-        spell_tooltip_html = build_tooltip_html(spell_tooltip, variables)
+        spell_tooltip_html = build_spell_html(spell_tooltip, variables)
 
         merged.append(
             dict(

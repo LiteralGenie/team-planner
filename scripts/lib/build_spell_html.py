@@ -26,7 +26,7 @@ Example tooltip:
 """
 
 
-def build_tooltip_html(template: str, variables: dict[str, list[float]]):
+def build_spell_html(template: str, variables: dict[str, list[float]]):
     # Variable casing is inconsistent...
     #   eg some placeholders reference AoE but correct name is AOE
     variables = {k.lower(): v for k, v in variables.items()}
