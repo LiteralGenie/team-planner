@@ -14,6 +14,7 @@ from lib.utils import (
     fetch_json_cached,
     get_cdragon_asset_url,
 )
+from yarl import URL
 
 USE_CACHED = True
 
@@ -32,6 +33,9 @@ MERGED_DATA_FILE = GUI_ASSETS_DIR / "tft" / "merged_teamplanner_data.json"
 
 ICON_DIR = GUI_ASSETS_DIR / "tft" / "champions"
 ICON_DIR.mkdir(parents=True, exist_ok=True)
+
+ABILITY_ICON_DIR = GUI_ASSETS_DIR / "tft" / "abilities"
+ABILITY_ICON_DIR.mkdir(parents=True, exist_ok=True)
 
 SPLASH_DIR = GUI_ASSETS_DIR / "tft" / "champion_splashes"
 SPLASH_DIR.mkdir(parents=True, exist_ok=True)
@@ -176,6 +180,46 @@ def download_icons(data: ITeamPlannerData):
         time.sleep(1)
 
 
+def download_ability_icons(data: ITeamPlannerData):
+    for champion in data:
+        id = champion["character_id"]
+
+        url = (
+            CDRAGON_URL
+            / "game"
+            / "assets"
+            / "characters"
+            / id.lower()
+            / "hud"
+            / "icons2d"
+            / f"{id.lower()}_ability.png"
+        )
+
+        if id == "TFT11_FortuneYord":
+            url = str(url).split("/")
+            url[-1] = f"tft11_fortuneyord_ability.tft_set11.png"
+            url = "/".join(url)
+        elif id == "TFT11_Azir":
+            url = str(url).split("/")
+            url[-1] = "tft11_azir_passive.tft_set11.png"
+            url = "/".join(url)
+        elif id == "TFT11_Nautilus":
+            url = str(url).split("/")
+            url.remove("icons2d")
+            url[-1] = "tft11_nautilus_r.tft_set11.png"
+            url = "/".join(url)
+
+        ext = str(url).split(".")[-1]
+
+        fp_out = ABILITY_ICON_DIR / f"{id}.{ext}"
+        if fp_out.exists():
+            continue
+
+        print("Downloading ability icon", url)
+        download_image(url, fp_out)
+        time.sleep(1)
+
+
 def download_splashes(data: ITeamPlannerData):
     for champion in data:
         url = get_cdragon_asset_url(champion["squareSplashIconPath"])
@@ -206,6 +250,7 @@ def main():
     print(f"Found {len(merged)} champions for set {LATEST_SET_ID}")
 
     download_icons(tp_data_filtered)
+    download_ability_icons(tp_data_filtered)
     download_splashes(tp_data_filtered)
 
     print("Creating", MERGED_DATA_FILE)

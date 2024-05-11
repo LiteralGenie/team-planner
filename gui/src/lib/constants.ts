@@ -45,6 +45,25 @@ export const TRAIT_ICONS: Record<string, string> = objectify(
     (path) => path
 )
 
+const ability_icon_files = import.meta.glob(
+    '$lib/assets/tft/abilities/*.png',
+    {
+        eager: true
+    }
+)
+
+export const ABILITY_ICONS: Record<string, string> = objectify(
+    Array.from(Object.keys(ability_icon_files)),
+    // Trait ID as key (ie filename minus extension)
+    (path: string) => {
+        const name = path.split('/').slice(-1)[0]
+        const stem = name.split('.')[0]
+        return stem
+    },
+    // Path as value
+    (path) => path
+)
+
 export const TRAITS_BY_ID = objectify(
     TRAITS,
     (t) => t.trait_id,

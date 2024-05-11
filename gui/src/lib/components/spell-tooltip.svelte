@@ -2,13 +2,18 @@
 </script>
 
 <script lang="ts">
-    import { CHAMPIONS_BY_ID } from '$lib/constants'
+    import { ABILITY_ICONS, CHAMPIONS_BY_ID } from '$lib/constants'
     import { interpolate_tooltip_images } from '$lib/utils/tooltips'
 
     export let champion_id: string
 
     $: champion = CHAMPIONS_BY_ID[champion_id]
-    $: html = interpolate_tooltip_images(champion.spell)
+    $: iconSrc = ABILITY_ICONS[champion_id]
+    $: html = interpolate_tooltip_images(champion.spell).replace(
+        '$ABILITY_ICON_SRC',
+        iconSrc
+    )
+    $: console.log(iconSrc)
 </script>
 
 <div class="root">
@@ -23,18 +28,35 @@
     .root :global(.tooltip-root) {
         display: grid;
         grid-template-areas:
-            'title title'
-            'desc  desc'
-            'left  right';
+            'icon  title title title title title'
+            'desc  desc  desc  desc  desc  desc'
+            'left  left  left  right right right';
         gap: 1em;
+
+        @apply text-sm;
+    }
+
+    .root :global(.spell-icon) {
+        grid-area: icon;
+
+        width: 100%;
+        height: 100%;
     }
 
     .root :global(.spell-name) {
         grid-area: title;
+
+        @apply text-base;
     }
 
     .root :global(.spell-description) {
         grid-area: desc;
+
+        border-top: 2px solid hsl(var(--border));
+        border-bottom: 2px solid hsl(var(--border));
+
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
     }
 
     .root :global(.post-script-left) {
@@ -43,5 +65,11 @@
 
     .root :global(.post-script-right) {
         grid-area: right;
+
+        text-align: right;
+    }
+
+    .root :global(.rules) {
+        @apply text-muted-foreground text-xs pt-2 italic;
     }
 </style>

@@ -55,7 +55,7 @@
                             {c.display_name}
                         </Button>
                     </Popover.Trigger>
-                    <Popover.Content class="w-80">
+                    <Popover.Content class="w-full max-w-[500px]">
                         <SpellTooltip champion_id={c.character_id} />
                     </Popover.Content>
                 </Popover.Root>
