@@ -6,6 +6,7 @@
         label: string
         disabled?: boolean
         tooltip?: string
+        tooltipPortal?: string
         suffix?: typeof SvelteComponent<any>
         suffixOpts?: any
         suffixClass?: string
@@ -17,7 +18,7 @@
 </script>
 
 <script lang="ts">
-    import * as Tooltip from '$lib/components/ui/tooltip/index.js'
+    import ConditionalTooltip from '$lib/components/conditional-tooltip.svelte'
     import CheckboxItem from './checkbox-item.svelte'
 
     export let options: CheckboxData[]
@@ -37,32 +38,14 @@
     <div class="h-[6px]"></div>
 
     <div class="flex gap-6 flex-wrap">
-        {#each options as { onChange, tooltip, ...props }}
-            {#if tooltip}
-                <Tooltip.Root
-                    group="spell"
-                    openDelay={100}
-                    closeOnPointerDown={true}
-                    portal={'dialog'}
-                >
-                    <Tooltip.Trigger>
-                        <CheckboxItem
-                            on:change={(ev) => onChange(ev.detail)}
-                            id={props.label}
-                            {...props}
-                        />
-                    </Tooltip.Trigger>
-                    <Tooltip.Content class="checkbox-tooltip-root">
-                        <span>{tooltip}</span>
-                    </Tooltip.Content>
-                </Tooltip.Root>
-            {:else}
+        {#each options as { onChange, tooltip, tooltipPortal, ...props }}
+            <ConditionalTooltip {tooltip} portal={tooltipPortal}>
                 <CheckboxItem
                     on:change={(ev) => onChange(ev.detail)}
                     id={props.label}
                     {...props}
                 />
-            {/if}
+            </ConditionalTooltip>
         {/each}
     </div>
 </fieldset>

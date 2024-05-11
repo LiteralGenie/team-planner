@@ -21,6 +21,7 @@
         id: string
         control: FormControlRecord<IdFilter>
         disabled: boolean
+        disabledTooltip: string
         included: boolean
     }
 
@@ -63,13 +64,18 @@
                 (c) => c.id === filter.id
             )!
 
+            const disabled = !globalFilter.included
+
             const control = $slotControls[idx]
 
             acc[filter.id] = {
                 id: filter.id,
                 control,
                 included: filter.included,
-                disabled: !globalFilter.included
+                disabled,
+                disabledTooltip: disabled
+                    ? 'Disabled by global filter'
+                    : ''
             }
 
             return acc
@@ -195,16 +201,17 @@
 
                 <div class="flex-grow border-l-2 champion-grid p-4">
                     {#each group.champions as c}
+                        {@const state = states[c.character_id]}
+
                         <ChampionCheckbox
                             on:click={() =>
                                 handleClick(c.character_id)}
                             src={CHAMPION_ICONS[c.character_id]}
                             label={c.display_name}
-                            value={states[c.character_id].included
-                                ? 'included'
-                                : null}
+                            value={state.included ? 'included' : null}
                             cost={c.tier}
-                            disabled={states[c.character_id].disabled}
+                            disabled={state.disabled}
+                            disabledTooltip={state.disabledTooltip}
                         />
                     {/each}
                 </div>

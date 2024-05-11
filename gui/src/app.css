@@ -191,3 +191,13 @@ button[disabled] {
     /* Disable selection of already-selected items */
     pointer-events: none;
 }
+
+.boring-tooltip {
+    @apply border-2;
+
+    background-color: hsl(var(--popover) / var(--tw-bg-opacity));
+    border-color: hsl(var(--border) / 75%);
+}
+.tooltip-trigger-disabled {
+    cursor: default;
+}
