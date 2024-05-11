@@ -1,4 +1,7 @@
 import sys
+import traceback
+from dataclasses import dataclass
+from functools import cached_property
 
 STAT_MAP = {
     1: dict(key="baseArmor", scaling=1),
@@ -11,51 +14,57 @@ STAT_MAP = {
 MAX_LEVEL = 6
 
 
+@dataclass
+class CalculationContext:
+    mDataValues: dict
+    mSpellCalculations: dict
+    stats: dict
+
+    @cached_property
+    def mDataValuesMapped(self):
+        return {x["mName"].lower(): x for x in self.mDataValues}
+
+
 def compute_spell_variables(
     mSpell: dict,
     stats: dict,
 ) -> dict[str, list[float]]:
-    mDataValuesMapped = {x["mName"].lower(): x for x in mSpell["mDataValues"]}
+    ctx = CalculationContext(
+        mDataValues=mSpell["mDataValues"],
+        mSpellCalculations=mSpell["mSpellCalculations"],
+        stats=stats,
+    )
 
-    calcs = {
-        k: compute_spell_calc(
-            v,
-            mSpell["mSpellCalculations"],
-            mDataValuesMapped,
-            stats,
-        )
-        for k, v in mSpell["mSpellCalculations"].items()
-    }
+    calcs = dict()
+    for k, v in mSpell["mSpellCalculations"].items():
+        try:
+            calcs[k] = compute_spell_calc(v, ctx)
+        except:
+            print("Spell calculation failed", k)
+            traceback.print_exc()
 
-    return dict(**mDataValuesMapped, **calcs)
+    return dict(**ctx.mDataValuesMapped, **calcs)
 
 
 def compute_spell_calc(
     mSpellCalculation: dict,
-    mSpellCalculationsAll: dict,
-    mDataValuesMapped: dict,
-    stats: dict,
+    ctx: CalculationContext,
 ) -> list[float]:
     mult = [1] * (MAX_LEVEL + 1)
     if mMultiplier := mSpellCalculation.get("mMultiplier"):
-        mult = compute_subpart(mMultiplier, mDataValuesMapped, stats)
+        mult = compute_subpart(mMultiplier, ctx)
 
     match mSpellCalculation["__type"]:
         case "GameCalculation":
             assert len(mSpellCalculation["mFormulaParts"]) == 1
 
-            vals = compute_subpart(
-                mSpellCalculation["mFormulaParts"][0], mDataValuesMapped, stats
-            )
+            vals = compute_subpart(mSpellCalculation["mFormulaParts"][0], ctx)
         case "GameCalculationModified":
             mMultiplier = mSpellCalculation["mMultiplier"]
-            mult_vals = compute_subpart(mMultiplier, mDataValuesMapped, stats)
+            mult_vals = compute_subpart(mMultiplier, ctx)
 
-            vals = compute_subpart(
-                mSpellCalculationsAll["mModifiedGameCalculation"],
-                mDataValuesMapped,
-                stats,
-            )
+            spell = mSpellCalculation["mModifiedGameCalculation"]
+            vals = compute_spell_calc(ctx.mSpellCalculations[spell], ctx)
 
             return product_list(mult_vals, vals)
 
@@ -64,8 +73,7 @@ def compute_spell_calc(
 
 def compute_subpart(
     mSubpart: dict,
-    mDataValuesMapped: dict,
-    stats: dict,
+    ctx: CalculationContext,
 ) -> list[float]:
     match mSubpart["__type"]:
         case "NumberCalculationPart":
@@ -73,10 +81,7 @@ def compute_subpart(
                 mSubpart["mNumber"],
             ] * (MAX_LEVEL + 1)
         case "SumOfSubPartsCalculationPart":
-            subs = [
-                compute_subpart(x, mDataValuesMapped, stats)
-                for x in mSubpart["mSubparts"]
-            ]
+            subs = [compute_subpart(x, ctx) for x in mSubpart["mSubparts"]]
 
             acc = [
                 0.0,
@@ -88,34 +93,47 @@ def compute_subpart(
         case "StatBySubPartCalculationPart":
             stat_id = mSubpart["mStat"]
             stat_key = STAT_MAP[stat_id]["key"]
-            stat = stats[stat_key]
+            stat = ctx.stats[stat_key]
 
-            data_vals = compute_subpart(mSubpart["mSubpart"], mDataValuesMapped, stats)
+            data_vals = compute_subpart(mSubpart["mSubpart"], ctx)
             return [
                 get_scaled_stat(stat_id, stat, idx) * x
                 for idx, x in enumerate(data_vals)
             ]
         case "SubPartScaledProportionalToStat":
-            sub = compute_subpart(mSubpart["mSubpart"], mDataValuesMapped, stats)
+            sub = compute_subpart(mSubpart["mSubpart"], ctx)
+
             mRatio = mSubpart["mRatio"]
-            return [mRatio * x for x in sub]
+            assert round(mRatio, 3) == 0.01
+
+            # This calculation seems to only be used for AP abilities but the ratio only makes sense
+            #   if we were also multiplying by the current AP (all champions start with 100)
+            # But we're not so this ratio would make the display value way too small
+            # So just gonna skip it here
+            return sub
+            # return [mRatio * x for x in sub]
         case "NamedDataValueCalculationPart":
             data_key = mSubpart["mDataValue"].lower()
-            return mDataValuesMapped[data_key]["mValues"]
+            return ctx.mDataValuesMapped[data_key]["mValues"]
         case "StatByNamedDataValueCalculationPart":
             stat_id = mSubpart["mStat"]
             stat_key = STAT_MAP[stat_id]["key"]
-            stat = stats[stat_key]
+            stat = ctx.stats[stat_key]
 
             data_key = mSubpart["mDataValue"].lower()
-            data_vals = mDataValuesMapped[data_key]["mValues"]
+            data_vals = ctx.mDataValuesMapped[data_key]["mValues"]
             return [
                 get_scaled_stat(stat_id, stat, idx) * x
                 for idx, x in enumerate(data_vals)
             ]
-        # case 'ProductOfSubPartsCalculationPart':
-        #     p1 = compute_subpart(mSubpart['mPart1'], mDataValuesMapped, stats)
-        #     p2 = compute_subpart(mSubpart['mPart2'], mDataValuesMapped, stats)
+        case "ProductOfSubPartsCalculationPart":
+            p1 = compute_subpart(mSubpart["mPart1"], ctx)
+            p2 = compute_subpart(mSubpart["mPart2"], ctx)
+            return product_list(p1, p2)
+        case "{f3cbe7b2}":
+            # Recursion case? For set 11, only Irelia has this calculation type
+            spell = mSubpart["{88536426}"]
+            return compute_spell_calc(ctx.mSpellCalculations[spell], ctx)
         case _:
             print("Unknown subpart type", mSubpart, file=sys.stderr)
             raise Exception()

@@ -8,7 +8,6 @@ from lib.utils import (
     DATA_DIR,
     GUI_ASSETS_DIR,
     LATEST_SET_ID,
-    LATEST_SET_NAME,
     LATEST_SET_PREFIX,
     download_image,
     fetch_json_cached,
@@ -25,9 +24,6 @@ TEAM_PLANNER_DATA_URL = (
 )
 TEAM_PLANNER_DATA_FILE = DATA_DIR / "tftchampions-teamplanner.json"
 
-SET_DATA_URL = CDRAGON_URL / "cdragon/tft/en_us.json"
-SET_DATA_FILE = DATA_DIR / "en_us.json"
-
 CHARACTERS_DATA_URL = CDRAGON_URL / "game/data/tftteamplanner/characters.bin.json"
 CHARACTERS_DATA_FILE = DATA_DIR / "characters.bin.json"
 
@@ -42,10 +38,15 @@ SPLASH_DIR.mkdir(parents=True, exist_ok=True)
 CHARACTER_BIN_DIR = DATA_DIR / "character_bins"
 CHARACTER_BIN_DIR.mkdir(parents=True, exist_ok=True)
 
+STRINGS_URL = (
+    CDRAGON_URL / "game" / "en_us" / "data" / "menu" / "en_us" / "main.stringtable.json"
+)
+STRINGS_FILE = DATA_DIR / "main.stringtable.json"
+
 ###
 
 ITeamPlannerData: TypeAlias = list[dict]
-ISetData: TypeAlias = dict
+IStringData: TypeAlias = dict
 ICharactersData: TypeAlias = dict
 IMergedData: TypeAlias = list[dict]
 ICharacterBinData: TypeAlias = dict[str, dict]
@@ -59,15 +60,15 @@ def fetch_teamplanner_data() -> ITeamPlannerData:
     )
 
 
-def fetch_unit_data() -> ISetData:
+def fetch_string_data() -> IStringData:
     return fetch_json_cached(
-        SET_DATA_URL,
-        SET_DATA_FILE,
+        STRINGS_URL,
+        STRINGS_FILE,
         use_cache=USE_CACHED,
     )
 
 
-def fetch_characters_data() -> ISetData:
+def fetch_characters_data() -> ICharactersData:
     return fetch_json_cached(
         CHARACTERS_DATA_URL,
         CHARACTERS_DATA_FILE,
@@ -84,7 +85,7 @@ def fetch_character_bin_data(id: str) -> ICharacterBinData:
 
 def build_merged_data(
     tp_data: ITeamPlannerData,
-    set_data: ISetData,
+    string_data: IStringData,
     char_data: ICharactersData,
     bin_data: ICharacterBinData,
 ) -> IMergedData:
@@ -92,19 +93,13 @@ def build_merged_data(
     Append the stats (ad, range, etc) from set data to the team planner data for each champion
     """
 
-    latest_set = next(
-        s for s in set_data["sets"].values() if s["name"] == LATEST_SET_NAME
-    )
-
     merged: IMergedData = []
     for c in tp_data:
-        unit = next(
-            u
-            for u in latest_set["champions"]
-            if u["characterName"] == c["character_id"]
-        )
-
         role = find_role_for_champion(c["character_id"], char_data)
+
+        spell = (
+            f'generatedtip_spelltft_{c["character_id"].lower()}spell_tooltipextended'
+        )
 
         character_bin = bin_data[c["character_id"]]
 
@@ -112,10 +107,7 @@ def build_merged_data(
         scripts = [v for k, v in character_bin.items() if k.endswith("Spell")]
         assert len(scripts) == 1
 
-        try:
-            vars = compute_spell_variables(scripts[0]["mSpell"], stats)
-        except Exception as e:
-            print("Failed", c["character_id"], e)
+        variables = compute_spell_variables(scripts[0]["mSpell"], stats)
 
         merged.append(
             dict(
@@ -125,10 +117,12 @@ def build_merged_data(
                 display_name=c["display_name"],
                 traits=c["traits"],
                 # from set data
-                stats=unit["stats"],
-                ability=unit["ability"],
+                spell=string_data["entries"][spell],
                 # from character data
                 damage_type=get_damage_type(role),
+                # from character bin data
+                variables=variables,
+                stats=stats,
             )
         )
 
@@ -199,14 +193,14 @@ def main():
     tp_data = fetch_teamplanner_data()
     tp_data_filtered = [d for d in tp_data if LATEST_SET_PREFIX in d["character_id"]]
 
-    set_data = fetch_unit_data()
+    string_data = fetch_string_data()
     char_data = fetch_characters_data()
     bin_data = {
         c["character_id"]: fetch_character_bin_data(c["character_id"])
         for c in tp_data_filtered
     }
 
-    merged = build_merged_data(tp_data_filtered, set_data, char_data, bin_data)
+    merged = build_merged_data(tp_data_filtered, string_data, char_data, bin_data)
     print(f"Found {len(merged)} champions for set {LATEST_SET_ID}")
 
     download_icons(tp_data_filtered)
