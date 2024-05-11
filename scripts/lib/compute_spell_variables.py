@@ -22,6 +22,8 @@ class CalculationContext:
 
     @cached_property
     def mDataValuesMapped(self):
+        # Variable casing is inconsistent...
+        #   eg formulas reference AoE but correct name is AOE
         return {x["mName"].lower(): x for x in self.mDataValues}
 
 
@@ -43,7 +45,17 @@ def compute_spell_variables(
             print("Spell calculation failed", k)
             traceback.print_exc()
 
-    return dict(**ctx.mDataValuesMapped, **calcs)
+    data_vals = dict()
+    for v in ctx.mDataValues:
+        if "mValues" not in v:
+            print("mDataValue has no values", v)
+            continue
+
+        key = v["mName"]
+        vals = v["mValues"]
+        data_vals[key] = vals
+
+    return dict(**data_vals, **calcs)
 
 
 def compute_spell_calc(

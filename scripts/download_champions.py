@@ -2,6 +2,7 @@ import json
 import time
 from typing import TypeAlias
 
+from lib.build_tooltip_html import build_tooltip_html
 from lib.compute_spell_variables import compute_spell_variables
 from lib.utils import (
     CDRAGON_URL,
@@ -97,10 +98,6 @@ def build_merged_data(
     for c in tp_data:
         role = find_role_for_champion(c["character_id"], char_data)
 
-        spell = (
-            f'generatedtip_spelltft_{c["character_id"].lower()}spell_tooltipextended'
-        )
-
         character_bin = bin_data[c["character_id"]]
 
         stats = next(v for k, v in character_bin.items() if k.endswith("/Root"))
@@ -108,6 +105,12 @@ def build_merged_data(
         assert len(scripts) == 1
 
         variables = compute_spell_variables(scripts[0]["mSpell"], stats)
+
+        spell = (
+            f'generatedtip_spelltft_{c["character_id"].lower()}spell_tooltipextended'
+        )
+        spell_tooltip = string_data["entries"][spell]
+        spell_tooltip_html = build_tooltip_html(spell_tooltip, variables)
 
         merged.append(
             dict(
@@ -117,7 +120,7 @@ def build_merged_data(
                 display_name=c["display_name"],
                 traits=c["traits"],
                 # from set data
-                spell=string_data["entries"][spell],
+                spell=spell_tooltip_html,
                 # from character data
                 damage_type=get_damage_type(role),
                 # from character bin data
