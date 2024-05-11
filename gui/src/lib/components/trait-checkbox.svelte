@@ -5,11 +5,13 @@
 <script lang="ts">
     import CheckmarkIcon from '$lib/icons/checkmark-icon.svelte'
     import XIcon from '$lib/icons/x-icon.svelte'
+    import ConditionalTooltip from './conditional-tooltip.svelte'
 
     export let src: string
     export let label: string
     export let disabled = false
     export let disabledValue: TraitCheckboxValue = 'excluded'
+    export let disabledTooltip: string = ''
 
     export let value: TraitCheckboxValue
 
@@ -21,44 +23,49 @@
     class="root flex flex-col justify-center items-center text-center gap-[1px]"
     class:active={actualValue !== null}
 >
-    <button
+    <ConditionalTooltip
+        tooltip={disabled ? disabledTooltip : ''}
         {disabled}
-        on:click
-        type="button"
-        class="h-12 w-12 relative select-none"
     >
-        <!-- @todo trait description tooltip -->
-        <!-- Hex icon -->
-        <div class="hex hover-fill p-[2px]">
-            <div class="hex dark-fill p-[2px]">
-                <div class="hex light-fill p-[2px]">
-                    <div class="hex dark-fill">
-                        <img class="h-[66%] w-[66%]" {src} />
+        <button
+            {disabled}
+            on:click
+            type="button"
+            class="h-12 w-12 relative select-none"
+        >
+            <!-- @todo trait description tooltip -->
+            <!-- Hex icon -->
+            <div class="hex hover-fill p-[2px]">
+                <div class="hex dark-fill p-[2px]">
+                    <div class="hex light-fill p-[2px]">
+                        <div class="hex dark-fill">
+                            <img class="h-[66%] w-[66%]" {src} />
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Selection indicator -->
-        {#if actualValue === 'included' || actualValue === 'excluded'}
-            <div
-                class:green={actualValue === 'included'}
-                class:red={actualValue === 'excluded'}
-                class="mark absolute bottom-[2px] right-[3px] rounded-full p-[2px] text-foreground"
-            >
-                {#if actualValue === 'included'}
-                    <CheckmarkIcon class="h-3 w-3" />
-                {:else if actualValue === 'excluded'}
-                    <XIcon class="h-3 w-3" />
-                {/if}
-            </div>
-        {/if}
-    </button>
+            <!-- Selection indicator -->
+            {#if actualValue === 'included' || actualValue === 'excluded'}
+                <div
+                    class:green={actualValue === 'included'}
+                    class:red={actualValue === 'excluded'}
+                    class="mark absolute bottom-[2px] right-[3px] rounded-full p-[2px] text-foreground"
+                >
+                    {#if actualValue === 'included'}
+                        <CheckmarkIcon class="h-3 w-3" />
+                    {:else if actualValue === 'excluded'}
+                        <XIcon class="h-3 w-3" />
+                    {/if}
+                </div>
+            {/if}
+        </button>
 
-    <!-- Label -->
-    <span class="text-xs text-muted-foreground whitespace-nowrap">
-        {label}
-    </span>
+        <!-- Label -->
+        <span class="text-xs text-muted-foreground whitespace-nowrap">
+            {label}
+        </span>
+    </ConditionalTooltip>
 </div>
 
 <style lang="postcss">

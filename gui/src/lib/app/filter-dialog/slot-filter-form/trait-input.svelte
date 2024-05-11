@@ -52,6 +52,7 @@
             label={trait.display_name}
             value={val.included ? 'included' : null}
             disabled={isDisabledGlobally(val.id)}
+            disabledTooltip="Disabled by global filter"
         />
     {/each}
 </fieldset>

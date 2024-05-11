@@ -21,7 +21,6 @@
         id: string
         control: FormControlRecord<IdFilter>
         disabled: boolean
-        disabledTooltip: string
         included: boolean
     }
 
@@ -72,10 +71,7 @@
                 id: filter.id,
                 control,
                 included: filter.included,
-                disabled,
-                disabledTooltip: disabled
-                    ? 'Disabled by global filter'
-                    : ''
+                disabled
             }
 
             return acc
@@ -211,7 +207,7 @@
                             value={state.included ? 'included' : null}
                             cost={c.tier}
                             disabled={state.disabled}
-                            disabledTooltip={state.disabledTooltip}
+                            disabledTooltip="Disabled by global filter"
                         />
                     {/each}
                 </div>
