@@ -1,4 +1,4 @@
-defusedxml
+html-sanitizer
 pillow
 requests
 tqdm

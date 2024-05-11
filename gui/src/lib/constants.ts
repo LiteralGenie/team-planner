@@ -1,7 +1,12 @@
 import type { CostTier } from '$lib/app/form-context/types'
 import ALL_CHAMPIONS from '$lib/assets/tft/merged_teamplanner_data.json'
+import ap_icon from '$lib/assets/tft/misc/statmodsabilitypowericon.png'
+import ad_icon from '$lib/assets/tft/misc/statmodsattackdamageicon.png'
 import ALL_TRAITS from '$lib/assets/tft/tfttraits.json'
 import { alphabetical, group, objectify, sort } from 'radash'
+
+export const AP_ICON = ap_icon
+export const AD_ICON = ad_icon
 
 export const TRAITS = ALL_TRAITS.filter(
     (t) => t.display_name !== 'Exalted'
@@ -126,24 +131,6 @@ export interface CDragonChampion {
         is_ad: boolean
         is_ap: boolean
     }
-    stats: {
-        armor: number
-        attackSpeed: number
-        critChance: number
-        critMultiplier: number
-        damage: number
-        hp: number
-        initialMana: number
-        magicResist: number
-        mana: number
-        range: number
-    }
-    ability: {
-        desc: string
-        name: string
-        variables: Array<{
-            name: string
-            value: number[] | null
-        }>
-    }
+    stats: {}
+    spell: string
 }

@@ -119,12 +119,11 @@ def build_merged_data(
                 tier=c["tier"],
                 display_name=c["display_name"],
                 traits=c["traits"],
-                # from set data
+                # from string data
                 spell=spell_tooltip_html,
                 # from character data
                 damage_type=get_damage_type(role),
                 # from character bin data
-                variables=variables,
                 stats=stats,
             )
         )

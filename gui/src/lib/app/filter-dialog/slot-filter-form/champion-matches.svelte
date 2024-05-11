@@ -3,6 +3,7 @@
     import type { AttributeFilter } from '$lib/app/form-context/types'
     import { applyAttributeFilterWithGlobal } from '$lib/app/form-context/utils'
     import ChampionPortrait from '$lib/components/champion-portrait.svelte'
+    import SpellTooltip from '$lib/components/spell-tooltip.svelte'
     import Button from '$lib/components/ui/button/button.svelte'
     import * as Popover from '$lib/components/ui/popover/index.js'
     import { CHAMPIONS, CHAMPION_ICONS } from '$lib/constants'
@@ -55,7 +56,7 @@
                         </Button>
                     </Popover.Trigger>
                     <Popover.Content class="w-80">
-                        popover
+                        <SpellTooltip champion_id={c.character_id} />
                     </Popover.Content>
                 </Popover.Root>
             </span>

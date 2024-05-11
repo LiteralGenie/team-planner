@@ -1,6 +1,7 @@
 import re
 import sys
-from html.parser import HTMLParser
+
+from html_sanitizer import Sanitizer
 
 """
 Example tooltip:
@@ -31,8 +32,19 @@ def build_tooltip_html(template: str, variables: dict[str, list[float]]):
     variables = {k.lower(): v for k, v in variables.items()}
 
     html = rename_tags(template)
-    html = interpolate(html, variables)
-    return f'<div class="tooltip-root">{html}</div>'
+    html = interpolate_variables(html, variables)
+    html = f'<div class="tooltip-root">{html}</div>'
+
+    allowed_tags = ("h1", "section", "span", "div", "br")
+    sanitizer = Sanitizer(
+        dict(
+            tags=allowed_tags,
+            attributes={tag: ("class",) for tag in allowed_tags},
+            empty=set(["br"]),
+            separate=set(["div"]),
+        )
+    )
+    return sanitizer.sanitize(html)
 
 
 def rename_tags(template: str):
@@ -41,10 +53,11 @@ def rename_tags(template: str):
         mainText=dict(tag="section", attrs=['class="spell-description"']),
         TFTKeyword=dict(tag="span", attrs=['class="tft-keyword"']),
         magicDamage=dict(tag="span", attrs=['class="magic-damage"']),
+        physicalDamage=dict(tag="span", attrs=['class="physical-damage"']),
         scaleHealth=dict(tag="span", attrs=['class="scale-health"']),
         rules=dict(tag="div", attrs=['class="rules"']),
-        postScriptLeft=dict(tag="span", attrs=['class="post-script-left"']),
-        postScriptRight=dict(tag="span", attrs=['class="post-script-right"']),
+        postScriptLeft=dict(tag="div", attrs=['class="post-script-left"']),
+        postScriptRight=dict(tag="div", attrs=['class="post-script-right"']),
     )
 
     result = template
@@ -59,7 +72,7 @@ def rename_tags(template: str):
     return result
 
 
-def interpolate(template: str, variables: dict[str, list[float]]):
+def interpolate_variables(template: str, variables: dict[str, list[float]]):
     # @some_var*100@ -> (some_var, 100)
     m = re.search(r"@(.*?)(?:\*(\d+))?@", template)
     if not m:
@@ -94,7 +107,7 @@ def interpolate(template: str, variables: dict[str, list[float]]):
         val_string = get_generated_variable(variables, var)
 
     start = template[: m.start()]
-    end = interpolate(template[m.end() :], variables)
+    end = interpolate_variables(template[m.end() :], variables)
     return start + val_string + end
 
 
