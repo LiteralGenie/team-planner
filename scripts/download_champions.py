@@ -112,7 +112,10 @@ def build_merged_data(
         scripts = [v for k, v in character_bin.items() if k.endswith("Spell")]
         assert len(scripts) == 1
 
-        vars = compute_spell_variables(scripts[0]["mSpell"], stats)
+        try:
+            vars = compute_spell_variables(scripts[0]["mSpell"], stats)
+        except Exception as e:
+            print("Failed", c["character_id"], e)
 
         merged.append(
             dict(
