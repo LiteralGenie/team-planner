@@ -13,7 +13,6 @@
         '$ABILITY_ICON_SRC',
         iconSrc
     )
-    $: console.log(iconSrc)
 </script>
 
 <div class="root">
@@ -74,5 +73,9 @@
 
     .root :global(.rules) {
         @apply text-muted-foreground text-xs pt-2 italic;
+    }
+
+    .root :global(.scaling-icon) {
+        @apply h-4 w-4 mx-[0.0625em];
     }
 </style>

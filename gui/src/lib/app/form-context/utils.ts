@@ -1,4 +1,4 @@
-import { CHAMPIONS } from '$lib/constants'
+import { CHAMPIONS, TRAITS_BY_ID } from '$lib/constants'
 import { deepCopy, filterMap, someFalse } from '$lib/utils/misc'
 import { isArray, isObject } from 'radash'
 import { FormControl } from './form-control'
@@ -139,7 +139,9 @@ export function applyGlobalFilter(filter: GlobalFilter) {
 
     return new Set(
         CHAMPIONS.filter((c) =>
-            c.traits.every((t) => activeTraits.has(t.id))
+            c.traits.every(
+                (t) => activeTraits.has(t.id) || !TRAITS_BY_ID[t.id]
+            )
         )
             .filter((c) => activeCostTiers.has(c.tier))
             .filter((c) => activeChampions.has(c.character_id))
@@ -158,7 +160,9 @@ export function applyAttributeFilter(
         CHAMPIONS.filter((c) => filter.cost[c.tier])
             .filter(
                 (c) =>
-                    filter.range[mapRangeValueToType(c.stats.range)]
+                    filter.range[
+                        mapRangeValueToType(c.stats.attackRange)
+                    ]
             )
             .filter((c) => {
                 if (filter.damageType.ad && filter.damageType.ap) {
@@ -197,11 +201,14 @@ export function applyAttributeFilterWithGlobal(
 }
 
 export function mapRangeValueToType(value: number): RangeType {
-    if (value <= 1.0) {
+    if (value <= 180) {
+        // =1 tile
         return 'close'
-    } else if (value < 3) {
+    } else if (value <= 420) {
+        // =2 tiles
         return 'mid'
     } else {
+        // >2 tiles
         return 'long'
     }
 }

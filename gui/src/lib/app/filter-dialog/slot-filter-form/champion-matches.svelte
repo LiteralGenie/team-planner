@@ -106,7 +106,9 @@
     }
 
     :global(.spell-tooltip-container) {
-        @apply w-full max-w-[500px];
+        @apply w-full max-w-[500px] border-2;
+
         background-color: hsl(var(--popover) / var(--tw-bg-opacity));
+        border-color: hsl(var(--border) / 75%);
     }
 </style>

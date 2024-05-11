@@ -82,7 +82,7 @@ def rename_tags(template: str):
 
 def interpolate_variables(template: str, variables: dict[str, list[float]]):
     # @some_var*100@ -> (some_var, 100)
-    m = re.search(r"@(.*?)(?:\*(\d+))?@", template)
+    m = re.search(r"@(.*?)(?:\*(\d+(?:\.\d+)?))?@", template)
     if not m:
         return template
 
@@ -108,18 +108,16 @@ def interpolate_variables(template: str, variables: dict[str, list[float]]):
         # In any case, it's not super common so just default to whatever
         val_string = "0"
     else:
-        assert not mult
-
         # This placeholder is probably one of these
         #   @FlatHealing2Prefix@@FlatHealing2@%@FlatHealing2Postfix@
-        val_string = get_generated_variable(variables, var)
+        val_string = get_generated_variable(variables, var, mult)
 
     start = template[: m.start()]
     end = interpolate_variables(template[m.end() :], variables)
     return start + val_string + end
 
 
-def get_generated_variable(variables: dict[str, list[float]], var: str):
+def get_generated_variable(variables: dict[str, list[float]], var: str, mult: str):
     m = re.search(r"(\w+)(\d)(prefix|postfix)?", var)
     if not m:
         print("Unknown variable", var, file=sys.stderr)
@@ -132,10 +130,16 @@ def get_generated_variable(variables: dict[str, list[float]], var: str):
     modifier = m.group(3)
 
     if modifier == "prefix":
+        assert not mult
         return ""
     elif modifier == "postfix":
+        assert not mult
         return ""
     elif modifier is None:
-        return str(round(variables[original_var][level]))
+        val = variables[original_var][level]
+        if mult:
+            val *= float(mult)
+
+        return str(round(val))
     else:
         raise Exception()
