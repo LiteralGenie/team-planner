@@ -10,8 +10,8 @@
     $: champion = CHAMPIONS_BY_ID[champion_id]
     $: iconSrc = ABILITY_ICONS[champion_id]
     $: html = interpolate_tooltip_images(champion.spell).replace(
-        '$ABILITY_ICON_SRC',
-        iconSrc
+        'placeholder="$ABILITY_ICON_SRC"',
+        `src="${iconSrc}"`
     )
 </script>
 

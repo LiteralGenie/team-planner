@@ -37,14 +37,14 @@ def build_tooltip_html(template: str, variables: dict[str, list[float]]):
     html = interpolate_variables(html, variables)
     html = f"""
     <div class="tooltip-root">
-        <img class="spell-icon" src="$ABILITY_ICON_SRC">
+        <img class="spell-icon" placeholder="$ABILITY_ICON_SRC">
         {html}
     </div>
     """
 
     allowed_tags = ("h1", "section", "span", "div", "br", "img")
     attributes: dict = {tag: ("class",) for tag in allowed_tags}
-    attributes["img"] = ("class", "src")
+    attributes["img"] = ("class", "placeholder")
     sanitizer = Sanitizer(
         dict(
             tags=allowed_tags,

@@ -36,6 +36,7 @@
                 <div class="hidden md:block">
                     <Tooltip.Root
                         group="spell"
+                        openDelay={100}
                         closeOnPointerDown={true}
                         portal={'dialog'}
                     >

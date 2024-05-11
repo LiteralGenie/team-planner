@@ -10,11 +10,11 @@
     export let slotControls: AttributeSlotControls
     export let slotValues: AttributeSlotValues
 
-    // @todo hint tooltip with range "Units with an attack range of 1 / 2 / 3+"
     $: options = [
         {
             value: slotValues.range.close,
             label: 'Melee',
+            tooltip: 'Melee units have a 1-hex range',
             onChange: (v: boolean) => handleChange('close', v),
             prefix: RangeIcon,
             prefixOpts: { activeClose: true },
@@ -24,6 +24,7 @@
         {
             value: slotValues.range.mid,
             label: 'Mid',
+            tooltip: 'Mid-range units have a 2-hex range',
             onChange: (v: boolean) => handleChange('mid', v),
             prefix: RangeIcon,
             prefixOpts: { activeMid: true },
@@ -33,6 +34,7 @@
         {
             value: slotValues.range.long,
             label: 'Long',
+            tooltip: 'Long-range units have a range of 3+ hexes',
             onChange: (v: boolean) => handleChange('long', v),
             prefix: RangeIcon,
             prefixOpts: { activeLong: true },
