@@ -2,7 +2,7 @@ import json
 import time
 from typing import TypeAlias
 
-from lib.interpolate_ability import interpolate_all, interpolate_expression
+from lib.compute_spell_variables import compute_spell_variables
 from lib.utils import (
     CDRAGON_URL,
     DATA_DIR,
@@ -39,12 +39,16 @@ ICON_DIR.mkdir(parents=True, exist_ok=True)
 SPLASH_DIR = GUI_ASSETS_DIR / "tft" / "champion_splashes"
 SPLASH_DIR.mkdir(parents=True, exist_ok=True)
 
+CHARACTER_BIN_DIR = DATA_DIR / "character_bins"
+CHARACTER_BIN_DIR.mkdir(parents=True, exist_ok=True)
+
 ###
 
 ITeamPlannerData: TypeAlias = list[dict]
 ISetData: TypeAlias = dict
 ICharactersData: TypeAlias = dict
 IMergedData: TypeAlias = list[dict]
+ICharacterBinData: TypeAlias = dict[str, dict]
 
 
 def fetch_teamplanner_data() -> ITeamPlannerData:
@@ -71,27 +75,29 @@ def fetch_characters_data() -> ISetData:
     )
 
 
-def filter_team_planner_data(tp_data: ITeamPlannerData) -> ITeamPlannerData:
-    return [d for d in tp_data if LATEST_SET_PREFIX in d["character_id"]]
+def fetch_character_bin_data(id: str) -> ICharacterBinData:
+    file_name = id.lower() + ".cdtb.bin.json"
+    url = CDRAGON_URL / "game" / "characters" / file_name
+    file = CHARACTER_BIN_DIR / file_name
+    return fetch_json_cached(url, file)
 
 
 def build_merged_data(
     tp_data: ITeamPlannerData,
     set_data: ISetData,
     char_data: ICharactersData,
+    bin_data: ICharacterBinData,
 ) -> IMergedData:
     """
     Append the stats (ad, range, etc) from set data to the team planner data for each champion
     """
-
-    filtered = filter_team_planner_data(tp_data)
 
     latest_set = next(
         s for s in set_data["sets"].values() if s["name"] == LATEST_SET_NAME
     )
 
     merged: IMergedData = []
-    for c in filtered:
+    for c in tp_data:
         unit = next(
             u
             for u in latest_set["champions"]
@@ -100,15 +106,13 @@ def build_merged_data(
 
         role = find_role_for_champion(c["character_id"], char_data)
 
-        print()
-        print(c["display_name"])
-        tooltip = interpolate_all(
-            c["character_id"],
-            unit["stats"],
-            unit["ability"]["variables"],
-            unit["ability"]["desc"],
-        )
-        print(tooltip)
+        character_bin = bin_data[c["character_id"]]
+
+        stats = next(v for k, v in character_bin.items() if k.endswith("/Root"))
+        scripts = [v for k, v in character_bin.items() if k.endswith("Spell")]
+        assert len(scripts) == 1
+
+        vars = compute_spell_variables(scripts[0]["mSpell"], stats)
 
         merged.append(
             dict(
@@ -159,9 +163,7 @@ def get_damage_type(role: dict) -> dict:
 
 
 def download_icons(data: ITeamPlannerData):
-    filtered = filter_team_planner_data(data)
-
-    for champion in filtered:
+    for champion in data:
         url = get_cdragon_asset_url(champion["squareIconPath"])
         ext = str(url).split(".")[-1]
 
@@ -176,9 +178,7 @@ def download_icons(data: ITeamPlannerData):
 
 
 def download_splashes(data: ITeamPlannerData):
-    filtered = filter_team_planner_data(data)
-
-    for champion in filtered:
+    for champion in data:
         url = get_cdragon_asset_url(champion["squareSplashIconPath"])
         ext = str(url).split(".")[-1]
 
@@ -194,14 +194,20 @@ def download_splashes(data: ITeamPlannerData):
 
 def main():
     tp_data = fetch_teamplanner_data()
+    tp_data_filtered = [d for d in tp_data if LATEST_SET_PREFIX in d["character_id"]]
+
     set_data = fetch_unit_data()
     char_data = fetch_characters_data()
+    bin_data = {
+        c["character_id"]: fetch_character_bin_data(c["character_id"])
+        for c in tp_data_filtered
+    }
 
-    merged = build_merged_data(tp_data, set_data, char_data)
+    merged = build_merged_data(tp_data_filtered, set_data, char_data, bin_data)
     print(f"Found {len(merged)} champions for set {LATEST_SET_ID}")
 
-    download_icons(tp_data)
-    download_splashes(tp_data)
+    download_icons(tp_data_filtered)
+    download_splashes(tp_data_filtered)
 
     print("Creating", MERGED_DATA_FILE)
     with open(MERGED_DATA_FILE, "w+") as file:
