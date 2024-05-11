@@ -31,7 +31,9 @@ def build_tooltip_html(template: str, variables: dict[str, list[float]]):
     #   eg some placeholders reference AoE but correct name is AOE
     variables = {k.lower(): v for k, v in variables.items()}
 
-    html = rename_tags(template)
+    html = template
+    html = zip_postscript_left_right(html)
+    html = rename_tags(html)
     html = interpolate_variables(html, variables)
     html = f"""
     <div class="tooltip-root">
@@ -47,8 +49,8 @@ def build_tooltip_html(template: str, variables: dict[str, list[float]]):
         dict(
             tags=allowed_tags,
             attributes=attributes,
-            empty=set(["br", "img"]),
-            separate=set(["div"]),
+            empty=set(["br", "img", "span"]),
+            separate=set(["div", "span"]),
         )
     )
     return sanitizer.sanitize(html)
@@ -64,8 +66,7 @@ def rename_tags(template: str):
         scaleHealth=dict(tag="span", attrs=['class="scale-health"']),
         rules=dict(tag="div", attrs=['class="rules"']),
         tftitemrules=dict(tag="div", attrs=['class="rules"']),
-        postScriptLeft=dict(tag="div", attrs=['class="post-script-left"']),
-        postScriptRight=dict(tag="div", attrs=['class="post-script-right"']),
+        postScript=dict(tag="div", attrs=['class="post-script"']),
     )
 
     result = template
@@ -143,3 +144,35 @@ def get_generated_variable(variables: dict[str, list[float]], var: str, mult: st
         return str(round(val))
     else:
         raise Exception()
+
+
+def zip_postscript_left_right(template: str) -> str:
+    left = re.search(r"<postScriptLeft>(.*)</postScriptLeft>", template)
+    right = re.search(r"<postScriptRight>(.*)</postScriptRight>", template)
+    if not left or not right:
+        raise Exception()
+
+    left_lines = left.group(1).split("<br>")
+    right_lines = right.group(1).split("<br>")
+    assert len(left_lines) == len(right_lines)
+
+    merged = []
+    for l, r in zip(left_lines, right_lines):
+        # Don't display total values in post script, only formula / percentages
+        #   ie replace  Damage: 625 / 938 / 1406 = 700%  + 100 / 150 / 225%
+        #   with        Damage: 700%  + 100 / 150 / 225%
+        l2 = re.sub(r": .* = ", ": ", l)
+        l = l2
+
+        merged.append(
+            f"""
+                <span>{l}</span>
+                <span>{r}</span>
+            """
+        )
+
+    joined = "\n".join(merged)
+    joined = f"<postScript>{joined}</postScript>"
+
+    assert left.start() < right.end()
+    return template[: left.start()] + joined + template[right.end() :]

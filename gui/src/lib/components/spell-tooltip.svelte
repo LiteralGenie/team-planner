@@ -20,7 +20,7 @@
 </div>
 
 <style lang="postcss">
-    .root :global(img) {
+    .root :global(.scaling-icon) {
         display: inline;
     }
 
@@ -28,10 +28,12 @@
         display: grid;
         grid-template-areas:
             'icon  title title title title title'
-            'desc  desc  desc  desc  desc  desc'
-            'left  left  left  right right right';
+            'desc  desc  desc  desc  desc  desc '
+            'deets deets deets deets deets deets';
         grid-template-columns: max-content 1fr;
         gap: 1em;
+
+        user-select: text !important;
 
         @apply text-sm;
     }
@@ -61,14 +63,20 @@
         padding-bottom: 0.5em;
     }
 
-    .root :global(.post-script-left) {
-        grid-area: left;
+    .root :global(.post-script) {
+        grid-area: deets;
+
+        @apply flex flex-col;
     }
 
-    .root :global(.post-script-right) {
-        grid-area: right;
+    .root :global(.post-script) {
+        display: grid;
+        grid-template-columns: 1fr max-content;
+        gap: 0 1em;
+    }
 
-        text-align: right;
+    .root :global(.post-script > :nth-child(2n)) {
+        text-align: end;
     }
 
     .root :global(.rules) {
