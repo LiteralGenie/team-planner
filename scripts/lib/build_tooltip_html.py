@@ -63,6 +63,7 @@ def rename_tags(template: str):
         physicalDamage=dict(tag="span", attrs=['class="physical-damage"']),
         scaleHealth=dict(tag="span", attrs=['class="scale-health"']),
         rules=dict(tag="div", attrs=['class="rules"']),
+        tftitemrules=dict(tag="div", attrs=['class="rules"']),
         postScriptLeft=dict(tag="div", attrs=['class="post-script-left"']),
         postScriptRight=dict(tag="div", attrs=['class="post-script-right"']),
     )

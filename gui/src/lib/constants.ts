@@ -1,12 +1,18 @@
 import type { CostTier } from '$lib/app/form-context/types'
 import ALL_CHAMPIONS from '$lib/assets/tft/merged_teamplanner_data.json'
 import ap_icon from '$lib/assets/tft/misc/statmodsabilitypowericon.png'
+import armor_icon from '$lib/assets/tft/misc/statmodsarmoricon.png'
 import ad_icon from '$lib/assets/tft/misc/statmodsattackdamageicon.png'
+import health_icon from '$lib/assets/tft/misc/statmodshealthscalingicon.png'
+import resist_icon from '$lib/assets/tft/misc/statmodsmagicresicon.png'
 import ALL_TRAITS from '$lib/assets/tft/tfttraits.json'
 import { alphabetical, group, objectify, sort } from 'radash'
 
 export const AP_ICON = ap_icon
 export const AD_ICON = ad_icon
+export const ARMOR_ICON = armor_icon
+export const RESIST_ICON = resist_icon
+export const HEALTH_ICON = health_icon
 
 export const TRAITS = ALL_TRAITS.filter(
     (t) => t.display_name !== 'Exalted'

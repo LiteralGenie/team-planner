@@ -16,6 +16,22 @@ targets: list[dict] = [
         url=CDRAGON_URL / "game/assets/perks/statmods/statmodsattackdamageicon.png",
         crop=(6, 6, 26, 26),
     ),
+    dict(
+        url=CDRAGON_URL / "game/assets/perks/statmods/statmodshealthscalingicon.png",
+        crop=(6, 6, 26, 26),
+    ),
+    dict(
+        url=CDRAGON_URL / "game/assets/perks/statmods/statmodsarmoricon.png",
+        crop=(6, 6, 26, 26),
+    ),
+    dict(
+        url=CDRAGON_URL / "game/assets/perks/statmods/statmodsmagicresicon.png",
+        crop=(6, 6, 26, 26),
+    ),
+    dict(
+        url=CDRAGON_URL / "game/assets/perks/statmods/statmodsattackspeedicon.png",
+        crop=(6, 6, 26, 26),
+    ),
 ]
 
 for tgt in targets:
