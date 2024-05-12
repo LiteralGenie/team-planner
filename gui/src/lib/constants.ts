@@ -124,6 +124,18 @@ export const CHAMPIONS_BY_ID = objectify(
     (c) => c
 ) satisfies Record<string, CDragonChampion>
 
+export const CHAMPIONS_BY_TRAIT = CHAMPIONS.reduce(
+    (acc, c) => {
+        for (let trait of c.traits) {
+            acc[trait.id] = acc[trait.id] || []
+            acc[trait.id].push(c)
+        }
+
+        return acc
+    },
+    {} as Record<string, CDragonChampion[]>
+)
+
 export interface CDragonTrait {
     display_name: string
     trait_id: string

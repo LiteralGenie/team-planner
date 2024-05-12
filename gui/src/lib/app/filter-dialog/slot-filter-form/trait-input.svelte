@@ -53,7 +53,6 @@
             closeOnPointerDown={true}
             portal="dialog"
             group="trait"
-            open={true}
         >
             <Tooltip.Trigger>
                 <TraitCheckbox
