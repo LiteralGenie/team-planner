@@ -3,9 +3,7 @@
 
 <script lang="ts">
     import {
-        CHAMPIONS_BY_ID,
         CHAMPIONS_BY_TRAIT,
-        CHAMPION_ICONS,
         TRAITS_BY_ID,
         TRAIT_ICONS
     } from '$lib/constants'
@@ -32,8 +30,7 @@
         {#each others as c}
             <div class="h-8 w-8">
                 <ChampionPortrait
-                    src={CHAMPION_ICONS[c.character_id]}
-                    cost={CHAMPIONS_BY_ID[c.character_id].tier}
+                    id={c.character_id}
                     hideInnerBorder={true}
                 />
             </div>

@@ -29,7 +29,7 @@ const TYPES: &'static str =
     r#"
 
 interface Team {
-    champion_ids: string[]
+    champion_ids: number[]
 }
 
 "#;

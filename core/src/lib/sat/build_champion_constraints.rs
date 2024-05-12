@@ -89,6 +89,12 @@ fn build_slot_constraints(
     let slot_options: Vec<HashSet<u8>> = slot_options
         .iter()
         .map(|opts| HashSet::from_iter(opts.clone().into_iter()))
+        // Slots that contain all champions don't need to be constraints
+        .filter(
+            |opts|
+                opts.len() <
+                (subgraph_constraints.num_vertices as usize)
+        )
         .collect();
 
     // Group each element by the parent sets it is common to
@@ -101,7 +107,6 @@ fn build_slot_constraints(
     }
 
     // Elements that are common to all sets don't need to be constraints
-    // (this is a massive speed up)
     disjoint_subsets = disjoint_subsets
         .into_iter()
         .filter(|s| s.parent_sets.len() != slot_options.len())

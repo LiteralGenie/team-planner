@@ -7,7 +7,7 @@
     import Button from '$lib/components/ui/button/button.svelte'
     import * as Popover from '$lib/components/ui/popover/index.js'
     import * as Tooltip from '$lib/components/ui/tooltip/index.js'
-    import { CHAMPIONS, CHAMPION_ICONS } from '$lib/constants'
+    import { CHAMPIONS } from '$lib/constants'
     import { sort } from 'radash'
 
     export let attributeFilter: AttributeFilter
@@ -42,10 +42,7 @@
                         disableHoverableContent={true}
                     >
                         <Tooltip.Trigger class="cursor-default">
-                            <ChampionPortrait
-                                src={CHAMPION_ICONS[c.character_id]}
-                                cost={c.tier}
-                            />
+                            <ChampionPortrait id={c.character_id} />
                         </Tooltip.Trigger>
                         <Tooltip.Content
                             class="spell-tooltip-container"
@@ -58,10 +55,7 @@
                 </div>
 
                 <div class="md:hidden">
-                    <ChampionPortrait
-                        src={CHAMPION_ICONS[c.character_id]}
-                        cost={c.tier}
-                    />
+                    <ChampionPortrait id={c.character_id} />
                 </div>
             </div>
 

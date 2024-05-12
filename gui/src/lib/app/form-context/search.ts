@@ -1,6 +1,5 @@
 import type { FilterForm } from '$lib/app/form-context/types'
 import { applyAttributeFilterWithGlobal } from '$lib/app/form-context/utils'
-import type { Team } from '$lib/assets/wasm/tft_core'
 import { CHAMPIONS } from '$lib/constants'
 import { invert, range } from 'radash'
 
@@ -35,7 +34,7 @@ function getSlotOptions(form: FilterForm): Array<string[]> {
     return slots
 }
 
-export function doSearch(form: FilterForm): Team[] {
+export function doSearch(form: FilterForm): string[][] {
     const champion_to_var = Object.values(CHAMPIONS).reduce(
         (acc, c, idx) => {
             acc[c.character_id] = idx
@@ -43,8 +42,6 @@ export function doSearch(form: FilterForm): Team[] {
         },
         {} as Record<string, number>
     )
-
-    const var_to_champion = invert(champion_to_var)
 
     const traits = new Map()
     CHAMPIONS.map((c) => [
@@ -65,6 +62,13 @@ export function doSearch(form: FilterForm): Team[] {
         traits
     }
 
-    console.log('searching with', options)
-    return window.tft.search_teams(options)
+    console.log('Searching with options', options)
+    const teams = window.tft.search_teams(options)
+
+    const var_to_champion = invert(champion_to_var)
+    const remapped = teams.map(({ champion_ids }) =>
+        champion_ids.map((v) => var_to_champion[v])
+    )
+
+    return remapped
 }
