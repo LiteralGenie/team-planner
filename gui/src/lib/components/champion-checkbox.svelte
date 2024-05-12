@@ -3,15 +3,19 @@
 </script>
 
 <script lang="ts">
-    import type { CostTier } from '$lib/app/form-context/types'
     import ChampionPortrait from '$lib/components/champion-portrait.svelte'
+    import * as Tooltip from '$lib/components/ui/tooltip/index.js'
+    import { CHAMPIONS_BY_ID, CHAMPION_ICONS } from '$lib/constants'
     import CheckmarkIcon from '$lib/icons/checkmark-icon.svelte'
     import XIcon from '$lib/icons/x-icon.svelte'
-    import ConditionalTooltip from './conditional-tooltip.svelte'
+    import SpellTooltip from './spell-tooltip.svelte'
 
-    export let src: string
-    export let label: string
-    export let cost: CostTier
+    export let id: string
+
+    $: champion = CHAMPIONS_BY_ID[id]
+    $: src = CHAMPION_ICONS[id]
+    $: label = champion.display_name
+    $: cost = champion.tier
 
     export let value: ChampionCheckboxValue
     export let disabled = false
@@ -26,40 +30,58 @@
     class="root flex flex-col justify-center items-center text-center gap-[1px]"
     class:active={actualValue !== null}
 >
-    <ConditionalTooltip
-        tooltip={disabled ? disabledTooltip : ''}
-        {disabled}
+    <Tooltip.Root
+        group="spell"
+        openDelay={100}
+        closeOnPointerDown={true}
+        portal={'dialog'}
     >
-        <button
-            {disabled}
-            on:click
-            type="button"
-            class="h-12 w-12 relative select-none"
+        <Tooltip.Trigger class="cursor-default">
+            <button
+                {disabled}
+                on:click
+                type="button"
+                class="h-12 w-12 relative select-none"
+            >
+                <ChampionPortrait {src} {cost} />
+
+                <!-- Selection indicator -->
+                {#if actualValue === 'included' || actualValue === 'excluded'}
+                    <div
+                        class:green={actualValue === 'included'}
+                        class:red={actualValue === 'excluded'}
+                        class="mark absolute bottom-[2px] right-[2px] rounded-full p-[2px] text-foreground"
+                    >
+                        {#if actualValue === 'included'}
+                            <CheckmarkIcon
+                                class="h-[0.9em] w-[0.9em]"
+                            />
+                        {:else if actualValue === 'excluded'}
+                            <XIcon class="h-[0.9em] w-[0.9em]" />
+                        {/if}
+                    </div>
+                {/if}
+            </button>
+
+            <!-- Label -->
+            <span
+                class="text-xs text-muted-foreground whitespace-nowrap"
+            >
+                {label}
+            </span>
+        </Tooltip.Trigger>
+        <Tooltip.Content
+            class={disabled
+                ? 'boring-tooltip'
+                : 'spell-tooltip-container'}
         >
-            <!-- @todo description tooltip -->
-            <ChampionPortrait {src} {cost} />
-
-            <!-- Selection indicator -->
-            {#if actualValue === 'included' || actualValue === 'excluded'}
-                <div
-                    class:green={actualValue === 'included'}
-                    class:red={actualValue === 'excluded'}
-                    class="mark absolute bottom-[2px] right-[2px] rounded-full p-[2px] text-foreground"
-                >
-                    {#if actualValue === 'included'}
-                        <CheckmarkIcon class="h-[0.9em] w-[0.9em]" />
-                    {:else if actualValue === 'excluded'}
-                        <XIcon class="h-[0.9em] w-[0.9em]" />
-                    {/if}
-                </div>
+            {#if disabled}
+                {disabledTooltip}
+            {:else}
+                <SpellTooltip champion_id={id} />
             {/if}
-        </button>
-
-        <!-- Label -->
-        <span class="text-xs text-muted-foreground whitespace-nowrap">
-            {label}
-        </span>
-    </ConditionalTooltip>
+        </Tooltip.Content>
+    </Tooltip.Root>
 </div>
 
 <style lang="postcss">

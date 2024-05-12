@@ -1,7 +1,6 @@
 <script lang="ts" context="module">
     import {
         CHAMPIONS,
-        CHAMPION_ICONS,
         TRAITS_BY_ID,
         type CDragonChampion,
         type CDragonTrait
@@ -202,10 +201,8 @@
                         <ChampionCheckbox
                             on:click={() =>
                                 handleClick(c.character_id)}
-                            src={CHAMPION_ICONS[c.character_id]}
-                            label={c.display_name}
+                            id={c.character_id}
                             value={state.included ? 'included' : null}
-                            cost={c.tier}
                             disabled={state.disabled}
                             disabledTooltip="Disabled by global filter"
                         />
