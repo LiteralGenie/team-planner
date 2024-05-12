@@ -156,7 +156,9 @@ export interface CDragonChampion {
         is_ap: boolean
     }
     stats: {
-        attackRange: number
+        damage: number
+        mana: number
+        range: number
     }
     spell: string
 }

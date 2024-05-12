@@ -2,20 +2,19 @@ import json
 import time
 from typing import TypeAlias
 
+from lib.build_spell_html import build_spell_html
 from lib.compute_spell_variables import compute_spell_variables
 from lib.utils import (
     CDRAGON_URL,
     DATA_DIR,
     GUI_ASSETS_DIR,
     LATEST_SET_ID,
+    LATEST_SET_NUMBER,
     LATEST_SET_PREFIX,
     download_image,
     fetch_json_cached,
     get_cdragon_asset_url,
 )
-from yarl import URL
-
-from scripts.lib.build_spell_html import build_spell_html
 
 USE_CACHED = True
 
@@ -29,6 +28,9 @@ TEAM_PLANNER_DATA_FILE = DATA_DIR / "tftchampions-teamplanner.json"
 
 CHARACTERS_DATA_URL = CDRAGON_URL / "game/data/tftteamplanner/characters.bin.json"
 CHARACTERS_DATA_FILE = DATA_DIR / "characters.bin.json"
+
+SET_DATA_URL = CDRAGON_URL / "cdragon/tft/en_us.json"
+SET_DATA_FILE = DATA_DIR / "en_us.json"
 
 MERGED_DATA_FILE = GUI_ASSETS_DIR / "tft" / "merged_teamplanner_data.json"
 
@@ -54,8 +56,9 @@ STRINGS_FILE = DATA_DIR / "main.stringtable.json"
 ITeamPlannerData: TypeAlias = list[dict]
 IStringData: TypeAlias = dict
 ICharactersData: TypeAlias = dict
-IMergedData: TypeAlias = list[dict]
+ISetData: TypeAlias = dict
 ICharacterBinData: TypeAlias = dict[str, dict]
+IMergedData: TypeAlias = list[dict]
 
 
 def fetch_teamplanner_data() -> ITeamPlannerData:
@@ -89,15 +92,26 @@ def fetch_character_bin_data(id: str) -> ICharacterBinData:
     return fetch_json_cached(url, file)
 
 
+def fetch_set_data() -> ICharactersData:
+    return fetch_json_cached(
+        SET_DATA_URL,
+        SET_DATA_FILE,
+        use_cache=USE_CACHED,
+    )
+
+
 def build_merged_data(
     tp_data: ITeamPlannerData,
     string_data: IStringData,
     char_data: ICharactersData,
     bin_data: ICharacterBinData,
+    set_data: ISetData,
 ) -> IMergedData:
     """
     Append the stats (ad, range, etc) from set data to the team planner data for each champion
     """
+
+    latest_set = next(v for k, v in set_data["sets"].items() if k == LATEST_SET_NUMBER)
 
     merged: IMergedData = []
     for c in tp_data:
@@ -108,6 +122,10 @@ def build_merged_data(
         stats = next(v for k, v in character_bin.items() if k.endswith("/Root"))
         scripts = [v for k, v in character_bin.items() if k.endswith("Spell")]
         assert len(scripts) == 1
+
+        set_champion = next(
+            x for x in latest_set["champions"] if x["apiName"] == c["character_id"]
+        )
 
         variables = compute_spell_variables(scripts[0]["mSpell"], stats)
 
@@ -124,12 +142,12 @@ def build_merged_data(
                 tier=c["tier"],
                 display_name=c["display_name"],
                 traits=c["traits"],
-                # from string data
+                # from string + bin data
                 spell=spell_tooltip_html,
                 # from character data
                 damage_type=get_damage_type(role),
-                # from character bin data
-                stats=stats,
+                # from set data
+                stats=set_champion["stats"],
             )
         )
 
@@ -246,8 +264,15 @@ def main():
         c["character_id"]: fetch_character_bin_data(c["character_id"])
         for c in tp_data_filtered
     }
+    set_data = fetch_set_data()
 
-    merged = build_merged_data(tp_data_filtered, string_data, char_data, bin_data)
+    merged = build_merged_data(
+        tp_data_filtered,
+        string_data,
+        char_data,
+        bin_data,
+        set_data,
+    )
     print(f"Found {len(merged)} champions for set {LATEST_SET_ID}")
 
     download_icons(tp_data_filtered)

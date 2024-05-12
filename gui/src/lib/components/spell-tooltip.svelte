@@ -2,8 +2,20 @@
 </script>
 
 <script lang="ts">
-    import { ABILITY_ICONS, CHAMPIONS_BY_ID } from '$lib/constants'
+    import { mapRangeValueToType } from '$lib/app/form-context/utils'
+
+    import {
+        ABILITY_ICONS,
+        AD_ICON,
+        AP_ICON,
+        CHAMPIONS_BY_ID,
+        MANA_ICON,
+        TRAIT_ICONS
+    } from '$lib/constants'
+    import GoldIcon from '$lib/icons/gold-icon.svelte'
+    import RangeIcon from '$lib/icons/range-icon.svelte'
     import { interpolate_tooltip_images } from '$lib/utils/tooltips'
+    import TraitIcon from './trait-icon.svelte'
 
     export let champion_id: string
 
@@ -13,10 +25,73 @@
         'placeholder="$ABILITY_ICON_SRC"',
         `src="${iconSrc}"`
     )
+
+    $: rangeType = mapRangeValueToType(champion.stats.range)
 </script>
 
-<div class="root">
+<div class="root flex flex-col">
     {@html html}
+
+    <div
+        class="border-t-2 pt-2 mt-2 text-sm text-muted-foreground flex justify-between items-center"
+    >
+        <span>Traits:</span>
+
+        <span class="comma-group flex gap-1">
+            {#each champion.traits as t}
+                <div class="flex items-center">
+                    <span class="trait-label">{t.name}</span>
+
+                    <div
+                        class="trait-icon inline-block h-[1.75em] w-[1.75em]"
+                    >
+                        <TraitIcon
+                            src={TRAIT_ICONS[t.id]}
+                            variant="sm"
+                        />
+                    </div>
+                </div>
+            {/each}
+        </span>
+    </div>
+
+    <div
+        class="pt-1 text-sm text-muted-foreground flex items-center justify-between"
+    >
+        <span>Stats:</span>
+
+        <div class="flex justify-end gap-3">
+            <span class="flex gap-1 items-center">
+                {champion.tier}
+                <GoldIcon class="h-[1em] ml-[-0.125em]" />
+            </span>
+
+            <span class="flex gap-1 items-center">
+                {Math.floor(champion.stats.damage)}
+                <img class="h-[1em]" src={AD_ICON} />
+            </span>
+
+            <span class="flex gap-1 items-center">
+                100
+                <img class="h-[1em]" src={AP_ICON} />
+            </span>
+
+            <span class="flex gap-[0.0625em] items-center">
+                {Math.floor(champion.stats.mana)}
+                <img class="h-[1em]" src={MANA_ICON} />
+            </span>
+
+            <span class="flex gap-1 items-center">
+                {Math.floor(champion.stats.range)}
+                <RangeIcon
+                    class="h-[1em]"
+                    activeClose={rangeType === 'close'}
+                    activeMid={rangeType === 'mid'}
+                    activeLong={rangeType === 'long'}
+                />
+            </span>
+        </div>
+    </div>
 </div>
 
 <style lang="postcss">
@@ -85,5 +160,19 @@
 
     .root :global(.scaling-icon) {
         @apply h-4 w-4 mx-[0.0625em];
+    }
+
+    .comma-group {
+        & > *:not(:last-child)::after {
+            padding-left: 0.125em;
+            content: ', ';
+        }
+    }
+
+    .trait-label {
+        @apply mr-1;
+    }
+    .trait-icon:not(:last-child) {
+        @apply mr-1;
     }
 </style>

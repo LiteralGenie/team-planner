@@ -160,9 +160,7 @@ export function applyAttributeFilter(
         CHAMPIONS.filter((c) => filter.cost[c.tier])
             .filter(
                 (c) =>
-                    filter.range[
-                        mapRangeValueToType(c.stats.attackRange)
-                    ]
+                    filter.range[mapRangeValueToType(c.stats.range)]
             )
             .filter((c) => {
                 if (filter.damageType.ad && filter.damageType.ap) {
@@ -201,14 +199,11 @@ export function applyAttributeFilterWithGlobal(
 }
 
 export function mapRangeValueToType(value: number): RangeType {
-    if (value <= 180) {
-        // =1 tile
+    if (value <= 1) {
         return 'close'
-    } else if (value <= 420) {
-        // =2 tiles
+    } else if (value <= 2) {
         return 'mid'
     } else {
-        // >2 tiles
         return 'long'
     }
 }
