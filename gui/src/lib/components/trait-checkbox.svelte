@@ -33,7 +33,6 @@
             type="button"
             class="h-12 w-12 relative select-none"
         >
-            <!-- @todo trait description tooltip -->
             <!-- Hex icon -->
             <div class="hex hover-fill p-[2px]">
                 <div class="hex dark-fill p-[2px]">
