@@ -9,8 +9,7 @@
         AD_ICON,
         AP_ICON,
         CHAMPIONS_BY_ID,
-        MANA_ICON,
-        TRAIT_ICONS
+        MANA_ICON
     } from '$lib/constants'
     import GoldIcon from '$lib/icons/gold-icon.svelte'
     import RangeIcon from '$lib/icons/range-icon.svelte'
@@ -45,10 +44,7 @@
                     <div
                         class="trait-icon inline-block h-[1.75em] w-[1.75em]"
                     >
-                        <TraitIcon
-                            src={TRAIT_ICONS[t.id]}
-                            variant="sm"
-                        />
+                        <TraitIcon id={t.id} variant="sm" />
                     </div>
                 </div>
             {/each}

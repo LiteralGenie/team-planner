@@ -8,7 +8,6 @@
     import TraitIcon from '$lib/components/trait-icon.svelte'
     import TraitTooltip from '$lib/components/trait-tooltip.svelte'
     import * as Tooltip from '$lib/components/ui/tooltip/index.js'
-    import { TRAIT_ICONS } from '$lib/constants'
     import GoldIcon from '$lib/icons/gold-icon.svelte'
     import XIcon from '$lib/icons/x-icon.svelte'
 
@@ -59,7 +58,7 @@
                 >
                     <Tooltip.Trigger class="cursor-default">
                         <div class="relative h-7 w-7">
-                            <TraitIcon src={TRAIT_ICONS[id]} />
+                            <TraitIcon {id} />
 
                             <div
                                 class="absolute bottom-0 right-0 rounded-full bg-[#eb1a26] p-[2px]"

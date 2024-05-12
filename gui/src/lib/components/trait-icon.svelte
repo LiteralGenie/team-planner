@@ -1,7 +1,11 @@
 <script lang="ts">
-    export let src: string
+    import { TRAIT_ICONS } from '$lib/constants'
+
+    export let id: string
     export let showHover = false
     export let variant: 'sm' | 'md' = 'sm'
+
+    $: src = TRAIT_ICONS[id]
 </script>
 
 <div

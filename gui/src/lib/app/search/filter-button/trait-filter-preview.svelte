@@ -22,8 +22,6 @@
 
     export let trait_id: string
     export let checked: boolean
-
-    $: src = srcs[trait_id]
 </script>
 
 <span
@@ -31,7 +29,7 @@
 >
     <div class="h-[28px] w-[28px] relative select-none">
         <!-- Hex icon -->
-        <TraitIcon {src} />
+        <TraitIcon id={trait_id} />
 
         <!-- Selection indicator -->
         <div
