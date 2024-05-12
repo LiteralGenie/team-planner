@@ -53,6 +53,7 @@
             closeOnPointerDown={true}
             portal="dialog"
             group="trait"
+            disableHoverableContent={true}
         >
             <Tooltip.Trigger>
                 <TraitCheckbox

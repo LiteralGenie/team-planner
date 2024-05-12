@@ -39,6 +39,7 @@
                         openDelay={100}
                         closeOnPointerDown={true}
                         portal={'dialog'}
+                        disableHoverableContent={true}
                     >
                         <Tooltip.Trigger class="cursor-default">
                             <ChampionPortrait

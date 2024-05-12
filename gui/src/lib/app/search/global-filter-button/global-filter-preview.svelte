@@ -59,6 +59,7 @@
                     group="preview"
                     openDelay={500}
                     closeOnPointerDown={true}
+                    disableHoverableContent={true}
                 >
                     <Tooltip.Trigger class="cursor-default">
                         <div class="relative h-7 w-7">
@@ -89,6 +90,7 @@
                         group="preview"
                         openDelay={500}
                         closeOnPointerDown={true}
+                        disableHoverableContent={true}
                     >
                         <Tooltip.Trigger class="cursor-default">
                             <ChampionPortrait

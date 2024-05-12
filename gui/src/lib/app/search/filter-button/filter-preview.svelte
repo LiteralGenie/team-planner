@@ -119,6 +119,7 @@
                         group="preview"
                         openDelay={500}
                         closeOnPointerDown={true}
+                        disableHoverableContent={true}
                     >
                         <Tooltip.Trigger class="cursor-default">
                             <TraitFilterPreview
@@ -142,6 +143,7 @@
                         group="preview"
                         openDelay={500}
                         closeOnPointerDown={true}
+                        disableHoverableContent={true}
                     >
                         <Tooltip.Trigger class="cursor-default">
                             <div class="relative">

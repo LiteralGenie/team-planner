@@ -1,3 +1,4 @@
+import { replaceState } from '$app/navigation'
 import { deepCopy } from '$lib/utils/misc'
 import { objectify } from 'radash'
 import { getContext, setContext } from 'svelte'
@@ -8,7 +9,11 @@ import {
     FILTER_FORM_PARSERS
 } from './defaults'
 import { type FilterForm, type FilterFormControls } from './types'
-import { createControl, type ValueOf } from './utils'
+import {
+    createControl,
+    serializeFilterForm,
+    type ValueOf
+} from './utils'
 
 /**
  * This context does a few form-related things...
@@ -23,9 +28,10 @@ import { createControl, type ValueOf } from './utils'
 
 export type FilterFormValue = {
     form: Readable<FilterForm>
-    formInitial: Readonly<FilterForm>
+    formInitial: Readable<Readonly<FilterForm>>
     controls: FilterFormControls
 
+    submit: () => void
     setValue: (value: FilterForm) => void
     resetGlobalFilter: () => void
     resetSlotFilter: (idx: number) => void
@@ -35,15 +41,16 @@ export type FilterFormValue = {
 const KEY = 'filter-form'
 
 export function setFilterFormContext(initValue: FilterForm) {
-    initValue = deepCopy(initValue)
+    const formInitial = writable(deepCopy(initValue))
     const controls = getDefaultControls(initValue, onChange)
 
     const form = writable(deepCopy(initValue))
 
     const value = {
         form,
-        formInitial: initValue,
+        formInitial,
         controls,
+        submit,
         setValue,
         resetGlobalFilter,
         resetSlotFilter,
@@ -95,6 +102,19 @@ export function setFilterFormContext(initValue: FilterForm) {
             // @ts-ignore: @todo why ts mad
             control.setValue(update[k])
         }
+    }
+
+    function submit() {
+        const formData = get(form)
+        formInitial.set(formData)
+
+        const update = new URL(window.location.href)
+        update.search = ''
+        update.searchParams.set(
+            'query',
+            serializeFilterForm(formData)
+        )
+        replaceState(update, {})
     }
 
     function destroy() {

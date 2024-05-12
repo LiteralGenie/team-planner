@@ -7,7 +7,12 @@
 </script>
 
 {#if tooltip}
-    <Tooltip.Root openDelay={100} closeOnPointerDown={true} {portal}>
+    <Tooltip.Root
+        disableHoverableContent={true}
+        openDelay={100}
+        closeOnPointerDown={true}
+        {portal}
+    >
         <Tooltip.Trigger
             class={disabled ? 'tooltip-trigger-disabled' : ''}
         >

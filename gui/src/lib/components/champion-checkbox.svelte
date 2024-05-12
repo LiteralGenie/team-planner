@@ -32,9 +32,10 @@
 >
     <Tooltip.Root
         group="spell"
-        openDelay={100}
+        openDelay={1000}
         closeOnPointerDown={true}
         portal={'dialog'}
+        disableHoverableContent={true}
     >
         <Tooltip.Trigger class="cursor-default">
             <button

@@ -1,4 +1,7 @@
 <script lang="ts">
+    import { getFilterFormContext } from './form-context/context'
+
+    const { formInitial } = getFilterFormContext()
 </script>
 
-$RESULTS
+{JSON.stringify($formInitial, null, 4)}

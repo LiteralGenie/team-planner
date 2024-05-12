@@ -15,7 +15,7 @@
     let showDialog = false
     let activeSlotIndex: SlotIndex = 0
 
-    const { form } = getFilterFormContext()
+    const { form, submit } = getFilterFormContext()
 
     function handleDialogOpen(idx: SlotIndex) {
         activeSlotIndex = idx
@@ -24,6 +24,8 @@
 
     function handleDialogClose() {
         showDialog = false
+
+        submit()
     }
 
     function getSlotState(slot: SlotFilter): string {

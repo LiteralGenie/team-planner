@@ -8,6 +8,7 @@ import type {
     AttributeFilter,
     CostTier,
     DamageType,
+    FilterForm,
     FormControlWrapper,
     GlobalFilter,
     IdFilter,
@@ -206,4 +207,8 @@ export function mapRangeValueToType(value: number): RangeType {
     } else {
         return 'long'
     }
+}
+
+export function serializeFilterForm(form: FilterForm): string {
+    return 'lmoa'
 }
