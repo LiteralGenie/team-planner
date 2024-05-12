@@ -2,61 +2,53 @@ use std::{ collections::{ HashMap, HashSet } };
 
 use logicng::formulas::{ EncodedFormula, FormulaFactory };
 
-use crate::{ console::log, lib::data::{ ChampionId, GameData } };
+use crate::console::log;
 
 use super::{
     build_subgraph_contraints,
-    HashStringSet,
+    HashIntSet,
     SubgraphConstraints,
 };
 
 pub fn build_champion_constraints(
+    graph_size: u8,
     subgraph_size: u8,
-    slot_options: Vec<Vec<ChampionId>>,
-    data: &GameData
-) -> (SubgraphConstraints, HashMap<i32, ChampionId>) {
-    // Map each champion id to arbitrary vertex index
-    let id_to_index: HashMap<&ChampionId, i32> = HashMap::from_iter(
-        data.champions
-            .values()
-            .enumerate()
-            .map(|(idx, c)| (&c.name, idx as i32))
-    );
-
-    let index_to_id: HashMap<i32, ChampionId> = HashMap::from_iter(
-        id_to_index.iter().map(|(k, v)| (v.clone(), (**k).clone()))
-    );
-
+    slot_options: &Vec<Vec<u8>>,
+    champion_traits: &HashMap<u8, Vec<u8>>
+) -> SubgraphConstraints {
     // Assign edges to champions that share traits
+    let mut grouped_by_trait = HashMap::<u8, Vec<u8>>::new();
+    for (champion, traits) in champion_traits.iter() {
+        for t in traits {
+            let cs = grouped_by_trait.entry(*t).or_insert(vec![]);
+            cs.push(*champion);
+        }
+    }
+
     let edges = HashSet::<(i32, i32)>::from_iter(
-        data.champions
-            .values()
-            .flat_map(|c|
-                c.traits.iter().flat_map(|t|
-                    data.champions_by_trait
-                        .get(t)
-                        .unwrap()
-                        .iter()
-                        .map(|other| (&c.name, other))
-                )
-            )
-            .map(|(id_1, id_2)| (
-                id_to_index.get(id_1).unwrap().clone(),
-                id_to_index.get(id_2).unwrap().clone(),
-            ))
+        grouped_by_trait.values().flat_map(|cs| {
+            // Calculate product minus dupes
+            let mut product = Vec::<(i32, i32)>::new();
+
+            for (i, c1) in cs.iter().enumerate() {
+                for c2 in cs.iter().skip(i + 1) {
+                    product.push((*c1 as i32, *c2 as i32));
+                }
+            }
+
+            return product;
+        })
     );
 
-    let n = data.champions.len() as i32;
     let mut constraints = build_subgraph_contraints(
-        n,
+        graph_size as i32,
         subgraph_size as i32,
         edges
     );
 
     let mut new_constraints = build_slot_constraints(
         slot_options,
-        &constraints,
-        id_to_index
+        &constraints
     );
 
     // Merge subgraph and slot constraints
@@ -65,12 +57,12 @@ pub fn build_champion_constraints(
     new_constraints.push(constraints.formula);
     constraints.formula = constraints.factory.and(&new_constraints);
 
-    (constraints, index_to_id)
+    constraints
 }
 
 #[derive(Debug)]
 struct ChampionSubset {
-    champions: HashSet<ChampionId>,
+    champions: HashSet<u8>,
     parent_sets: Vec<usize>,
 }
 
@@ -85,17 +77,16 @@ impl ChampionSubset {
 
 // @TODO: really need to decouple this from SubgraphConstraints / FormulaFactory for testing
 fn build_slot_constraints(
-    slot_options: Vec<Vec<ChampionId>>,
-    subgraph_constraints: &SubgraphConstraints,
-    id_to_index: HashMap<&ChampionId, i32>
+    slot_options: &Vec<Vec<u8>>,
+    subgraph_constraints: &SubgraphConstraints
 ) -> Vec<EncodedFormula> {
     log!("slot options {:?}", slot_options);
 
     let mut disjoint_subsets = Vec::<ChampionSubset>::new();
 
-    let slot_options: Vec<HashSet<String>> = slot_options
-        .into_iter()
-        .map(|opts| HashSet::from_iter(opts.into_iter()))
+    let slot_options: Vec<HashSet<u8>> = slot_options
+        .iter()
+        .map(|opts| HashSet::from_iter(opts.clone().into_iter()))
         .collect();
 
     // Group each element by the parent sets it is common to
@@ -122,7 +113,7 @@ fn build_slot_constraints(
                 &Vec::from_iter(
                     options
                         .iter()
-                        .map(|id| format!("v{}", id_to_index[id]))
+                        .map(|id| format!("v{}", id))
                         .map(|name| f.variable(name.as_str()))
                 )
             )
@@ -196,17 +187,8 @@ fn build_slot_constraints(
                 other_vars.remove(var);
             }
 
-            let lhs_vars = champion_ids_to_vars(
-                &lhs.0,
-                &f,
-                &id_to_index
-            );
-
-            let rhs_vars = champion_ids_to_vars(
-                &other_vars,
-                &f,
-                &id_to_index
-            );
+            let lhs_vars = champion_ids_to_vars(&lhs.0, &f);
+            let rhs_vars = champion_ids_to_vars(&other_vars, &f);
 
             let c = f.implication(f.and(&lhs_vars), f.or(&rhs_vars));
             // log!("{:?}", c.to_string(f));
@@ -218,12 +200,11 @@ fn build_slot_constraints(
 }
 
 fn champion_ids_to_vars(
-    ids: &HashSet<String>,
-    factory: &FormulaFactory,
-    id_to_index: &HashMap<&ChampionId, i32>
+    ids: &HashSet<u8>,
+    factory: &FormulaFactory
 ) -> Vec<EncodedFormula> {
     ids.iter()
-        .map(|id_champion| format!("v{}", id_to_index[id_champion]))
+        .map(|id_champion| format!("v{}", id_champion))
         .map(|name| factory.variable(name.as_str()))
         .collect()
 }
@@ -246,16 +227,16 @@ fn champion_ids_to_vars(
  *   }
  */
 fn find_all_products(
-    options: &HashSet<String>,
+    options: &HashSet<u8>,
     length: usize
-) -> HashSet<HashStringSet> {
+) -> HashSet<HashIntSet> {
     // Init with the options mapped to sets
     //   eg [ "a", "b", "c" ] -> { { "a" }, { "b" }, { "c" } }
     let mut iterations = vec![
         HashSet::from_iter(
             options
                 .iter()
-                .map(|s| HashStringSet::from_vec(&vec![s.clone()]))
+                .map(|s| HashIntSet::from_vec(&vec![s.clone()]))
         )
     ];
 
@@ -292,9 +273,9 @@ fn find_all_products(
  *   }
  */
 fn product(
-    source: &HashStringSet,
-    options: &HashSet<String>
-) -> HashSet<HashStringSet> {
+    source: &HashIntSet,
+    options: &HashSet<u8>
+) -> HashSet<HashIntSet> {
     HashSet::from_iter(
         options.iter().map(|opt| {
             let mut s = source.clone();

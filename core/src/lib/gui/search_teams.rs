@@ -1,18 +1,20 @@
+use std::collections::HashMap;
+
 use serde::{ Deserialize, Serialize };
 use serde_wasm_bindgen::to_value;
 use wasm_bindgen::{ prelude::wasm_bindgen, JsValue, UnwrapThrowExt };
-use crate::lib::data::{ ChampionId, GameData };
 
 use crate::console::log;
 use crate::lib::sat::{ build_champion_constraints, SubgraphSolver };
-
-use super::search_champions::{ ChampionFilter, filter_champions };
 use super::team::Team;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct SearchOptions {
     pub team_size: u8,
-    pub champions: Option<Vec<ChampionFilter>>,
+    pub num_champions: u8,
+    pub slots: Vec<Vec<u8>>,
+    pub traits: HashMap<u8, Vec<u8>>,
+
     pub debug: Option<bool>,
 }
 
@@ -22,18 +24,13 @@ pub fn search_teams(options: ISearchTeamsOptions) -> JsValue {
         ::from_value(options.into())
         .unwrap_throw();
 
-    let data = GameData::new();
+    log!("Searching for teams with options {:?}", options);
 
-    let champion_filters: Vec<Vec<ChampionId>> = options.champions
-        .unwrap_or(vec![])
-        .into_iter()
-        .map(|filter| filter_champions(filter))
-        .collect();
-
-    let (constraints, index_to_id) = build_champion_constraints(
+    let constraints = build_champion_constraints(
+        options.num_champions,
         options.team_size,
-        champion_filters,
-        &data
+        &options.slots,
+        &options.traits
     );
 
     log!("solving with {} constraints", constraints.num_constraints);
@@ -62,7 +59,7 @@ pub fn search_teams(options: ISearchTeamsOptions) -> JsValue {
     for _ in 0..20 {
         match solver.next() {
             Some(sol) => {
-                let team = Team::new(sol, &index_to_id, &data);
+                let team = Team::new(sol, &options.traits);
                 log!("{:?}", team);
                 results.push(team);
             }
