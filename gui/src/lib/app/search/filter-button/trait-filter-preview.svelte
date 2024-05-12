@@ -29,11 +29,7 @@
 <span
     class="root inline-flex flex-col justify-center items-center text-center gap-[1px]"
 >
-    <button
-        on:click
-        type="button"
-        class="h-[28px] w-[28px] relative select-none"
-    >
+    <div class="h-[28px] w-[28px] relative select-none">
         <!-- Hex icon -->
         <TraitIcon {src} />
 
@@ -49,7 +45,7 @@
                 <XIcon class="h-[6px] w-[6px]" />
             {/if}
         </div>
-    </button>
+    </div>
 </span>
 
 <style lang="postcss">

@@ -4,7 +4,10 @@
 <script lang="ts">
     import { getFilterFormContext } from '$lib/app/form-context/context'
     import ChampionPortrait from '$lib/components/champion-portrait.svelte'
+    import SpellTooltip from '$lib/components/spell-tooltip.svelte'
     import TraitIcon from '$lib/components/trait-icon.svelte'
+    import TraitTooltip from '$lib/components/trait-tooltip.svelte'
+    import * as Tooltip from '$lib/components/ui/tooltip/index.js'
     import {
         CHAMPIONS_BY_ID,
         CHAMPION_ICONS,
@@ -52,18 +55,29 @@
     {#if bannedTraits.length > 0}
         <div class="inline-flex pl-1 gap-[0.0625em]">
             {#each bannedTraits as id}
-                <div class="inline relative h-8 w-8">
-                    <TraitIcon src={TRAIT_ICONS[id]} />
+                <Tooltip.Root
+                    group="preview"
+                    openDelay={500}
+                    closeOnPointerDown={true}
+                >
+                    <Tooltip.Trigger class="cursor-default">
+                        <div class="relative h-7 w-7">
+                            <TraitIcon src={TRAIT_ICONS[id]} />
 
-                    <div
-                        class="absolute bottom-0 right-0 rounded-full bg-[#eb1a26] p-[2px]"
-                    >
-                        <XIcon
-                            class="h-[0.5em] w-[0.5em] text-foreground"
-                            stroke-width="3"
-                        />
-                    </div>
-                </div>
+                            <div
+                                class="absolute bottom-0 right-0 rounded-full bg-[#eb1a26] p-[2px]"
+                            >
+                                <XIcon
+                                    class="h-[0.5em] w-[0.5em] text-foreground"
+                                    stroke-width="3"
+                                />
+                            </div>
+                        </div>
+                    </Tooltip.Trigger>
+                    <Tooltip.Content class="spell-tooltip-container">
+                        <TraitTooltip trait_id={id} />
+                    </Tooltip.Content>
+                </Tooltip.Root>
             {/each}
         </div>
     {/if}
@@ -71,20 +85,33 @@
         <div class="inline-flex pl-1 gap-[0.5em]">
             {#each bannedChampions as id}
                 <div class="inline relative h-6 w-6">
-                    <ChampionPortrait
-                        cost={CHAMPIONS_BY_ID[id].tier}
-                        src={CHAMPION_ICONS[id]}
-                        hideInnerBorder={true}
-                    />
-
-                    <div
-                        class="champion-mark absolute rounded-full bg-[#eb1a26] p-[2px]"
+                    <Tooltip.Root
+                        group="preview"
+                        openDelay={500}
+                        closeOnPointerDown={true}
                     >
-                        <XIcon
-                            class="h-[0.5em] w-[0.5em] text-foreground"
-                            stroke-width="3"
-                        />
-                    </div>
+                        <Tooltip.Trigger class="cursor-default">
+                            <ChampionPortrait
+                                cost={CHAMPIONS_BY_ID[id].tier}
+                                src={CHAMPION_ICONS[id]}
+                                hideInnerBorder={true}
+                            />
+
+                            <div
+                                class="champion-mark absolute rounded-full bg-[#eb1a26] p-[2px]"
+                            >
+                                <XIcon
+                                    class="h-[0.5em] w-[0.5em] text-foreground"
+                                    stroke-width="3"
+                                />
+                            </div>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content
+                            class="spell-tooltip-container"
+                        >
+                            <SpellTooltip champion_id={id} />
+                        </Tooltip.Content>
+                    </Tooltip.Root>
                 </div>
             {/each}
         </div>

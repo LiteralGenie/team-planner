@@ -8,6 +8,9 @@
     import apIcon from '$lib/assets/tft/misc/statmodsabilitypowericon.png'
     import adIcon from '$lib/assets/tft/misc/statmodsattackdamageicon.png'
     import ChampionPortrait from '$lib/components/champion-portrait.svelte'
+    import SpellTooltip from '$lib/components/spell-tooltip.svelte'
+    import TraitTooltip from '$lib/components/trait-tooltip.svelte'
+    import * as Tooltip from '$lib/components/ui/tooltip/index.js'
     import { CHAMPIONS_BY_ID, CHAMPION_ICONS } from '$lib/constants'
     import CheckmarkIcon from '$lib/icons/checkmark-icon.svelte'
     import GoldIcon from '$lib/icons/gold-icon.svelte'
@@ -112,29 +115,57 @@
         {#if activeFilters.traits}
             <span>
                 {#each activeFilters.traits as { id, included }}
-                    <TraitFilterPreview
-                        trait_id={id}
-                        checked={included}
-                    />
+                    <Tooltip.Root
+                        group="preview"
+                        openDelay={500}
+                        closeOnPointerDown={true}
+                    >
+                        <Tooltip.Trigger class="cursor-default">
+                            <TraitFilterPreview
+                                trait_id={id}
+                                checked={included}
+                            />
+                        </Tooltip.Trigger>
+                        <Tooltip.Content
+                            class="spell-tooltip-container"
+                        >
+                            <TraitTooltip trait_id={id} />
+                        </Tooltip.Content>
+                    </Tooltip.Root>
                 {/each}
             </span>
         {/if}
         {#if activeFilters.champions}
             <div class="champion-grid pt-1">
                 {#each activeFilters.champions as { id }}
-                    <div class="relative">
-                        <ChampionPortrait
-                            cost={CHAMPIONS_BY_ID[id].tier}
-                            src={CHAMPION_ICONS[id]}
-                            hideInnerBorder={true}
-                        />
+                    <Tooltip.Root
+                        group="preview"
+                        openDelay={500}
+                        closeOnPointerDown={true}
+                    >
+                        <Tooltip.Trigger class="cursor-default">
+                            <div class="relative">
+                                <ChampionPortrait
+                                    cost={CHAMPIONS_BY_ID[id].tier}
+                                    src={CHAMPION_ICONS[id]}
+                                    hideInnerBorder={true}
+                                />
 
-                        <div
-                            class="mark absolute bottom-[-0px] right-[-0px] rounded-full p-[2px] text-foreground"
+                                <div
+                                    class="mark absolute bottom-[-0px] right-[-0px] rounded-full p-[2px] text-foreground"
+                                >
+                                    <CheckmarkIcon
+                                        class="h-[6px] w-[6px]"
+                                    />
+                                </div>
+                            </div>
+                        </Tooltip.Trigger>
+                        <Tooltip.Content
+                            class="spell-tooltip-container"
                         >
-                            <CheckmarkIcon class="h-[6px] w-[6px]" />
-                        </div>
-                    </div>
+                            <SpellTooltip champion_id={id} />
+                        </Tooltip.Content>
+                    </Tooltip.Root>
                 {/each}
             </div>
         {/if}
