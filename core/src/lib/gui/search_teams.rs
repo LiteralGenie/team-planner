@@ -13,7 +13,7 @@ struct SearchOptions {
     pub team_size: u8,
     pub num_champions: u8,
     pub slots: Vec<Vec<u8>>,
-    pub traits: HashMap<u8, Vec<u8>>,
+    pub traits: HashMap<u8, Vec<String>>,
 
     pub debug: Option<bool>,
 }
@@ -59,7 +59,7 @@ pub fn search_teams(options: ISearchTeamsOptions) -> JsValue {
     for _ in 0..20 {
         match solver.next() {
             Some(sol) => {
-                let team = Team::new(sol, &options.traits);
+                let team = Team::new(sol);
                 log!("{:?}", team);
                 results.push(team);
             }
@@ -76,9 +76,12 @@ pub fn search_teams(options: ISearchTeamsOptions) -> JsValue {
 const TYPES: &'static str =
     r#"
 
-interface ISearchTeamsOptions {
+export interface ISearchTeamsOptions {
     team_size: number
-    champions?: IChampionFilter[]
+    num_champions: number
+    slots: Array<number[]>
+    traits: Map<number, string[]>
+
     debug?: boolean
 }
 

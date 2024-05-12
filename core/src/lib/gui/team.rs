@@ -6,14 +6,10 @@ use wasm_bindgen::prelude::wasm_bindgen;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Team {
     pub champion_ids: Vec<u8>,
-    pub trait_counts: HashMap<u8, u16>,
 }
 
 impl Team {
-    pub fn new(
-        sat_lits: Vec<String>,
-        champion_traits: &HashMap<u8, Vec<u8>>
-    ) -> Self {
+    pub fn new(sat_lits: Vec<String>) -> Self {
         let champion_ids: Vec<u8> = sat_lits
             .iter()
             // Ignore negatives ("~v1")
@@ -22,21 +18,8 @@ impl Team {
             .map(|s| s[1..].parse::<u8>().unwrap())
             .collect();
 
-        let mut trait_counts = HashMap::new();
-        for c in champion_ids.iter() {
-            let traits = champion_traits.get(c).unwrap();
-
-            for t in traits.iter() {
-                let count = trait_counts
-                    .entry(*t)
-                    .or_insert_with(|| 0);
-                *count += 1;
-            }
-        }
-
         Self {
             champion_ids,
-            trait_counts,
         }
     }
 }
@@ -47,7 +30,6 @@ const TYPES: &'static str =
 
 interface Team {
     champion_ids: string[]
-    trait_counts: Record<string, number>    
 }
 
 "#;

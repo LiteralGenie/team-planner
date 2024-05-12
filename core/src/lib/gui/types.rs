@@ -8,9 +8,7 @@ const WINDOW: &'static str =
 declare global {
     interface Window {
         tft: {
-            search_champions: typeof SearchChampions
-            search_teams: typeof SearchTeams
-            get_data: typeof GetData
+            search_teams: SearchTeams
         }
     }
 }

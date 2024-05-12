@@ -14,13 +14,15 @@ pub fn build_champion_constraints(
     graph_size: u8,
     subgraph_size: u8,
     slot_options: &Vec<Vec<u8>>,
-    champion_traits: &HashMap<u8, Vec<u8>>
+    champion_traits: &HashMap<u8, Vec<String>>
 ) -> SubgraphConstraints {
     // Assign edges to champions that share traits
-    let mut grouped_by_trait = HashMap::<u8, Vec<u8>>::new();
+    let mut grouped_by_trait = HashMap::<String, Vec<u8>>::new();
     for (champion, traits) in champion_traits.iter() {
         for t in traits {
-            let cs = grouped_by_trait.entry(*t).or_insert(vec![]);
+            let cs = grouped_by_trait
+                .entry(t.clone())
+                .or_insert(vec![]);
             cs.push(*champion);
         }
     }
@@ -97,6 +99,14 @@ fn build_slot_constraints(
 
         merge_into_disjoint_list(new_set, &mut disjoint_subsets);
     }
+
+    // Elements that are common to all sets don't need to be constraints
+    // (this is a massive speed up)
+    disjoint_subsets = disjoint_subsets
+        .into_iter()
+        .filter(|s| s.parent_sets.len() != slot_options.len())
+        .collect();
+
     log!(
         "{} disjoint sets {:?}",
         disjoint_subsets.len(),
