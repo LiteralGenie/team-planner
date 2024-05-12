@@ -7,6 +7,8 @@
         IdFilter
     } from '$lib/app/form-context/types'
     import TraitCheckbox from '$lib/components/trait-checkbox.svelte'
+    import TraitTooltip from '$lib/components/trait-tooltip.svelte'
+    import * as Tooltip from '$lib/components/ui/tooltip/index.js'
     import type { CDragonTrait } from '$lib/constants'
     import { TRAITS_BY_ID, TRAIT_ICONS } from '$lib/constants'
     import { zip } from 'radash'
@@ -36,7 +38,7 @@
 
     function isDisabledGlobally(id_trait: string) {
         const trait = $form.global.traits.find(
-            ({ id, included }) => id === id_trait
+            ({ id }) => id === id_trait
         )!
         return !trait.included
     }
@@ -46,14 +48,27 @@
     <legend class="pb-2">Traits</legend>
 
     {#each zipped as [val, ctrl, trait]}
-        <TraitCheckbox
-            on:click={() => handleClick(val, ctrl)}
-            src={TRAIT_ICONS[val.id]}
-            label={trait.display_name}
-            value={val.included ? 'included' : null}
-            disabled={isDisabledGlobally(val.id)}
-            disabledTooltip="Disabled by global filter"
-        />
+        <Tooltip.Root
+            openDelay={100}
+            closeOnPointerDown={true}
+            portal="dialog"
+            group="trait"
+            open={true}
+        >
+            <Tooltip.Trigger>
+                <TraitCheckbox
+                    on:click={() => handleClick(val, ctrl)}
+                    src={TRAIT_ICONS[val.id]}
+                    label={trait.display_name}
+                    value={val.included ? 'included' : null}
+                    disabled={isDisabledGlobally(val.id)}
+                    disabledTooltip="Disabled by global filter"
+                />
+            </Tooltip.Trigger>
+            <Tooltip.Content class="boring-tooltip max-w-[400px]">
+                <TraitTooltip trait_id={val.id} />
+            </Tooltip.Content>
+        </Tooltip.Root>
     {/each}
 </fieldset>
 

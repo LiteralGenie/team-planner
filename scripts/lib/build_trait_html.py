@@ -63,8 +63,9 @@ def build_trait_html(trait: dict):
     html = expand_row(html, trait)
     html = interpolate(html, ctx)
 
-    html = html.replace("<row>", '<span clsas="conditional-effect">')
+    html = html.replace("<row>", '<span class="conditional-effect">')
     html = html.replace("</row>", "</span>")
+    # html = html.replace("<br>", " ")
 
     html = f'<div class="trait-tooltip">{html}</div>'
     html = sanitize(html)
