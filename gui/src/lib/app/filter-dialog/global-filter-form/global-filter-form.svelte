@@ -20,8 +20,12 @@
     </div>
 
     <div class="pt-8 flex justify-end">
-        <Button on:click={resetGlobalFilter} class="px-6">
-            Reset
+        <Button
+            variant="secondary"
+            on:click={resetGlobalFilter}
+            class="min-w-full lg:min-w-max px-6"
+        >
+            Clear
         </Button>
     </div>
 </form>

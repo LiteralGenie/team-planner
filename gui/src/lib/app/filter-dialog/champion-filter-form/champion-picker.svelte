@@ -1,7 +1,6 @@
 <script lang="ts" context="module">
     import {
         CHAMPIONS,
-        CHAMPION_ICONS,
         TRAITS_BY_ID,
         type CDragonChampion,
         type CDragonTrait
@@ -63,13 +62,15 @@
                 (c) => c.id === filter.id
             )!
 
+            const disabled = !globalFilter.included
+
             const control = $slotControls[idx]
 
             acc[filter.id] = {
                 id: filter.id,
                 control,
                 included: filter.included,
-                disabled: !globalFilter.included
+                disabled
             }
 
             return acc
@@ -155,7 +156,9 @@
 </script>
 
 <fieldset>
-    <div class="pb-5 flex items-center justify-between">
+    <div
+        class="pb-12 sm:pb-5 flex items-center justify-between gap-4"
+    >
         <div class="flex flex-col justify-center">
             <legend class="pb-1">Champions</legend>
             <p class="text-muted-foreground text-xs">
@@ -193,16 +196,15 @@
 
                 <div class="flex-grow border-l-2 champion-grid p-4">
                     {#each group.champions as c}
+                        {@const state = states[c.character_id]}
+
                         <ChampionCheckbox
                             on:click={() =>
                                 handleClick(c.character_id)}
-                            src={CHAMPION_ICONS[c.character_id]}
-                            label={c.display_name}
-                            value={states[c.character_id].included
-                                ? 'included'
-                                : null}
-                            cost={c.tier}
-                            disabled={states[c.character_id].disabled}
+                            id={c.character_id}
+                            value={state.included ? 'included' : null}
+                            disabled={state.disabled}
+                            disabledTooltip="Disabled by global filter"
                         />
                     {/each}
                 </div>

@@ -2,8 +2,8 @@ import json
 import time
 from typing import TypeAlias
 
-import requests
-from utils import (
+from lib.build_trait_html import build_trait_html
+from lib.utils import (
     DATA_DIR,
     GUI_ASSETS_DIR,
     LATEST_SET_ID,
@@ -19,7 +19,7 @@ USE_CACHED = True
 DATA_URL = "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/tfttraits.json"
 DATA_FILE = DATA_DIR / "tfttraits.json"
 
-FILTERED_DATA_FILE = GUI_ASSETS_DIR / "tft" / "tfttraits.json"
+OUTPUT_FILE = GUI_ASSETS_DIR / "tft" / "traits.json"
 
 IMAGE_DIR = GUI_ASSETS_DIR / "tft" / "traits"
 IMAGE_DIR.mkdir(parents=True, exist_ok=True)
@@ -58,16 +58,25 @@ def is_unique(trait: ITrait) -> bool:
     return any(s == "kUnique" for s in styles)
 
 
+def process_trait_data(trait: ITrait) -> dict:
+    return dict(
+        display_name=trait["display_name"],
+        trait_id=trait["trait_id"],
+        tooltip_html=build_trait_html(trait),
+    )
+
+
 def main():
     data = fetch()
 
     filtered = [d for d in data if LATEST_SET_ID in d["set"] and not is_unique(d)]
     print(f"Found {len(filtered)} traits for set {LATEST_SET_ID}")
 
-    with open(FILTERED_DATA_FILE, "w+") as file:
-        json.dump(filtered, file, indent=4)
-
     download_icons(filtered)
+
+    processed = [process_trait_data(d) for d in filtered]
+    with open(OUTPUT_FILE, "w+") as file:
+        json.dump(processed, file, indent=4)
 
 
 main()

@@ -1,12 +1,11 @@
 <script lang="ts">
-    import apIcon from '$lib/assets/tft/misc/statmodsabilitypowericon.png'
-    import adIcon from '$lib/assets/tft/misc/statmodsattackdamageicon.png'
+    import { AD_ICON, AP_ICON } from '$lib/constants'
 
     export let variant: 'ad' | 'ap'
 </script>
 
 {#if variant === 'ad'}
-    <img src={adIcon} class="h-4 w-4" />
+    <img src={AD_ICON} class="h-4 w-4" />
 {:else}
-    <img src={apIcon} class="h-4 w-4" />
+    <img src={AP_ICON} class="h-4 w-4" />
 {/if}

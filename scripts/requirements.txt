@@ -1,3 +1,5 @@
+html-sanitizer
 pillow
 requests
+tqdm
 yarl

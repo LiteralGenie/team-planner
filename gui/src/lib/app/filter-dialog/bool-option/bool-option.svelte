@@ -23,7 +23,7 @@
 
 <RadioGroup.Root
     value={String(value)}
-    class="flex items-center justify-center gap-4"
+    class="flex items-center justify-center gap-4 flex-wrap"
 >
     {#each options as opt}
         <BoolOptionItem

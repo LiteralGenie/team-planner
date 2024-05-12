@@ -1,4 +1,4 @@
-import { CHAMPIONS } from '$lib/constants'
+import { CHAMPIONS, TRAITS_BY_ID } from '$lib/constants'
 import { deepCopy, filterMap, someFalse } from '$lib/utils/misc'
 import { isArray, isObject } from 'radash'
 import { FormControl } from './form-control'
@@ -120,20 +120,40 @@ export function getActiveSlotFilters(
     return activeFilters
 }
 
+export function applyGlobalFilter(filter: GlobalFilter) {
+    const activeTraits = new Set(
+        filter.traits
+            .filter(({ included }) => included)
+            .map(({ id }) => id)
+    )
+
+    const activeCostTiers = new Set(
+        Object.entries(filter.cost)
+            .filter(([_, included]) => included)
+            .map(([cost, _]) => parseInt(cost) as CostTier)
+    )
+
+    const activeChampions = new Set(
+        filter.champions.filter((c) => c.included).map((c) => c.id)
+    )
+
+    return new Set(
+        CHAMPIONS.filter((c) =>
+            c.traits.every(
+                (t) => activeTraits.has(t.id) || !TRAITS_BY_ID[t.id]
+            )
+        )
+            .filter((c) => activeCostTiers.has(c.tier))
+            .filter((c) => activeChampions.has(c.character_id))
+            .map((c) => c.character_id)
+    )
+}
+
 export function applyAttributeFilter(
-    global: GlobalFilter,
     filter: AttributeFilter
 ): Set<String> {
     const activeTraits = new Set(
-        filter.traits
-            .filter((t) => t.included)
-            .filter((t) => {
-                const globalTrait = global.traits.find(
-                    ({ id }) => id === t.id
-                )!
-                return globalTrait.included
-            })
-            .map((t) => t.id)
+        filter.traits.filter((t) => t.included).map((t) => t.id)
     )
 
     return new Set(
@@ -161,20 +181,27 @@ export function applyAttributeFilter(
                 )
                 return isEmpty || isActive
             })
-            .filter((c) => {
-                const globalChampionFilter = global.champions.find(
-                    ({ id }) => id === c.character_id
-                )!
-                return globalChampionFilter.included
-            })
             .map((c) => c.character_id)
     )
 }
 
+export function applyAttributeFilterWithGlobal(
+    globalFilter: GlobalFilter,
+    attrFilter: AttributeFilter
+): Set<string> {
+    const byGlobal = applyGlobalFilter(globalFilter)
+    const byAttr = applyAttributeFilter(attrFilter)
+
+    // Return intersection of sets
+    return new Set(
+        Array.from(byGlobal.values()).filter((c) => byAttr.has(c))
+    )
+}
+
 export function mapRangeValueToType(value: number): RangeType {
-    if (value <= 1.0) {
+    if (value <= 1) {
         return 'close'
-    } else if (value < 3) {
+    } else if (value <= 2) {
         return 'mid'
     } else {
         return 'long'

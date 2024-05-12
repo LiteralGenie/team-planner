@@ -6,10 +6,7 @@ serialize form to / from url
 
 dialog
     different font for titles
-    tooltips
-        "disabled by global filter"
-        "champion info"
-    group champions picker by cost / trait 
+    mobile tooltips
 
 dream
     pick rate stats

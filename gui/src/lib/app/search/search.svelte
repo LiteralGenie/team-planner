@@ -1,10 +1,12 @@
 <script lang="ts">
-    import { CHAMPIONS } from '$lib/constants'
     import FilterDialog from '../filter-dialog/filter-dialog.svelte'
     import type { SlotIndex } from '../filter-dialog/slot-tabs.svelte'
     import { getFilterFormContext } from '../form-context/context'
     import type { SlotFilter } from '../form-context/types'
-    import { applyAttributeFilter } from '../form-context/utils'
+    import {
+        applyAttributeFilterWithGlobal,
+        applyGlobalFilter
+    } from '../form-context/utils'
     import FilterButton from './filter-button/filter-button.svelte'
     import FilterPreview from './filter-button/filter-preview.svelte'
     import GlobalFilterButton from './global-filter-button/global-filter-button.svelte'
@@ -24,31 +26,34 @@
         showDialog = false
     }
 
-    function slotState(slot: SlotFilter): string {
+    function getSlotState(slot: SlotFilter): string {
+        const numTotal = applyGlobalFilter($form.global).size
+
         if (slot.useAttributes) {
-            const n = applyAttributeFilter(
+            const n = applyAttributeFilterWithGlobal(
                 $form.global,
                 slot.byAttribute
             ).size
 
             if (n === 0) {
-                return 'active'
+                return 'error'
             } else if (n === 1) {
                 // showing champion icon is possible but looks janky due to how large the container is + how zoomed in the image is
                 // return matches.values().next().value
                 return 'active'
-            } else if (n === CHAMPIONS.length) {
+            } else if (n === numTotal) {
                 return 'inactive'
             } else {
                 return 'active'
             }
         } else {
-            const n = slot.byChampion.champions.length
+            const n = slot.byChampion.champions.filter(
+                (c) => c.included
+            ).length
+
             if (n === 1) {
                 // return slot.byId[0].id
                 return 'active'
-            } else if (n === CHAMPIONS.length) {
-                return 'inactive'
             } else if (n > 1) {
                 return 'active'
             } else {
@@ -74,12 +79,18 @@
                 >
                     {#each $form.slots as slot, idx}
                         <div class="cell flex gap-4 items-center">
-                            <!-- @todo: error state on no champions -->
                             <FilterButton
                                 on:click={() => handleDialogOpen(idx)}
-                                variant={slotState(slot)}
+                                variant={getSlotState(slot)}
                             />
-                            <FilterPreview {slot} />
+                            {#if getSlotState(slot) !== 'error'}
+                                <FilterPreview {slot} />
+                            {:else}
+                                <span>
+                                    No champions match the configured
+                                    filters
+                                </span>
+                            {/if}
                         </div>
                     {/each}
                 </div>

@@ -1,8 +1,12 @@
 <script lang="ts">
     import { getFilterFormContext } from '$lib/app/form-context/context'
     import type { AttributeFilter } from '$lib/app/form-context/types'
-    import { applyAttributeFilter } from '$lib/app/form-context/utils'
+    import { applyAttributeFilterWithGlobal } from '$lib/app/form-context/utils'
     import ChampionPortrait from '$lib/components/champion-portrait.svelte'
+    import SpellTooltip from '$lib/components/spell-tooltip.svelte'
+    import Button from '$lib/components/ui/button/button.svelte'
+    import * as Popover from '$lib/components/ui/popover/index.js'
+    import * as Tooltip from '$lib/components/ui/tooltip/index.js'
     import { CHAMPIONS, CHAMPION_ICONS } from '$lib/constants'
     import { sort } from 'radash'
 
@@ -10,7 +14,10 @@
 
     const { form } = getFilterFormContext()
 
-    $: activeIds = applyAttributeFilter($form.global, attributeFilter)
+    $: activeIds = applyAttributeFilterWithGlobal(
+        $form.global,
+        attributeFilter
+    )
 
     $: championsSorted = sort(
         CHAMPIONS,
@@ -19,22 +26,65 @@
     )
 </script>
 
-<div class="icon-grid">
+<div class="matches-portal icon-grid gap-2">
     {#each championsSorted as c}
         <div
             class="cell flex flex-col justify-center items-center text-center gap-[1px]"
             class:active={activeIds.has(c.character_id)}
         >
             <div class="h-12 w-12 relative select-none">
-                <ChampionPortrait
-                    src={CHAMPION_ICONS[c.character_id]}
-                    cost={c.tier}
-                />
+                <div class="hidden md:block">
+                    <Tooltip.Root
+                        group="spell"
+                        openDelay={100}
+                        closeOnPointerDown={true}
+                        portal={'dialog'}
+                    >
+                        <Tooltip.Trigger class="cursor-default">
+                            <ChampionPortrait
+                                src={CHAMPION_ICONS[c.character_id]}
+                                cost={c.tier}
+                            />
+                        </Tooltip.Trigger>
+                        <Tooltip.Content
+                            class="spell-tooltip-container"
+                        >
+                            <SpellTooltip
+                                champion_id={c.character_id}
+                            />
+                        </Tooltip.Content>
+                    </Tooltip.Root>
+                </div>
+
+                <div class="md:hidden">
+                    <ChampionPortrait
+                        src={CHAMPION_ICONS[c.character_id]}
+                        cost={c.tier}
+                    />
+                </div>
             </div>
 
             <!-- Label -->
-            <span class="text-xs whitespace-nowrap">
+            <span class="hidden md:block text-xs whitespace-nowrap">
                 {c.display_name}
+            </span>
+
+            <!-- Mobile label with popover description -->
+            <span class="md:hidden">
+                <Popover.Root portal={'dialog'}>
+                    <Popover.Trigger asChild let:builder>
+                        <Button
+                            builders={[builder]}
+                            variant="link"
+                            class="h-6 text-inherit"
+                        >
+                            {c.display_name}
+                        </Button>
+                    </Popover.Trigger>
+                    <Popover.Content class="spell-tooltip-container">
+                        <SpellTooltip champion_id={c.character_id} />
+                    </Popover.Content>
+                </Popover.Root>
             </span>
         </div>
     {/each}
@@ -46,7 +96,6 @@
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
         align-items: start;
-        gap: 6px;
     }
 
     .cell {
@@ -55,5 +104,12 @@
         &.active {
             display: flex;
         }
+    }
+
+    :global(.spell-tooltip-container) {
+        @apply w-full max-w-[500px] border-2;
+
+        background-color: hsl(var(--popover) / var(--tw-bg-opacity));
+        border-color: hsl(var(--border) / 75%);
     }
 </style>

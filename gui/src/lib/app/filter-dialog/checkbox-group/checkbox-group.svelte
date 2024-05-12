@@ -5,6 +5,8 @@
         value: boolean | Boolean
         label: string
         disabled?: boolean
+        tooltip?: string
+        tooltipPortal?: string
         suffix?: typeof SvelteComponent<any>
         suffixOpts?: any
         suffixClass?: string
@@ -16,6 +18,7 @@
 </script>
 
 <script lang="ts">
+    import ConditionalTooltip from '$lib/components/conditional-tooltip.svelte'
     import CheckboxItem from './checkbox-item.svelte'
 
     export let options: CheckboxData[]
@@ -23,7 +26,7 @@
     export let description: string = ''
 </script>
 
-<fieldset class="flex flex-col">
+<fieldset class="root flex flex-col">
     <legend class="">{label}</legend>
 
     {#if description}
@@ -35,15 +38,23 @@
     <div class="h-[6px]"></div>
 
     <div class="flex gap-6 flex-wrap">
-        {#each options as { onChange, ...props }}
-            <CheckboxItem
-                on:change={(ev) => onChange(ev.detail)}
-                id={props.label}
-                {...props}
-            />
+        {#each options as { onChange, tooltip, tooltipPortal, ...props }}
+            <ConditionalTooltip {tooltip} portal={tooltipPortal}>
+                <CheckboxItem
+                    on:change={(ev) => onChange(ev.detail)}
+                    id={props.label}
+                    {...props}
+                />
+            </ConditionalTooltip>
         {/each}
     </div>
 </fieldset>
 
 <style lang="postcss">
+    :global(.checkbox-tooltip-root) {
+        @apply border-2;
+
+        background-color: hsl(var(--popover) / var(--tw-bg-opacity));
+        border-color: hsl(var(--border) / 75%);
+    }
 </style>

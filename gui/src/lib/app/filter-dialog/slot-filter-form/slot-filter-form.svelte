@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { applyAttributeFilter } from '$lib/app/form-context/utils'
+    import { applyAttributeFilterWithGlobal } from '$lib/app/form-context/utils'
     import Button from '$lib/components/ui/button/button.svelte'
     import AlertIcon from '$lib/icons/alert-icon.svelte'
     import InfoIcon from '$lib/icons/info-icon.svelte'
@@ -31,7 +31,7 @@
     $: attributeControls = $slot.controls.byAttribute
     $: attributeValues = $form.slots[slotIndex].byAttribute
 
-    $: slotMatches = applyAttributeFilter(
+    $: slotMatches = applyAttributeFilterWithGlobal(
         $form.global,
         attributeValues
     )
@@ -58,21 +58,12 @@
     >
         <!-- Filters -->
         <div bind:this={mobileFilterScrollEl} class="filters">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1
-                        class="text-xl text-foreground font-bold mb-2"
-                    >
-                        Filters
-                    </h1>
+            <div>
+                <h1 class="text-xl text-foreground font-bold mb-2">
+                    Filters
+                </h1>
 
-                    <SlotTypeInput {slotIndex} />
-                </div>
-
-                <Button
-                    on:click={() => handleReset()}
-                    class="px-6 lg:hidden">Reset</Button
-                >
+                <SlotTypeInput {slotIndex} />
             </div>
 
             <hr class="my-6" />
@@ -146,9 +137,13 @@
             </div>
         </div>
 
-        <div class="pt-6 pr-2 col-span-2 hidden lg:flex justify-end">
-            <Button on:click={() => handleReset()} class="px-6">
-                Reset
+        <div class="pt-8 pr-2 col-span-2 flex justify-end">
+            <Button
+                variant="secondary"
+                on:click={() => handleReset()}
+                class="min-w-full lg:min-w-max px-6"
+            >
+                Clear
             </Button>
         </div>
     </div>
