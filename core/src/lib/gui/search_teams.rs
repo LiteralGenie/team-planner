@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use web_time::Instant;
 
 use serde::{ Deserialize, Serialize };
 use serde_wasm_bindgen::to_value;
@@ -20,6 +21,8 @@ struct SearchOptions {
 
 #[wasm_bindgen]
 pub fn search_teams(options: ISearchTeamsOptions) -> JsValue {
+    let start = Instant::now();
+
     let options: SearchOptions = serde_wasm_bindgen
         ::from_value(options.into())
         .unwrap_throw();
@@ -33,7 +36,11 @@ pub fn search_teams(options: ISearchTeamsOptions) -> JsValue {
         &options.traits
     );
 
-    log!("solving with {} constraints", constraints.num_constraints);
+    log!(
+        "[{}ms] Solving with {} constraints",
+        start.elapsed().as_millis(),
+        constraints.num_constraints
+    );
     if options.debug.unwrap_or(false) {
         // This takes a few seconds to run
         log!(
@@ -73,7 +80,11 @@ pub fn search_teams(options: ISearchTeamsOptions) -> JsValue {
         }
     }
 
-    log!("Returning {} teams", results.len());
+    log!(
+        "[{}ms] Returning {} teams",
+        start.elapsed().as_millis(),
+        results.len()
+    );
     to_value(&results).unwrap()
 }
 
