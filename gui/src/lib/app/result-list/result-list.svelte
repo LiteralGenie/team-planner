@@ -1,5 +1,4 @@
 <script lang="ts">
-    import loadWasm, * as tft from '$lib/assets/wasm/tft_core'
     import { TRAITS_BY_ID } from '$lib/constants'
     import { DerivedUniqueStore } from '$lib/utils/misc'
     import { sort } from 'radash'
@@ -28,13 +27,7 @@
             return []
         }
 
-        // @todo: this init-if-not-ssr logic should be higher in the render tree
-        if (window.tft === undefined) {
-            await loadWasm()
-            window.tft = tft
-        }
-
-        const results = doSearch(form)
+        const results = await doSearch(form)
 
         // @todo: control result count from gui
         return results.slice(0, 100)

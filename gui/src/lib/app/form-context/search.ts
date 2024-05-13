@@ -34,7 +34,9 @@ function getSlotOptions(form: FilterForm): Array<string[]> {
     return slots
 }
 
-export function doSearch(form: FilterForm): string[][] {
+export async function doSearch(
+    form: FilterForm
+): Promise<string[][]> {
     const slotOptions = getSlotOptions(form)
 
     const allChampions: Set<string> = new Set()
@@ -80,7 +82,11 @@ export function doSearch(form: FilterForm): string[][] {
     }
 
     console.log('Searching with options', options)
-    const teams = window.tft.search_teams(options)
+
+    // @todo: override wasm_bindgen types
+    await wasm_bindgen()
+    const { search_teams } = wasm_bindgen
+    const teams = search_teams(options as any) as any
 
     const var_to_champion = invert(champion_to_var)
     const remapped = teams.map(({ champion_ids }) =>
