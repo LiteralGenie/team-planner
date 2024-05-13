@@ -3,7 +3,7 @@ import {
     CHAMPIONS_BY_ID,
     TRAITS_BY_ID,
     type CDragonTrait,
-    type TraitLevel
+    type CDragonTraitLevel
 } from '$lib/constants'
 import { deepCopy, filterMap, someFalse } from '$lib/utils/misc'
 import { isArray, isObject } from 'radash'
@@ -219,14 +219,18 @@ export function serializeFilterForm(form: FilterForm): string {
     return 'lmoa'
 }
 
+export type TraitLevel = CDragonTraitLevel & {
+    levelIdx: number
+}
+
 export function getTraitLevel(
     unitCount: number,
     trait: CDragonTrait
 ): TraitLevel | null {
     let traitLevel: TraitLevel | null = null
-    for (let level of trait.levels) {
+    for (let [levelIdx, level] of trait.levels.entries()) {
         if (unitCount > level.min_units) {
-            traitLevel = level
+            traitLevel = { ...level, levelIdx }
         } else {
             break
         }

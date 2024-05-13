@@ -3,13 +3,15 @@
 
 <script lang="ts">
     import ChampionPortrait from '$lib/components/champion-portrait.svelte'
+    import SpellTooltip from '$lib/components/spell-tooltip.svelte'
     import TraitIcon from '$lib/components/trait-icon.svelte'
+    import TraitTooltip from '$lib/components/trait-tooltip.svelte'
+    import * as Tooltip from '$lib/components/ui/tooltip/index.js'
+    import { CHAMPIONS_BY_ID, TRAITS_BY_ID } from '$lib/constants'
     import {
-        CHAMPIONS_BY_ID,
-        TRAITS_BY_ID,
+        getTraitLevel,
         type TraitLevel
-    } from '$lib/constants'
-    import { getTraitLevel } from '../form-context/utils'
+    } from '../form-context/utils'
 
     export let ids: string[]
 
@@ -80,7 +82,19 @@
     <div class="flex justify-start gap-2">
         {#each ids as id}
             <span class="h-12 w-12">
-                <ChampionPortrait {id} />
+                <Tooltip.Root
+                    group="spell"
+                    openDelay={100}
+                    closeOnPointerDown={true}
+                    disableHoverableContent={true}
+                >
+                    <Tooltip.Trigger class="cursor-default">
+                        <ChampionPortrait {id} />
+                    </Tooltip.Trigger>
+                    <Tooltip.Content class="spell-tooltip-container">
+                        <SpellTooltip champion_id={id} />
+                    </Tooltip.Content>
+                </Tooltip.Root>
             </span>
         {/each}
     </div>
@@ -92,12 +106,29 @@
                 class:inactive={level === null}
                 class="inline-flex gap-0 justify-center items-center"
             >
-                <div class="icon h-[2.5em] w-[2.5em]">
-                    <TraitIcon
-                        id={trait.trait_id}
-                        style={level?.style_name}
-                        variant="md"
-                    />
+                <div class="icon">
+                    <Tooltip.Root
+                        openDelay={100}
+                        closeOnPointerDown={true}
+                        group="trait"
+                        disableHoverableContent={true}
+                    >
+                        <Tooltip.Trigger class="h-[2.5em] w-[2.5em]">
+                            <TraitIcon
+                                id={trait.trait_id}
+                                style={level?.style_name}
+                                variant="md"
+                            />
+                        </Tooltip.Trigger>
+                        <Tooltip.Content
+                            class="boring-tooltip max-w-[400px]"
+                        >
+                            <TraitTooltip
+                                trait_id={trait.trait_id}
+                                traitLevelIdx={level?.levelIdx}
+                            />
+                        </Tooltip.Content>
+                    </Tooltip.Root>
                 </div>
 
                 <span

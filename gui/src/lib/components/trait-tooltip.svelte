@@ -11,6 +11,7 @@
     import ChampionPortrait from './champion-portrait.svelte'
 
     export let trait_id: string
+    export let traitLevelIdx: number | null = null
 
     $: trait = TRAITS_BY_ID[trait_id]
     $: iconSrc = TRAIT_ICONS[trait_id]
@@ -19,9 +20,20 @@
         `src="${iconSrc}"`
     )
     $: others = CHAMPIONS_BY_TRAIT[trait_id]
+
+    let rootEl: HTMLElement
+
+    $: {
+        if (rootEl && traitLevelIdx !== null) {
+            const rowEls = [
+                ...rootEl.querySelectorAll('.conditional-effect')
+            ]
+            rowEls[traitLevelIdx]?.classList.add('active')
+        }
+    }
 </script>
 
-<div class="root">
+<div bind:this={rootEl} class="root">
     <h1 class="text-base font-bold pb-1">{trait.display_name}</h1>
 
     {@html html}
@@ -59,5 +71,8 @@
         @apply block;
 
         color: hsl(var(--muted-foreground));
+    }
+    .root :global(.conditional-effect.active) {
+        color: hsl(var(--foreground));
     }
 </style>

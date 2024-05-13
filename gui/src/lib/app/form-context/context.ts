@@ -1,4 +1,3 @@
-import { replaceState } from '$app/navigation'
 import { deepCopy } from '$lib/utils/misc'
 import { objectify } from 'radash'
 import { getContext, setContext } from 'svelte'
@@ -114,7 +113,7 @@ export function setFilterFormContext(initValue: FilterForm) {
             'query',
             serializeFilterForm(formData)
         )
-        replaceState(update, {})
+        // replaceState(update, {})
     }
 
     function destroy() {

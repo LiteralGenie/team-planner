@@ -136,7 +136,7 @@ export const CHAMPIONS_BY_TRAIT = CHAMPIONS.reduce(
     {} as Record<string, CDragonChampion[]>
 )
 
-export interface TraitLevel {
+export interface CDragonTraitLevel {
     min_units: number
     style_name: 'kBronze' | 'kSilver' | 'kGold' | 'kChromatic'
 }
@@ -145,7 +145,7 @@ export interface CDragonTrait {
     display_name: string
     trait_id: string
     tooltip_html: string
-    levels: Array<TraitLevel>
+    levels: Array<CDragonTraitLevel>
 }
 
 export interface CDragonChampion {
