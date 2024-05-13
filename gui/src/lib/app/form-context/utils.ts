@@ -1,5 +1,6 @@
 import {
     CHAMPIONS,
+    CHAMPIONS_BY_ID,
     TRAITS_BY_ID,
     type CDragonTrait,
     type TraitLevel
@@ -232,4 +233,26 @@ export function getTraitLevel(
     }
 
     return traitLevel
+}
+
+export function tallyTraits(
+    champions: string[]
+): Record<string, number> {
+    return champions
+        .map((id) => CHAMPIONS_BY_ID[id])
+        .reduce(
+            (acc, c) => {
+                for (let trait of c.traits) {
+                    if (!TRAITS_BY_ID[trait.id]) {
+                        continue
+                    }
+
+                    acc[trait.id] = acc[trait.id] || 0
+                    acc[trait.id] += 1
+                }
+
+                return acc
+            },
+            {} as Record<string, number>
+        )
 }

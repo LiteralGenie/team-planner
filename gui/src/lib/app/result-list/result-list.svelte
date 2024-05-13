@@ -1,11 +1,13 @@
 <script lang="ts">
     import loadWasm, * as tft from '$lib/assets/wasm/tft_core'
+    import { TRAITS_BY_ID } from '$lib/constants'
     import { DerivedUniqueStore } from '$lib/utils/misc'
-    import { shuffle } from 'radash'
+    import { sort } from 'radash'
     import { onMount } from 'svelte'
     import { getFilterFormContext } from '../form-context/context'
     import { doSearch } from '../form-context/search'
     import type { FilterForm } from '../form-context/types'
+    import { getTraitLevel, tallyTraits } from '../form-context/utils'
     import ResultItem from './result-item.svelte'
 
     const { formInitial } = getFilterFormContext()
@@ -34,9 +36,49 @@
 
         const results = doSearch(form)
 
-        // @todo: rust should be randomizing this
         // @todo: control result count from gui
-        return shuffle(results).slice(0, 40)
+        return results
+    }
+
+    function sortResults(results: string[][]): string[][] {
+        return sort(results, (cs) => scoreTeam(cs), true)
+
+        function scoreTeam(champions: string[]) {
+            const traitCounts = tallyTraits(champions)
+
+            let score = 0
+
+            for (let x of Object.entries(traitCounts)) {
+                const [traitId, count] = x
+                const level = getTraitLevel(
+                    count,
+                    TRAITS_BY_ID[traitId]
+                )
+
+                switch (level?.style_name) {
+                    case undefined:
+                        score += 0
+                        break
+                    case 'kBronze':
+                        score += 1
+                        break
+                    case 'kSilver':
+                        score += 2
+                        break
+                    case 'kGold':
+                        score += 3
+                        break
+                    case 'kChromatic':
+                        score += 4
+                        break
+                    default:
+                        console.error('Invalid trait level', level)
+                        throw Error()
+                }
+            }
+
+            return score
+        }
     }
 </script>
 
@@ -48,7 +90,7 @@
         <!-- <h1 class="pb-4 text-xl font-bold">Matches</h1> -->
 
         <div class="flex flex-col gap-4">
-            {#each results as ids}
+            {#each sortResults(results) as ids}
                 <ResultItem {ids} />
             {/each}
         </div>

@@ -32,16 +32,18 @@
         Object.entries(traitCounts),
         ([_, count]) => count,
         true
-    ).map(([id, count]) => {
-        const trait = TRAITS_BY_ID[id]
-        const level = getTraitLevel(count, trait)
+    )
+        .map(([id, count]) => {
+            const trait = TRAITS_BY_ID[id]
+            const level = getTraitLevel(count, trait)
 
-        return {
-            trait,
-            level,
-            count
-        }
-    })
+            return {
+                trait,
+                level,
+                count
+            }
+        })
+        .filter(({ count }) => count > 1)
 </script>
 
 <div class="card flex justify-between">
@@ -58,9 +60,10 @@
     <div class="flex gap-4">
         {#each traits as { trait, level, count }}
             <span
+                class:inactive={level === null}
                 class="inline-flex gap-0 justify-center items-center"
             >
-                <div class="h-9 w-9">
+                <div class="icon h-[2.5em] w-[2.5em]">
                     <TraitIcon
                         id={trait.trait_id}
                         style={level?.style_name}
@@ -69,7 +72,7 @@
                 </div>
 
                 <span
-                    class="w-6 h-5 text-xs border-2 border-l-0 text-center"
+                    class="label w-6 text-xs flex justify-center items-center"
                 >
                     {count}
                 </span>
@@ -83,5 +86,25 @@
         @apply p-4 rounded-sm;
 
         background-color: hsl(var(--card) / 60%);
+    }
+
+    .label {
+        border-width: 1.5px;
+        border-left: none;
+        border-color: #6b6d6b;
+        height: 1.55em;
+        width: 2em;
+    }
+
+    .icon :global(.outline-layer) {
+        padding-right: 0;
+    }
+
+    .inactive {
+        display: none;
+
+        @media screen(lg) {
+            display: flex;
+        }
     }
 </style>

@@ -35,7 +35,9 @@
         portal={'dialog'}
         disableHoverableContent={true}
     >
-        <Tooltip.Trigger class="cursor-default">
+        <Tooltip.Trigger
+            class="cursor-default flex flex-col gap-1 items-center justify-center"
+        >
             <button
                 {disabled}
                 on:click
