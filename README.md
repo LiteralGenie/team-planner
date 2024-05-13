@@ -13,7 +13,7 @@ After downloading any neccessary dependencies / assets (which may a take a few m
 
 Make sure [Rust](https://www.rust-lang.org/tools/install), [Node.js](https://github.com/nvm-sh/nvm), and [Python 3.10+](https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa) are installed.
 
-Then download the TFT metadata / assets from CDragon.
+Then download the TFT metadata / assets from [CDragon](https://www.communitydragon.org/).
 ```bash
 cd scripts
 ./venv/bin/python -m pip install -r requirements.txt
