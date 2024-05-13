@@ -33,5 +33,6 @@ cd ..
 And finally, run the web gui.
 ```bash
 cd gui
+npm install
 npm run dev
 ```
