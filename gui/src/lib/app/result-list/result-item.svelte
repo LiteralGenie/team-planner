@@ -4,8 +4,11 @@
 <script lang="ts">
     import ChampionPortrait from '$lib/components/champion-portrait.svelte'
     import TraitIcon from '$lib/components/trait-icon.svelte'
-    import { CHAMPIONS_BY_ID, TRAITS_BY_ID } from '$lib/constants'
-    import { sort } from 'radash'
+    import {
+        CHAMPIONS_BY_ID,
+        TRAITS_BY_ID,
+        type TraitLevel
+    } from '$lib/constants'
     import { getTraitLevel } from '../form-context/utils'
 
     export let ids: string[]
@@ -28,11 +31,7 @@
             {} as Record<string, number>
         )
 
-    $: traits = sort(
-        Object.entries(traitCounts),
-        ([_, count]) => count,
-        true
-    )
+    $: traits = Object.entries(traitCounts)
         .map(([id, count]) => {
             const trait = TRAITS_BY_ID[id]
             const level = getTraitLevel(count, trait)
@@ -44,6 +43,36 @@
             }
         })
         .filter(({ count }) => count > 1)
+        .sort((left, right) => {
+            const lvlDiff =
+                scoreTraitLevel(left.level) -
+                scoreTraitLevel(right.level)
+            if (lvlDiff) {
+                return lvlDiff
+            }
+
+            const countDiff = left.count - right.count
+            return countDiff
+        })
+        .reverse()
+
+    function scoreTraitLevel(level: TraitLevel | null): number {
+        switch (level?.style_name) {
+            case undefined:
+                return 0
+            case 'kBronze':
+                return 1
+            case 'kSilver':
+                return 2
+            case 'kGold':
+                return 3
+            case 'kChromatic':
+                return 4
+            default:
+                console.error('Invalid trait level', level)
+                throw Error()
+        }
+    }
 </script>
 
 <div class="card flex justify-between">

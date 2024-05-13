@@ -37,7 +37,7 @@
         const results = doSearch(form)
 
         // @todo: control result count from gui
-        return results
+        return results.slice(0, 100)
     }
 
     function sortResults(results: string[][]): string[][] {

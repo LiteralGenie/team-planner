@@ -98,7 +98,9 @@
             bind:this={mobilePreviewScrollEl}
             class="preview min-h-48 flex flex-col"
         >
-            <h1 class="pb-1 text-xl font-bold">Slot Preview</h1>
+            <h1 class="pb-1 text-xl font-bold">
+                Slot #{slotIndex + 1} Preview
+            </h1>
 
             <p class="text-muted-foreground text-xs pb-3">
                 Only teams containing at least one of these champions

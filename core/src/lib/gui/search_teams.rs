@@ -63,7 +63,7 @@ pub fn search_teams(options: ISearchTeamsOptions) -> JsValue {
     //        Or do we have to manually serialize the SAT stuff
     //           (by converting to a formula string or something)
     let mut results: Vec<Team> = vec![];
-    for _ in 0..50 {
+    for _ in 0..1000 {
         match solver.next() {
             Some(sol) => {
                 let team = Team::new(sol);
