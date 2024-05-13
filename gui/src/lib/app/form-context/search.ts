@@ -3,6 +3,8 @@ import { applyAttributeFilterWithGlobal } from '$lib/app/form-context/utils'
 import { CHAMPIONS_BY_ID } from '$lib/constants'
 import { invert, range } from 'radash'
 
+const worker = new Worker('worker.js')
+
 function getSlotOptions(form: FilterForm): Array<string[]> {
     const slots: Array<string[]> = []
 
@@ -34,9 +36,7 @@ function getSlotOptions(form: FilterForm): Array<string[]> {
     return slots
 }
 
-export async function doSearch(
-    form: FilterForm
-): Promise<string[][]> {
+export function setSearchOptions(form: FilterForm) {
     const slotOptions = getSlotOptions(form)
 
     const allChampions: Set<string> = new Set()
@@ -58,6 +58,8 @@ export async function doSearch(
         },
         {} as Record<string, number>
     )
+
+    const var_to_champion = invert(champion_to_var)
 
     const slots = slotOptions.map((cs) =>
         cs.map((c) => champion_to_var[c])
@@ -81,17 +83,21 @@ export async function doSearch(
         traits
     }
 
-    console.log('Searching with options', options)
+    worker.postMessage({
+        type: 'setOptions',
+        options,
+        var_to_champion
+    })
+}
 
-    // @todo: override wasm_bindgen types
-    await wasm_bindgen()
-    const { search_teams } = wasm_bindgen
-    const teams = search_teams(options as any) as any
+export async function getSearchResult(): Promise<string[] | null> {
+    worker.postMessage({
+        type: 'nextSolution'
+    })
 
-    const var_to_champion = invert(champion_to_var)
-    const remapped = teams.map(({ champion_ids }) =>
-        champion_ids.map((v) => var_to_champion[v])
-    )
-
-    return remapped
+    return new Promise((resolve) => {
+        worker.onmessage = (ev) => {
+            resolve(ev.data)
+        }
+    })
 }

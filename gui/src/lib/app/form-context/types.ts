@@ -2,6 +2,12 @@ import type { FormControl } from './form-control'
 import type { FormControlArray } from './form-control-array'
 import type { FormControlRecord } from './form-control-record'
 
+declare global {
+    interface Window {
+        worker: Worker
+    }
+}
+
 export interface FormInput {
     value: string
     addEventListener: (

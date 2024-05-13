@@ -1,11 +1,6 @@
 declare namespace wasm_bindgen {
 	/* tslint:disable */
 	/* eslint-disable */
-	/**
-	* @param {ISearchTeamsOptions} options
-	* @returns {any}
-	*/
-	export function search_teams(options: ISearchTeamsOptions): any;
 	
 	
 	export interface ISearchTeamsOptions {
@@ -17,9 +12,6 @@ declare namespace wasm_bindgen {
 	    debug?: boolean
 	}
 	
-	export type SearchTeams = (options: ISearchTeamsOptions) => Team[]
-	
-	
 	
 	
 	
@@ -29,6 +21,23 @@ declare namespace wasm_bindgen {
 	
 	
 	
+	/**
+	*/
+	export class TeamFinder {
+	  free(): void;
+	/**
+	* @returns {TeamFinder}
+	*/
+	  static new(): TeamFinder;
+	/**
+	* @param {any} options
+	*/
+	  reset(options: any): void;
+	/**
+	* @returns {any}
+	*/
+	  next(): any;
+	}
 	
 }
 
@@ -36,7 +45,10 @@ declare type InitInput = RequestInfo | URL | Response | BufferSource | WebAssemb
 
 declare interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly search_teams: (a: number) => number;
+  readonly __wbg_teamfinder_free: (a: number) => void;
+  readonly teamfinder_new: () => number;
+  readonly teamfinder_reset: (a: number, b: number) => void;
+  readonly teamfinder_next: (a: number) => number;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_exn_store: (a: number) => void;

@@ -1,10 +1,13 @@
 <script lang="ts">
     import { TRAITS_BY_ID } from '$lib/constants'
     import { DerivedUniqueStore } from '$lib/utils/misc'
-    import { sort } from 'radash'
+    import { range, sort } from 'radash'
     import { onMount } from 'svelte'
     import { getFilterFormContext } from '../form-context/context'
-    import { doSearch } from '../form-context/search'
+    import {
+        getSearchResult as fetchSearchResult,
+        setSearchOptions
+    } from '../form-context/search'
     import type { FilterForm } from '../form-context/types'
     import { getTraitLevel, tallyTraits } from '../form-context/utils'
     import ResultItem from './result-item.svelte'
@@ -27,10 +30,20 @@
             return []
         }
 
-        const results = await doSearch(form)
+        console.log('setting', form)
+        setSearchOptions(form)
 
-        // @todo: control result count from gui
-        return results.slice(0, 100)
+        const results: string[][] = []
+        for (let _ of range(1000 - 1)) {
+            const r = await fetchSearchResult()
+            if (!r) {
+                break
+            }
+
+            results.push(r)
+        }
+
+        return results
     }
 
     function sortResults(results: string[][]): string[][] {
@@ -83,7 +96,7 @@
         <!-- <h1 class="pb-4 text-xl font-bold">Matches</h1> -->
 
         <div class="flex flex-col gap-4">
-            {#each sortResults(results) as ids}
+            {#each sortResults(results).slice(100) as ids}
                 <ResultItem {ids} />
             {/each}
         </div>
