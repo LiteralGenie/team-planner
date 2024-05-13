@@ -60,7 +60,11 @@ pub fn search_teams(options: ISearchTeamsOptions) -> JsValue {
         match solver.next() {
             Some(sol) => {
                 let team = Team::new(sol);
-                log!("{:?}", team);
+
+                if options.debug.unwrap_or(false) {
+                    log!("{:?}", team);
+                }
+
                 results.push(team);
             }
             None => {
@@ -69,6 +73,7 @@ pub fn search_teams(options: ISearchTeamsOptions) -> JsValue {
         }
     }
 
+    log!("Returning {} teams", results.len());
     to_value(&results).unwrap()
 }
 

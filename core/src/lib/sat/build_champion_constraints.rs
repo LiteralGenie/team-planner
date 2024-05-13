@@ -1,6 +1,7 @@
 use std::{ collections::{ HashMap, HashSet } };
 
 use logicng::formulas::{ EncodedFormula, FormulaFactory };
+use itertools::Itertools;
 
 use crate::console::log;
 
@@ -89,6 +90,7 @@ fn build_slot_constraints(
     let slot_options: Vec<HashSet<u8>> = slot_options
         .iter()
         .map(|opts| HashSet::from_iter(opts.clone().into_iter()))
+        // @todo: can this optimization be generalized?
         // Slots that contain all champions don't need to be constraints
         .filter(
             |opts|
@@ -105,12 +107,6 @@ fn build_slot_constraints(
 
         merge_into_disjoint_list(new_set, &mut disjoint_subsets);
     }
-
-    // Elements that are common to all sets don't need to be constraints
-    disjoint_subsets = disjoint_subsets
-        .into_iter()
-        .filter(|s| s.parent_sets.len() != slot_options.len())
-        .collect();
 
     log!(
         "{} disjoint sets {:?}",
@@ -138,38 +134,27 @@ fn build_slot_constraints(
     // A single champion cannot fill multiple slots
     //
     // For example, if we have two sets of slot options with common options
-    //   A = { 1, 2 }
-    //   B = { 1, 3 }
+    //   A = { 1, 2, 3 }
+    //   B = { 1, 4, 5 }
     //
     // Then the at-least-one constraints from above are
-    //   (1|2) & (1|3)
+    //   (1|2|3) & (1|4|5)
     //
-    // So 1,3 is a valid solution, but so is 1
-    // To force the solution to have two elements, we add the additional constraint
-    //   1 => 3|4     "If one is in the solution, so is 3 or 4"
+    // So (1,3) is a valid solution, but so is (1,_)
+    // To force the solution to have another element from one of the slots, we add the additional constraint
+    //   1 => (2|3) | (4|5)
     //
     // If we have three sets of slot options
-    //   A = { 1, 2 }
-    //   B = { 1, 3 }
-    //   C = { 1, 4 }
+    //   A = { 1, 2, 3 }
+    //   B = { 1, 2, 4 }
+    //   C = { 1, 2, 5 }
     //
-    // Then to prevent the length-1 solution, we need to add
-    //   1      =>  2|3|4    "prevents 1"
+    // Then to prevent (1,_,_) and (2,_,_), we need to add
+    //   1      =>  ((2|3) & (2|4)) | ((2|4) & (2|5))
+    //   2      =>  ((1|3) & (1|4)) | ((1|4) & (1|5))
+    //   1 & 2  =>  3 | 4 | 5
     //
-    // And to prevent length-2 solutions, we need to add
-    //   1 & 2  =>  3|4      "prevents 1,2"
-    //   1 & 3  =>  2|4      "prevents 1,3"
-    //
-    // Generalizing this to elements common to all sets in { S_0, S_1, S_2, ..., S_k },
-    // means adding these constraints
-    //   x_0        =>  x_other in { S_other - x_0 }
-    //   x_0, x_1   =>  x_other in { S_other - x_0 - x_1 }
-    //   ...
-    //   x_0, ..., x_k-1 => x_other in (S_other - x_0 - ... x_k-1)
-    // for every combination of (x_0, ..., x_k) in the common set
-    // where
-    //   S_other = (S_0 union S_1 union S_2 ...)
-    //   S_other - x_k = "all elements in S_other except for x_k"
+    // @todo finish explanation
     for set in disjoint_subsets {
         let n_parents = set.parent_sets.len();
         if n_parents <= 1 {
@@ -183,12 +168,6 @@ fn build_slot_constraints(
             )
         );
 
-        let mut union_of_parents = HashSet::new();
-        for idx in set.parent_sets {
-            let parent = slot_options[idx].clone();
-            union_of_parents.extend(parent);
-        }
-
         log!(
             "appending {} dedupe constraints involving {} champions from {} sets: {:?}",
             combinations.len(),
@@ -197,16 +176,42 @@ fn build_slot_constraints(
             set.champions
         );
         for lhs in combinations.iter() {
-            let mut other_vars = union_of_parents.clone();
-            for var in lhs.0.iter() {
-                other_vars.remove(var);
+            let lhs_vars = champion_ids_to_vars(&lhs.0, &f);
+
+            let mut parents_minus_lhs = vec![];
+            for idx in set.parent_sets.iter() {
+                let mut set = slot_options[*idx].clone();
+                for var in lhs.0.iter() {
+                    set.remove(var);
+                }
+
+                parents_minus_lhs.push(set);
             }
 
-            let lhs_vars = champion_ids_to_vars(&lhs.0, &f);
-            let rhs_vars = champion_ids_to_vars(&other_vars, &f);
+            let num_parents_true = n_parents - lhs.0.len();
+            let rhs_vars = Vec::from_iter(
+                parents_minus_lhs
+                    .iter()
+                    .combinations(num_parents_true)
+                    .map(|parents| {
+                        let parent_formulas = Vec::from_iter(
+                            parents
+                                .iter()
+                                .map(|set|
+                                    f.or(
+                                        &champion_ids_to_vars(
+                                            &set,
+                                            &f
+                                        )
+                                    )
+                                )
+                        );
+
+                        f.and(&parent_formulas)
+                    })
+            );
 
             let c = f.implication(f.and(&lhs_vars), f.or(&rhs_vars));
-            // log!("{:?}", c.to_string(f));
             constraints.push(c);
         }
     }
