@@ -9,6 +9,7 @@ import as_icon from '$lib/assets/tft/misc/statmodsattackspeedicon.png'
 import health_icon from '$lib/assets/tft/misc/statmodshealthscalingicon.png'
 import resist_icon from '$lib/assets/tft/misc/statmodsmagicresicon.png'
 import ALL_TRAITS from '$lib/assets/tft/traits.json'
+import { objectifyGlobImports } from '$lib/utils/misc'
 import { alphabetical, group, objectify, sort } from 'radash'
 
 export const AP_ICON = ap_icon
@@ -38,43 +39,19 @@ function sortChampions(champions: CDragonChampion[]) {
         .flatMap((cs) => cs)
 }
 
-const trait_icon_files = import.meta.glob(
-    '$lib/assets/tft/traits/*.png',
-    {
-        eager: true
-    }
-)
+export const TRAIT_ICONS: Record<string, string> =
+    objectifyGlobImports(
+        import.meta.glob('$lib/assets/tft/traits/*.png', {
+            eager: true
+        })
+    )
 
-export const TRAIT_ICONS: Record<string, string> = objectify(
-    Array.from(Object.keys(trait_icon_files)),
-    // Trait ID as key (ie filename minus extension)
-    (path: string) => {
-        const name = path.split('/').slice(-1)[0]
-        const stem = name.split('.')[0]
-        return stem
-    },
-    // Path as value
-    (path) => path
-)
-
-const ability_icon_files = import.meta.glob(
-    '$lib/assets/tft/abilities/*.png',
-    {
-        eager: true
-    }
-)
-
-export const ABILITY_ICONS: Record<string, string> = objectify(
-    Array.from(Object.keys(ability_icon_files)),
-    // Trait ID as key (ie filename minus extension)
-    (path: string) => {
-        const name = path.split('/').slice(-1)[0]
-        const stem = name.split('.')[0]
-        return stem
-    },
-    // Path as value
-    (path) => path
-)
+export const ABILITY_ICONS: Record<string, string> =
+    objectifyGlobImports(
+        import.meta.glob('$lib/assets/tft/abilities/*.png', {
+            eager: true
+        })
+    )
 
 export const TRAITS_BY_ID = objectify(
     TRAITS,
@@ -82,23 +59,12 @@ export const TRAITS_BY_ID = objectify(
     (t) => t
 ) satisfies Record<string, CDragonTrait>
 
-const champion_icon_files = import.meta.glob(
-    '$lib/assets/tft/champions/*',
-    {
-        eager: true
-    }
-)
-export const CHAMPION_ICONS: Record<string, string> = objectify(
-    Array.from(Object.keys(champion_icon_files)),
-    // Trait ID as key (ie filename minus extension)
-    (path: string) => {
-        const name = path.split('/').slice(-1)[0]
-        const stem = name.split('.')[0]
-        return stem
-    },
-    // Path as value
-    (path) => path
-)
+export const CHAMPION_ICONS: Record<string, string> =
+    objectifyGlobImports(
+        import.meta.glob('$lib/assets/tft/champions/*', {
+            eager: true
+        })
+    )
 
 const champion_splash_files = import.meta.glob(
     '$lib/assets/tft/champion_splashes/*',
