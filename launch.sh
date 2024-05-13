@@ -13,7 +13,7 @@ cd ..
 
 # Download assets / data from CDragon
 cd scripts
-if [ -d ./ ]; then
+if [ ! -d ./venv ]; then
   python3 -m venv venv
 fi
 ./venv/bin/python -m pip install -r requirements.txt
