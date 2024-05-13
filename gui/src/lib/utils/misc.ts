@@ -1,4 +1,4 @@
-import { isEqual } from 'radash'
+import { isEqual, objectify } from 'radash'
 import type { Readable, Subscriber, Unsubscriber } from 'svelte/store'
 
 const UNINITIALIZED = Symbol('UNITIALIZED')
@@ -59,4 +59,18 @@ export function filterMap<V, T>(xs: T[], filter: (x: T) => V | null) {
     const mapped = xs.map((x) => filter(x))
     const filtered = mapped.filter((x) => x !== null)
     return filtered as V[]
+}
+
+export function objectifyGlobImports(imports: Record<string, any>) {
+    return objectify(
+        Object.entries(imports),
+        // File name minus extension as key
+        ([path, val]: [string, any]) => {
+            const name = path.split('/').slice(-1)[0]
+            const stem = name.split('.')[0]
+            return stem
+        },
+        // Path as value
+        ([path, val]: [string, any]) => val.default
+    )
 }
