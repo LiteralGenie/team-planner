@@ -1,4 +1,9 @@
-import { CHAMPIONS, TRAITS_BY_ID } from '$lib/constants'
+import {
+    CHAMPIONS,
+    TRAITS_BY_ID,
+    type CDragonTrait,
+    type TraitLevel
+} from '$lib/constants'
 import { deepCopy, filterMap, someFalse } from '$lib/utils/misc'
 import { isArray, isObject } from 'radash'
 import { FormControl } from './form-control'
@@ -211,4 +216,20 @@ export function mapRangeValueToType(value: number): RangeType {
 
 export function serializeFilterForm(form: FilterForm): string {
     return 'lmoa'
+}
+
+export function getTraitLevel(
+    unitCount: number,
+    trait: CDragonTrait
+): TraitLevel | null {
+    let traitLevel: TraitLevel | null = null
+    for (let level of trait.levels) {
+        if (unitCount > level.min_units) {
+            traitLevel = level
+        } else {
+            break
+        }
+    }
+
+    return traitLevel
 }

@@ -79,7 +79,7 @@ export const ABILITY_ICONS: Record<string, string> = objectify(
 export const TRAITS_BY_ID = objectify(
     TRAITS,
     (t) => t.trait_id,
-    (t) => t
+    (t) => t as CDragonTrait
 ) satisfies Record<string, CDragonTrait>
 
 const champion_icon_files = import.meta.glob(
@@ -136,10 +136,16 @@ export const CHAMPIONS_BY_TRAIT = CHAMPIONS.reduce(
     {} as Record<string, CDragonChampion[]>
 )
 
+export interface TraitLevel {
+    min_units: number
+    style_name: 'kBronze' | 'kSilver' | 'kGold' | 'kChromatic'
+}
+
 export interface CDragonTrait {
     display_name: string
     trait_id: string
     tooltip_html: string
+    levels: Array<TraitLevel>
 }
 
 export interface CDragonChampion {

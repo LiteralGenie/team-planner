@@ -1,6 +1,6 @@
 import type { FilterForm } from '$lib/app/form-context/types'
 import { applyAttributeFilterWithGlobal } from '$lib/app/form-context/utils'
-import { CHAMPIONS } from '$lib/constants'
+import { CHAMPIONS_BY_ID } from '$lib/constants'
 import { invert, range } from 'radash'
 
 function getSlotOptions(form: FilterForm): Array<string[]> {
@@ -35,25 +35,42 @@ function getSlotOptions(form: FilterForm): Array<string[]> {
 }
 
 export function doSearch(form: FilterForm): string[][] {
-    const champion_to_var = Object.values(CHAMPIONS).reduce(
-        (acc, c, idx) => {
-            acc[c.character_id] = idx
+    const slotOptions = getSlotOptions(form)
+
+    const allChampions: Set<string> = new Set()
+    for (let opts of slotOptions) {
+        for (let c of opts) {
+            allChampions.add(c)
+        }
+    }
+
+    const champion_to_var = [...allChampions.values()].reduce(
+        (acc, id, idx) => {
+            // Filtering champs globally banned reduces calculation time
+            // @todo: this should really be done on rust side
+            if (allChampions.has(id)) {
+                acc[id] = idx
+            }
+
             return acc
         },
         {} as Record<string, number>
     )
 
-    const traits = new Map()
-    CHAMPIONS.map((c) => [
-        champion_to_var[c.character_id],
-        c.traits.map((t) => t.name)
-    ]).forEach(([k, v]) => traits.set(k as number, v as string[]))
-
-    const num_champions = Object.values(champion_to_var).length
-
-    const slots = getSlotOptions(form).map((cs) =>
+    const slots = slotOptions.map((cs) =>
         cs.map((c) => champion_to_var[c])
     )
+
+    const traits = new Map()
+    ;[...allChampions.values()]
+        .map((id) => CHAMPIONS_BY_ID[id])
+        .map((c) => [
+            champion_to_var[c.character_id],
+            c.traits.map((t) => t.name)
+        ])
+        .forEach(([k, v]) => traits.set(k as number, v as string[]))
+
+    const num_champions = Object.values(champion_to_var).length
 
     const options = {
         num_champions,

@@ -6,6 +6,7 @@
     import TraitIcon from '$lib/components/trait-icon.svelte'
     import { CHAMPIONS_BY_ID, TRAITS_BY_ID } from '$lib/constants'
     import { sort } from 'radash'
+    import { getTraitLevel } from '../form-context/utils'
 
     export let ids: string[]
 
@@ -27,11 +28,20 @@
             {} as Record<string, number>
         )
 
-    $: traitCountEntriesSorted = sort(
+    $: traits = sort(
         Object.entries(traitCounts),
         ([_, count]) => count,
         true
-    )
+    ).map(([id, count]) => {
+        const trait = TRAITS_BY_ID[id]
+        const level = getTraitLevel(count, trait)
+
+        return {
+            trait,
+            level,
+            count
+        }
+    })
 </script>
 
 <div class="card flex justify-between">
@@ -46,15 +56,23 @@
 
     <!-- Traits -->
     <div class="flex gap-4">
-        {#each traitCountEntriesSorted as [id, count]}
+        {#each traits as { trait, level, count }}
             <span
-                class="inline-flex gap-1 justify-center items-center"
+                class="inline-flex gap-0 justify-center items-center"
             >
-                <div class="h-8 w-8">
-                    <TraitIcon {id} />
+                <div class="h-9 w-9">
+                    <TraitIcon
+                        id={trait.trait_id}
+                        style={level?.style_name}
+                        variant="md"
+                    />
                 </div>
 
-                <span>{count}</span>
+                <span
+                    class="w-6 h-5 text-xs border-2 border-l-0 text-center"
+                >
+                    {count}
+                </span>
             </span>
         {/each}
     </div>

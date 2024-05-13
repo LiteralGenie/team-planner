@@ -1,9 +1,19 @@
+<script lang="ts" context="module">
+    type TraitIconStyle =
+        | null
+        | 'kBronze'
+        | 'kSilver'
+        | 'kGold'
+        | 'kChromatic'
+</script>
+
 <script lang="ts">
     import { TRAIT_ICONS } from '$lib/constants'
 
     export let id: string
     export let showHover = false
     export let variant: 'sm' | 'md' = 'sm'
+    export let style: TraitIconStyle = null
 
     $: src = TRAIT_ICONS[id]
 </script>
@@ -11,6 +21,10 @@
 <div
     class:sm={variant === 'sm'}
     class:md={variant === 'md'}
+    class:bronze={style === 'kBronze'}
+    class:silver={style === 'kSilver'}
+    class:gold={style === 'kGold'}
+    class:chromatic={style === 'kChromatic'}
     class:hover-layer={showHover}
     class="hex"
 >
@@ -27,9 +41,12 @@
     .hex {
         @apply h-full w-full flex justify-center items-center;
 
-        &.outline-layer,
         &.bg-layer {
-            background-color: #232323;
+            background-color: #131313;
+        }
+
+        &.outline-layer {
+            background-color: rgba(0, 0, 0, 50%);
         }
 
         &.border-layer {
@@ -51,7 +68,7 @@
 
     .sm {
         & .outline-layer {
-            padding: 1px;
+            padding: 2px;
         }
         & .border-layer {
             padding: 1px;
@@ -63,7 +80,59 @@
             padding: 2px;
         }
         & .border-layer {
-            padding: 2px;
+            padding: 1.5px;
+        }
+    }
+
+    .hex.bronze {
+        & .bg-layer {
+            background: linear-gradient(
+                #764a2c,
+                #9c6442 40%,
+                #57341b 60%,
+                #57341b 100%
+            );
+        }
+
+        & .border-layer {
+            background-color: hsla(0, 0%, 100%, 50%);
+        }
+    }
+    .hex.silver {
+        & .bg-layer {
+            background: linear-gradient(
+                #738994,
+                #a7bdc0 40%,
+                #86a5a7 60%,
+                #86a5a7 100%
+            );
+        }
+
+        & .border-layer {
+            background-color: hsla(0, 0%, 80%);
+        }
+    }
+    .hex.silver {
+        & .bg-layer {
+            background: linear-gradient(
+                #ddba53,
+                #e7c360 40%,
+                #af8528 60%,
+                #af8528 100%
+            );
+        }
+
+        & .border-layer {
+            background-color: hsla(0, 0%, 80%);
+        }
+    }
+
+    .hex.bronze,
+    .hex.silver,
+    .hex.gold,
+    .hex.chromatic {
+        & img {
+            filter: invert(1);
         }
     }
 </style>
