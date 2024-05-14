@@ -1,21 +1,19 @@
 <script lang="ts">
+    import { range } from 'radash'
     import Svelecte from 'svelecte'
     import { getFilterFormContext } from '../form-context/context'
+    import { MAX_TEAM_SIZE } from '../form-context/defaults'
 
-    const groupByOptions = [
-        { value: 20, text: 20 },
-        { value: 50, text: 50 },
-        { value: 100, text: 100 },
-        { value: 200, text: 200 },
-        { value: 500, text: 500 }
-    ]
+    const groupByOptions = [...range(2, MAX_TEAM_SIZE)].map(
+        (idx) => ({ value: idx, text: idx })
+    )
 
     const { form, controls, submit } = getFilterFormContext()
 
     let rootEl: HTMLDivElement
 
     function handleChange(value: number) {
-        controls.resultCount.onChange(value)
+        controls.teamSize.onChange(value)
         submit()
     }
 
@@ -24,17 +22,17 @@
         isSelectionSection?: boolean
     ): string {
         return isSelectionSection
-            ? `Result count: ${item.value}`
+            ? `<div class="flex"><span>Team size:</span> <span class="w-4 flex justify-end">${item.value}</span></div>`
             : item.value.toString()
     }
 </script>
 
-<div bind:this={rootEl}>
+<div bind:this={rootEl} class="dark-select">
     <Svelecte
         renderer={renderOption}
         on:change={(ev) => handleChange(ev.detail.value)}
         options={groupByOptions}
-        value={$form.resultCount}
+        value={$form.teamSize}
         searchable={false}
         keepSelectionInList={true}
         highlightFirstItem={false}
@@ -42,3 +40,14 @@
         class="min-w-max"
     />
 </div>
+
+<style lang="postcss">
+    .dark-select {
+        --sv-bg: hsl(var(--background) / 90%);
+        --sv-dropdown-active-bg: hsl(var(--card) / 100%);
+        --sv-dropdown-selected-bg: hsl(var(--card) / 100%);
+    }
+    .dark-select :global(.sv-control--selection) {
+        padding-right: 0 !important;
+    }
+</style>

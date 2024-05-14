@@ -49,6 +49,7 @@ export const DEFAULT_SLOT_FILTER = {
     byChampion: DEFAULT_CHAMPION_FILTER
 } satisfies SlotFilter
 
+export const MAX_TEAM_SIZE = 11
 const DEFAULT_TEAM_SIZE = 7
 
 export const DEFAULT_GLOBAL_FILTER = {
@@ -73,7 +74,7 @@ export const DEFAULT_FILTER_FORM = {
     teamSize: DEFAULT_TEAM_SIZE,
     resultCount: 100,
     global: deepCopy(DEFAULT_GLOBAL_FILTER),
-    slots: [...range(1, DEFAULT_TEAM_SIZE)].map(() =>
+    slots: [...range(1, MAX_TEAM_SIZE)].map(() =>
         deepCopy(DEFAULT_SLOT_FILTER)
     )
 } as const satisfies FilterForm
