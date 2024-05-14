@@ -7,19 +7,13 @@
     setFilterFormContext(DEFAULT_FILTER_FORM)
 </script>
 
-<main class="h-full w-full max-w-6xl mx-auto p-4 flex flex-col gap-4">
+<main class="h-full w-full max-w-6xl mx-auto p-4 flex flex-col">
     <Search />
 
-    <hr class="mt-4" />
+    <hr class="mt-8 pb-4" />
 
     <ResultList />
 </main>
 
 <style lang="postcss">
-    .result {
-        @apply min-h-24 flex flex-col justify-center;
-    }
-
-    .divider {
-    }
 </style>
