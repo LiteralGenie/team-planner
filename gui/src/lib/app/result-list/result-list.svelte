@@ -1,5 +1,4 @@
 <script lang="ts" context="module">
-    const BATCH_SIZE = 100
     const FIRST_BATCH_SIZE = 50
     const NUM_BATCHES = 5
 
@@ -25,14 +24,19 @@
     import ResultItem from './result-item.svelte'
 
     const { formInitial } = getFilterFormContext()
+    $: console.log('formInitial', formInitial)
 
     const uniqueForm = new DerivedUniqueStore(formInitial)
+    $: console.log('uniqueForm', uniqueForm)
 
     let results: ScoredTeam[] = []
     let fetchId: number = 0
     let isFetching = false
 
-    $: resultsSorted = sortResults(results).slice(0, 100)
+    $: resultsSorted = sortResults(results).slice(
+        0,
+        $formInitial.resultCount
+    )
 
     $: handleFormChange($uniqueForm)
 
@@ -53,7 +57,9 @@
         const idBeforeLoad = fetchId
 
         const teams = (
-            await fetchSearchResults(batchSizeOverride ?? BATCH_SIZE)
+            await fetchSearchResults(
+                batchSizeOverride ?? $uniqueForm.resultCount
+            )
         ).map((ids) => ({
             team_id: Math.random(),
             ids,

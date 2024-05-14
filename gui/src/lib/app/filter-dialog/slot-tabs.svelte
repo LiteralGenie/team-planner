@@ -42,7 +42,7 @@
                 Global
             </button>
 
-            {#each $form.slots as slot, idx}
+            {#each $form.slots.slice(0, $form.teamSize) as slot, idx}
                 <button
                     on:click={() => dispatch('tabclick', idx)}
                     class:active={slotIndex === idx}

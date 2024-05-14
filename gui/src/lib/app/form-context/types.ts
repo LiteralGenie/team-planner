@@ -100,6 +100,7 @@ export interface GlobalFilter {
 
 export interface FilterForm {
     teamSize: number
+    resultCount: number
     global: GlobalFilter
     slots: SlotFilter[]
 }

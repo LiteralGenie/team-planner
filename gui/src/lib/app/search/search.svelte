@@ -12,6 +12,7 @@
     import FilterPreview from './filter-button/filter-preview.svelte'
     import GlobalFilterButton from './global-filter-button/global-filter-button.svelte'
     import GlobalFilterPreview from './global-filter-button/global-filter-preview.svelte'
+    import TeamSizeInput from './team-size-input.svelte'
 
     let showDialog = false
     let activeSlotIndex: SlotIndex = 0
@@ -83,7 +84,7 @@
                 <div
                     class="filter-grid text-sm text-muted-foreground"
                 >
-                    {#each $form.slots as slot, idx}
+                    {#each $form.slots.slice(0, $form.teamSize) as slot, idx}
                         <div class="cell flex gap-4 items-center">
                             <FilterButton
                                 on:click={() => handleDialogOpen(idx)}
@@ -103,13 +104,19 @@
             </div>
 
             <div
-                class="cell !p-1 text-muted-foreground text-sm flex gap-2 items-center"
+                class="cell !p-1 text-muted-foreground text-sm flex flex-col sm:flex-row justify-end items-center gap-8"
             >
-                <GlobalFilterButton
-                    on:click={() => handleDialogOpen('global')}
-                />
+                <div class="w-full flex justify-start gap-2">
+                    <GlobalFilterButton
+                        on:click={() => handleDialogOpen('global')}
+                    />
 
-                <GlobalFilterPreview />
+                    <GlobalFilterPreview />
+                </div>
+
+                <div>
+                    <TeamSizeInput />
+                </div>
             </div>
         </div>
 
