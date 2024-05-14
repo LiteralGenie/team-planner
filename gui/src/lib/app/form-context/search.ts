@@ -5,6 +5,15 @@ import { invert, range } from 'radash'
 
 const worker = new Worker('worker.js')
 
+// Worker's init function is async
+const workerInit = new Promise((resolve) =>
+    worker.addEventListener('message', (ev) => {
+        if (ev.data.type === 'ready') {
+            resolve(true)
+        }
+    })
+)
+
 function getSlotOptions(form: FilterForm): Array<string[]> {
     const slots: Array<string[]> = []
 
@@ -36,7 +45,7 @@ function getSlotOptions(form: FilterForm): Array<string[]> {
     return slots
 }
 
-export function setSearchOptions(form: FilterForm) {
+export async function setSearchOptions(form: FilterForm) {
     const slotOptions = getSlotOptions(form)
 
     const allChampions: Set<string> = new Set()
@@ -83,6 +92,8 @@ export function setSearchOptions(form: FilterForm) {
         traits
     }
 
+    await workerInit
+
     worker.postMessage({
         type: 'setOptions',
         options,
@@ -90,13 +101,22 @@ export function setSearchOptions(form: FilterForm) {
     })
 }
 
-export async function getSearchResult(): Promise<string[] | null> {
+export async function getSearchResult(
+    batchSize: number
+): Promise<string[][]> {
+    const start = Date.now()
+
     worker.postMessage({
-        type: 'nextSolution'
+        type: 'nextSolution',
+        batchSize
     })
 
     return new Promise((resolve) => {
         worker.onmessage = (ev) => {
+            console.log(
+                `Fetched ${batchSize} results in ${Math.floor(Date.now() - start)}ms`
+            )
+
             resolve(ev.data)
         }
     })

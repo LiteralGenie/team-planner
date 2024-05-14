@@ -26,14 +26,24 @@ async function init_wasm_in_worker() {
 
                 return
             case 'nextSolution':
-                const teamVars = finder.next()
-                const teamIds = teamVars.map(
-                    (v) => ctx.var_to_champion[v]
-                )
-                self.postMessage(teamIds)
+                const { batchSize } = event.data
+
+                const results = []
+
+                for (let idx = 0; idx < batchSize; idx++) {
+                    const teamVars = finder.next()
+                    const teamIds = teamVars.map(
+                        (v) => ctx.var_to_champion[v]
+                    )
+                    results.push(teamIds)
+                }
+
+                self.postMessage(results)
                 return
         }
     }
+
+    self.postMessage({ type: 'ready' })
 }
 
 init_wasm_in_worker()

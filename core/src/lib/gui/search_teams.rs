@@ -63,10 +63,10 @@ impl TeamFinder {
             Some(sol) => {
                 let team = Team::new(sol);
 
-                log!(
-                    "[{}ms] Found solution",
-                    start.elapsed().as_millis()
-                );
+                // log!(
+                //     "[{}ms] Found solution",
+                //     start.elapsed().as_millis()
+                // );
                 if self.options.debug.unwrap_or(false) {
                     log!("{:?}", team);
                 }
