@@ -32,6 +32,10 @@ async function init_wasm_in_worker() {
 
                 for (let idx = 0; idx < batchSize; idx++) {
                     const teamVars = finder.next()
+                    if (!teamVars) {
+                        break
+                    }
+
                     const teamIds = teamVars.map(
                         (v) => ctx.var_to_champion[v]
                     )

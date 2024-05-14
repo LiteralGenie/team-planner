@@ -172,6 +172,9 @@ button[disabled] {
     --sv-dropdown-active-bg: hsl(var(--foreground) / 10%);
     --sv-dropdown-selected-bg: hsl(var(--foreground) / 10%);
 }
+.svelecte {
+    cursor: pointer;
+}
 .svelecte.is-open .sv-control {
     border-bottom-left-radius: 0 !important;
     border-bottom-right-radius: 0 !important;
@@ -186,6 +189,9 @@ button[disabled] {
 .sv-input--sizer {
     /* Disable invisible input causing text to ellipsis */
     width: 0;
+
+    /* Prevent width jittering */
+    position: relative !important;
 }
 .sv-dd-item-active {
     /* Disable selection of already-selected items */
