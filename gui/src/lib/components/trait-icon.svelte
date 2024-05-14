@@ -112,13 +112,40 @@
             background-color: hsla(0, 0%, 80%);
         }
     }
-    .hex.silver {
+    .hex.gold {
         & .bg-layer {
             background: linear-gradient(
                 #ddba53,
                 #e7c360 40%,
                 #af8528 60%,
                 #af8528 100%
+            );
+        }
+
+        & .border-layer {
+            background-color: hsla(0, 0%, 80%);
+        }
+    }
+    .hex.chromatic {
+        /* This should never be used. Chromatic tiers aren't currently possible without emblems. */
+        & .bg-layer {
+            background: conic-gradient(
+                #b8f9b8,
+                #b0defe,
+                #c1b9fc,
+                #ef9eff,
+                #aff7fe,
+                #fafff3,
+                #fffbbd,
+                #f2b29c,
+                #cceab3,
+                #cbc9e9,
+                #c5e0ff,
+                #adffd8,
+                #ffffd2,
+                #9cfbff,
+                #e6a7ff,
+                #b8f9b8
             );
         }
 

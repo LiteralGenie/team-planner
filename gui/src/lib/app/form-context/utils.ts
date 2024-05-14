@@ -229,7 +229,7 @@ export function getTraitLevel(
 ): TraitLevel | null {
     let traitLevel: TraitLevel | null = null
     for (let [levelIdx, level] of trait.levels.entries()) {
-        if (unitCount > level.min_units) {
+        if (unitCount >= level.min_units) {
             traitLevel = { ...level, levelIdx }
         } else {
             break

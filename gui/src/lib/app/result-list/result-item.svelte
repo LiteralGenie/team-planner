@@ -77,9 +77,9 @@
     }
 </script>
 
-<div class="card flex justify-between">
+<div class="card flex flex-col justify-center items-center gap-4">
     <!-- Champions -->
-    <div class="flex justify-start gap-2">
+    <div class="flex justify-start gap-4">
         {#each ids as id}
             <span class="h-12 w-12">
                 <Tooltip.Root
@@ -143,7 +143,7 @@
 
 <style lang="postcss">
     .card {
-        @apply p-4 rounded-sm;
+        @apply p-6 rounded-sm;
 
         background-color: hsl(var(--card) / 60%);
     }
@@ -163,7 +163,7 @@
     .inactive {
         display: none;
 
-        @media screen(lg) {
+        @media screen(md) {
             display: flex;
         }
     }
