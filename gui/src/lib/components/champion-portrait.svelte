@@ -1,9 +1,11 @@
 <script lang="ts">
-    import type { CostTier } from '$lib/app/form-context/types'
+    import { CHAMPIONS_BY_ID, CHAMPION_ICONS } from '$lib/constants'
 
-    export let src: string
-    export let cost: CostTier
+    export let id: string
     export let hideInnerBorder = false
+
+    $: cost = CHAMPIONS_BY_ID[id].tier
+    $: src = CHAMPION_ICONS[id]
 </script>
 
 <div

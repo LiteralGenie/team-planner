@@ -8,11 +8,6 @@
     import TraitIcon from '$lib/components/trait-icon.svelte'
     import TraitTooltip from '$lib/components/trait-tooltip.svelte'
     import * as Tooltip from '$lib/components/ui/tooltip/index.js'
-    import {
-        CHAMPIONS_BY_ID,
-        CHAMPION_ICONS,
-        TRAIT_ICONS
-    } from '$lib/constants'
     import GoldIcon from '$lib/icons/gold-icon.svelte'
     import XIcon from '$lib/icons/x-icon.svelte'
 
@@ -59,10 +54,11 @@
                     group="preview"
                     openDelay={500}
                     closeOnPointerDown={true}
+                    disableHoverableContent={true}
                 >
                     <Tooltip.Trigger class="cursor-default">
                         <div class="relative h-7 w-7">
-                            <TraitIcon src={TRAIT_ICONS[id]} />
+                            <TraitIcon {id} />
 
                             <div
                                 class="absolute bottom-0 right-0 rounded-full bg-[#eb1a26] p-[2px]"
@@ -89,11 +85,11 @@
                         group="preview"
                         openDelay={500}
                         closeOnPointerDown={true}
+                        disableHoverableContent={true}
                     >
                         <Tooltip.Trigger class="cursor-default">
                             <ChampionPortrait
-                                cost={CHAMPIONS_BY_ID[id].tier}
-                                src={CHAMPION_ICONS[id]}
+                                {id}
                                 hideInnerBorder={true}
                             />
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { sleep } from 'radash'
     import FilterDialog from '../filter-dialog/filter-dialog.svelte'
     import type { SlotIndex } from '../filter-dialog/slot-tabs.svelte'
     import { getFilterFormContext } from '../form-context/context'
@@ -15,15 +16,20 @@
     let showDialog = false
     let activeSlotIndex: SlotIndex = 0
 
-    const { form } = getFilterFormContext()
+    const { form, submit } = getFilterFormContext()
 
     function handleDialogOpen(idx: SlotIndex) {
         activeSlotIndex = idx
         showDialog = true
     }
 
-    function handleDialogClose() {
+    async function handleDialogClose() {
         showDialog = false
+
+        // Let dialog's close animation finish
+        await sleep(250)
+
+        submit()
     }
 
     function getSlotState(slot: SlotFilter): string {

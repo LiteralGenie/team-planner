@@ -10,7 +10,7 @@
         AP_ICON,
         CHAMPIONS_BY_ID,
         MANA_ICON,
-        TRAIT_ICONS
+        TRAITS_BY_ID
     } from '$lib/constants'
     import GoldIcon from '$lib/icons/gold-icon.svelte'
     import RangeIcon from '$lib/icons/range-icon.svelte'
@@ -27,6 +27,7 @@
     )
 
     $: rangeType = mapRangeValueToType(champion.stats.range)
+    $: traits = champion.traits.filter((t) => t.id in TRAITS_BY_ID)
 </script>
 
 <div class="root flex flex-col">
@@ -38,17 +39,14 @@
         <span>Traits:</span>
 
         <span class="comma-group flex gap-1">
-            {#each champion.traits as t}
+            {#each traits as t}
                 <div class="flex items-center">
                     <span class="trait-label">{t.name}</span>
 
                     <div
                         class="trait-icon inline-block h-[1.75em] w-[1.75em]"
                     >
-                        <TraitIcon
-                            src={TRAIT_ICONS[t.id]}
-                            variant="sm"
-                        />
+                        <TraitIcon id={t.id} variant="sm" />
                     </div>
                 </div>
             {/each}

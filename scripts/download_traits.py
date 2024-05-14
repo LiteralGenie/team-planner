@@ -59,10 +59,17 @@ def is_unique(trait: ITrait) -> bool:
 
 
 def process_trait_data(trait: ITrait) -> dict:
+    levels = [
+        dict(min_units=x["min_units"], style_name=x["style_name"])
+        for x in trait["conditional_trait_sets"]
+    ]
+    levels.sort(key=lambda x: x["min_units"])
+
     return dict(
         display_name=trait["display_name"],
         trait_id=trait["trait_id"],
         tooltip_html=build_trait_html(trait),
+        levels=levels,
     )
 
 

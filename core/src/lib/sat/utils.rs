@@ -81,3 +81,30 @@ impl HashStringSet {
         Self(HashSet::from_iter(xs.clone().into_iter()))
     }
 }
+
+#[derive(Clone, Debug)]
+pub struct HashIntSet(pub HashSet<u8>);
+
+impl PartialEq for HashIntSet {
+    fn eq(&self, other: &HashIntSet) -> bool {
+        self.0.is_subset(&other.0) && other.0.is_subset(&self.0)
+    }
+}
+
+impl Eq for HashIntSet {}
+
+impl Hash for HashIntSet {
+    fn hash<H>(&self, state: &mut H) where H: Hasher {
+        let mut a: Vec<&u8> = self.0.iter().collect();
+        a.sort();
+        for s in a.iter() {
+            s.hash(state);
+        }
+    }
+}
+
+impl HashIntSet {
+    pub fn from_vec(xs: &Vec<u8>) -> Self {
+        Self(HashSet::from_iter(xs.clone().into_iter()))
+    }
+}

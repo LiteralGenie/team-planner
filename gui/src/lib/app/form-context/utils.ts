@@ -1,4 +1,10 @@
-import { CHAMPIONS, TRAITS_BY_ID } from '$lib/constants'
+import {
+    CHAMPIONS,
+    CHAMPIONS_BY_ID,
+    TRAITS_BY_ID,
+    type CDragonTrait,
+    type CDragonTraitLevel
+} from '$lib/constants'
 import { deepCopy, filterMap, someFalse } from '$lib/utils/misc'
 import { isArray, isObject } from 'radash'
 import { FormControl } from './form-control'
@@ -8,6 +14,7 @@ import type {
     AttributeFilter,
     CostTier,
     DamageType,
+    FilterForm,
     FormControlWrapper,
     GlobalFilter,
     IdFilter,
@@ -206,4 +213,50 @@ export function mapRangeValueToType(value: number): RangeType {
     } else {
         return 'long'
     }
+}
+
+export function serializeFilterForm(form: FilterForm): string {
+    return 'lmoa'
+}
+
+export type TraitLevel = CDragonTraitLevel & {
+    levelIdx: number
+}
+
+export function getTraitLevel(
+    unitCount: number,
+    trait: CDragonTrait
+): TraitLevel | null {
+    let traitLevel: TraitLevel | null = null
+    for (let [levelIdx, level] of trait.levels.entries()) {
+        if (unitCount >= level.min_units) {
+            traitLevel = { ...level, levelIdx }
+        } else {
+            break
+        }
+    }
+
+    return traitLevel
+}
+
+export function tallyTraits(
+    champions: string[]
+): Record<string, number> {
+    return champions
+        .map((id) => CHAMPIONS_BY_ID[id])
+        .reduce(
+            (acc, c) => {
+                for (let trait of c.traits) {
+                    if (!TRAITS_BY_ID[trait.id]) {
+                        continue
+                    }
+
+                    acc[trait.id] = acc[trait.id] || 0
+                    acc[trait.id] += 1
+                }
+
+                return acc
+            },
+            {} as Record<string, number>
+        )
 }

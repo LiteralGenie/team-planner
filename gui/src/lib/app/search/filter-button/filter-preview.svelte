@@ -11,7 +11,6 @@
     import SpellTooltip from '$lib/components/spell-tooltip.svelte'
     import TraitTooltip from '$lib/components/trait-tooltip.svelte'
     import * as Tooltip from '$lib/components/ui/tooltip/index.js'
-    import { CHAMPIONS_BY_ID, CHAMPION_ICONS } from '$lib/constants'
     import CheckmarkIcon from '$lib/icons/checkmark-icon.svelte'
     import GoldIcon from '$lib/icons/gold-icon.svelte'
     import RangeIcon from '$lib/icons/range-icon.svelte'
@@ -119,6 +118,7 @@
                         group="preview"
                         openDelay={500}
                         closeOnPointerDown={true}
+                        disableHoverableContent={true}
                     >
                         <Tooltip.Trigger class="cursor-default">
                             <TraitFilterPreview
@@ -142,12 +142,12 @@
                         group="preview"
                         openDelay={500}
                         closeOnPointerDown={true}
+                        disableHoverableContent={true}
                     >
                         <Tooltip.Trigger class="cursor-default">
                             <div class="relative">
                                 <ChampionPortrait
-                                    cost={CHAMPIONS_BY_ID[id].tier}
-                                    src={CHAMPION_ICONS[id]}
+                                    {id}
                                     hideInnerBorder={true}
                                 />
 

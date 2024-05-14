@@ -5,7 +5,7 @@
 <script lang="ts">
     import ChampionPortrait from '$lib/components/champion-portrait.svelte'
     import * as Tooltip from '$lib/components/ui/tooltip/index.js'
-    import { CHAMPIONS_BY_ID, CHAMPION_ICONS } from '$lib/constants'
+    import { CHAMPIONS_BY_ID } from '$lib/constants'
     import CheckmarkIcon from '$lib/icons/checkmark-icon.svelte'
     import XIcon from '$lib/icons/x-icon.svelte'
     import SpellTooltip from './spell-tooltip.svelte'
@@ -13,9 +13,7 @@
     export let id: string
 
     $: champion = CHAMPIONS_BY_ID[id]
-    $: src = CHAMPION_ICONS[id]
     $: label = champion.display_name
-    $: cost = champion.tier
 
     export let value: ChampionCheckboxValue
     export let disabled = false
@@ -32,18 +30,21 @@
 >
     <Tooltip.Root
         group="spell"
-        openDelay={100}
+        openDelay={1000}
         closeOnPointerDown={true}
         portal={'dialog'}
+        disableHoverableContent={true}
     >
-        <Tooltip.Trigger class="cursor-default">
+        <Tooltip.Trigger
+            class="cursor-default flex flex-col gap-1 items-center justify-center"
+        >
             <button
                 {disabled}
                 on:click
                 type="button"
                 class="h-12 w-12 relative select-none"
             >
-                <ChampionPortrait {src} {cost} />
+                <ChampionPortrait {id} />
 
                 <!-- Selection indicator -->
                 {#if actualValue === 'included' || actualValue === 'excluded'}

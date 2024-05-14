@@ -17,7 +17,7 @@ export class DerivedUniqueStore<T> implements Readable<T> {
                 this.prevValue === UNINITIALIZED ||
                 !isEqual(this.prevValue, update)
             ) {
-                this.prevValue = update
+                this.prevValue = deepCopy(update)
                 run(update)
             }
         })

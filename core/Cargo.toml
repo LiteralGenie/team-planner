@@ -6,10 +6,25 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+itertools = "0.12.1"
 logicng = "0.1.0-alpha.3"
 serde = "1.0.199"
 serde-wasm-bindgen = "0.6.5"
 wasm-bindgen = "0.2.92"
+web-time = "1.1.0"
+console_error_panic_hook = { version = "0.1.6", optional = true }
+
+[dependencies.web-sys]
+version = "0.3.4"
+features = [
+    'console',
+    'Document',
+    'HtmlElement',
+    'HtmlInputElement',
+    'MessageEvent',
+    'Window',
+    'Worker',
+]
 
 [build-dependencies]
 wasm-pack = "0.12.1"

@@ -1,42 +1,102 @@
+use std::cell::RefCell;
+use std::collections::HashMap;
+use std::rc::Rc;
+use web_sys::Worker;
+use web_time::Instant;
+
 use serde::{ Deserialize, Serialize };
 use serde_wasm_bindgen::to_value;
 use wasm_bindgen::{ prelude::wasm_bindgen, JsValue, UnwrapThrowExt };
-use crate::lib::data::{ ChampionId, GameData };
 
 use crate::console::log;
 use crate::lib::sat::{ build_champion_constraints, SubgraphSolver };
-
-use super::search_champions::{ ChampionFilter, filter_champions };
 use super::team::Team;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct SearchOptions {
     pub team_size: u8,
-    pub champions: Option<Vec<ChampionFilter>>,
+    pub num_champions: u8,
+    pub slots: Vec<Vec<u8>>,
+    pub traits: HashMap<u8, Vec<String>>,
+
     pub debug: Option<bool>,
+}
+#[wasm_bindgen]
+pub struct TeamFinder {
+    options: SearchOptions,
+    solver: SubgraphSolver,
 }
 
 #[wasm_bindgen]
-pub fn search_teams(options: ISearchTeamsOptions) -> JsValue {
-    let options: SearchOptions = serde_wasm_bindgen
-        ::from_value(options.into())
-        .unwrap_throw();
+impl TeamFinder {
+    pub fn new() -> Self {
+        let options = SearchOptions {
+            team_size: 1,
+            num_champions: 1,
+            slots: vec![],
+            traits: HashMap::new(),
+            debug: Some(false),
+        };
 
-    let data = GameData::new();
+        let solver = init_solver(&options);
 
-    let champion_filters: Vec<Vec<ChampionId>> = options.champions
-        .unwrap_or(vec![])
-        .into_iter()
-        .map(|filter| filter_champions(filter))
-        .collect();
+        Self {
+            options,
+            solver,
+        }
+    }
 
-    let (constraints, index_to_id) = build_champion_constraints(
+    pub fn reset(&mut self, options: JsValue) {
+        let options: SearchOptions = serde_wasm_bindgen
+            ::from_value(options.into())
+            .unwrap_throw();
+
+        self.solver = init_solver(&options);
+
+        self.options = options;
+    }
+
+    pub fn next(&mut self) -> JsValue {
+        let start = Instant::now();
+
+        match self.solver.next() {
+            Some(sol) => {
+                let team = Team::new(sol);
+
+                // log!(
+                //     "[{}ms] Found solution",
+                //     start.elapsed().as_millis()
+                // );
+                if self.options.debug.unwrap_or(false) {
+                    log!("{:?}", team);
+                }
+
+                return to_value(&team.champion_ids).unwrap();
+            }
+            None => {
+                return JsValue::null();
+            }
+        }
+    }
+}
+
+fn init_solver(options: &SearchOptions) -> SubgraphSolver {
+    let start = Instant::now();
+
+    log!("Setting solver options {:?}", options);
+
+    let constraints = build_champion_constraints(
+        options.num_champions,
         options.team_size,
-        champion_filters,
-        &data
+        &options.slots,
+        &options.traits
     );
 
-    log!("solving with {} constraints", constraints.num_constraints);
+    log!(
+        "[{}ms] Solving with {} constraints",
+        start.elapsed().as_millis(),
+        constraints.num_constraints
+    );
     if options.debug.unwrap_or(false) {
         // This takes a few seconds to run
         log!(
@@ -50,43 +110,21 @@ pub fn search_teams(options: ISearchTeamsOptions) -> JsValue {
         );
     }
 
-    let mut solver = SubgraphSolver::new(constraints);
-
-    // @TODO: How to pass the generator to JS so it can display results as they're generated?
-    //        The constraints struct cant be serialized because the SAT library objects cant be.
-    //        Will rust let us create a global cache that persists between calls
-    //           so that JS only needs a resume-id to generate more results?
-    //        Or do we have to manually serialize the SAT stuff
-    //           (by converting to a formula string or something)
-    let mut results: Vec<Team> = vec![];
-    for _ in 0..20 {
-        match solver.next() {
-            Some(sol) => {
-                let team = Team::new(sol, &index_to_id, &data);
-                log!("{:?}", team);
-                results.push(team);
-            }
-            None => {
-                break;
-            }
-        }
-    }
-
-    to_value(&results).unwrap()
+    SubgraphSolver::new(constraints)
 }
 
 #[wasm_bindgen(typescript_custom_section)]
 const TYPES: &'static str =
     r#"
 
-interface ISearchTeamsOptions {
+export interface ISearchTeamsOptions {
     team_size: number
-    champions?: IChampionFilter[]
+    num_champions: number
+    slots: Array<number[]>
+    traits: Map<number, string[]>
+
     debug?: boolean
 }
-
-type SearchTeams = (options: ISearchTeamsOptions) => Team[]
-
 "#;
 
 #[wasm_bindgen]

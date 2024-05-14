@@ -3,9 +3,7 @@
 
 <script lang="ts">
     import {
-        CHAMPIONS_BY_ID,
         CHAMPIONS_BY_TRAIT,
-        CHAMPION_ICONS,
         TRAITS_BY_ID,
         TRAIT_ICONS
     } from '$lib/constants'
@@ -13,6 +11,7 @@
     import ChampionPortrait from './champion-portrait.svelte'
 
     export let trait_id: string
+    export let traitLevelIdx: number | null = null
 
     $: trait = TRAITS_BY_ID[trait_id]
     $: iconSrc = TRAIT_ICONS[trait_id]
@@ -21,9 +20,20 @@
         `src="${iconSrc}"`
     )
     $: others = CHAMPIONS_BY_TRAIT[trait_id]
+
+    let rootEl: HTMLElement
+
+    $: {
+        if (rootEl && traitLevelIdx !== null) {
+            const rowEls = [
+                ...rootEl.querySelectorAll('.conditional-effect')
+            ]
+            rowEls[traitLevelIdx]?.classList.add('active')
+        }
+    }
 </script>
 
-<div class="root">
+<div bind:this={rootEl} class="root">
     <h1 class="text-base font-bold pb-1">{trait.display_name}</h1>
 
     {@html html}
@@ -32,8 +42,7 @@
         {#each others as c}
             <div class="h-8 w-8">
                 <ChampionPortrait
-                    src={CHAMPION_ICONS[c.character_id]}
-                    cost={CHAMPIONS_BY_ID[c.character_id].tier}
+                    id={c.character_id}
                     hideInnerBorder={true}
                 />
             </div>
@@ -62,5 +71,8 @@
         @apply block;
 
         color: hsl(var(--muted-foreground));
+    }
+    .root :global(.conditional-effect.active) {
+        color: hsl(var(--foreground));
     }
 </style>
