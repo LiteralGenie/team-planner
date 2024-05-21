@@ -15,6 +15,7 @@
     import GoldIcon from '$lib/icons/gold-icon.svelte'
     import RangeIcon from '$lib/icons/range-icon.svelte'
     import { interpolate_tooltip_images } from '$lib/utils/tooltips'
+    import ChampionPortrait from './champion-portrait.svelte'
     import TraitIcon from './trait-icon.svelte'
 
     export let champion_id: string
@@ -34,60 +35,58 @@
     {@html html}
 
     <div
-        class="border-t-2 pt-2 mt-2 text-sm text-muted-foreground flex justify-between items-center"
+        class="border-t-2 pt-4 pb-2 mt-2 text-sm text-muted-foreground flex gap-4 items-center"
     >
-        <span>Traits:</span>
+        <div class="h-12 w-12 shrink-0">
+            <ChampionPortrait id={champion_id} hideInnerBorder />
+        </div>
 
-        <span class="comma-group flex gap-1">
-            {#each traits as t}
-                <div class="flex items-center">
-                    <span class="trait-label">{t.name}</span>
+        <div class="flex flex-col gap-1 items-start justify-center">
+            <span class="comma-group flex gap-1">
+                {#each traits as t}
+                    <div class="flex items-center">
+                        <span class="trait-label">{t.name}</span>
 
-                    <div
-                        class="trait-icon inline-block h-[1.75em] w-[1.75em]"
-                    >
-                        <TraitIcon id={t.id} variant="sm" />
+                        <div
+                            class="trait-icon inline-block h-[1.75em] w-[1.75em]"
+                        >
+                            <TraitIcon id={t.id} variant="sm" />
+                        </div>
                     </div>
-                </div>
-            {/each}
-        </span>
-    </div>
-
-    <div
-        class="pt-1 text-sm text-muted-foreground flex items-center justify-between"
-    >
-        <span>Stats:</span>
-
-        <div class="flex justify-end gap-3">
-            <span class="flex gap-1 items-center">
-                {champion.tier}
-                <GoldIcon class="h-[1em] ml-[-0.125em]" />
+                {/each}
             </span>
 
-            <span class="flex gap-1 items-center">
-                {Math.floor(champion.stats.damage)}
-                <img class="h-[1em]" src={AD_ICON} />
-            </span>
+            <div class="flex justify-end gap-3">
+                <span class="flex gap-1 items-center">
+                    {champion.tier}
+                    <GoldIcon class="h-[1em] ml-[-0.125em]" />
+                </span>
 
-            <span class="flex gap-1 items-center">
-                100
-                <img class="h-[1em]" src={AP_ICON} />
-            </span>
+                <span class="flex gap-1 items-center">
+                    {Math.floor(champion.stats.damage)}
+                    <img class="h-[1em]" src={AD_ICON} />
+                </span>
 
-            <span class="flex gap-[0.0625em] items-center">
-                {Math.floor(champion.stats.mana)}
-                <img class="h-[1em]" src={MANA_ICON} />
-            </span>
+                <span class="flex gap-1 items-center">
+                    100
+                    <img class="h-[1em]" src={AP_ICON} />
+                </span>
 
-            <span class="flex gap-1 items-center">
-                {Math.floor(champion.stats.range)}
-                <RangeIcon
-                    class="h-[1em]"
-                    activeClose={rangeType === 'close'}
-                    activeMid={rangeType === 'mid'}
-                    activeLong={rangeType === 'long'}
-                />
-            </span>
+                <span class="flex gap-[0.0625em] items-center">
+                    {Math.floor(champion.stats.mana)}
+                    <img class="h-[1em]" src={MANA_ICON} />
+                </span>
+
+                <span class="flex gap-1 items-center">
+                    {Math.floor(champion.stats.range)}
+                    <RangeIcon
+                        class="h-[1em]"
+                        activeClose={rangeType === 'close'}
+                        activeMid={rangeType === 'mid'}
+                        activeLong={rangeType === 'long'}
+                    />
+                </span>
+            </div>
         </div>
     </div>
 </div>

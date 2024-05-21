@@ -16,7 +16,7 @@ from lib.utils import (
     get_cdragon_asset_url,
 )
 
-USE_CACHED = True
+USE_CACHED = False
 
 ###
 

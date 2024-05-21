@@ -12,7 +12,7 @@ from lib.utils import (
     get_cdragon_asset_url,
 )
 
-USE_CACHED = True
+USE_CACHED = False
 
 ###
 
@@ -28,14 +28,6 @@ IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 
 ITrait: TypeAlias = dict
 IData: TypeAlias = list[ITrait]
-
-
-def fetch() -> IData:
-    return fetch_json_cached(
-        DATA_URL,
-        DATA_FILE,
-        use_cache=USE_CACHED,
-    )
 
 
 def download_icons(data: IData):
@@ -74,7 +66,11 @@ def process_trait_data(trait: ITrait) -> dict:
 
 
 def main():
-    data = fetch()
+    data = fetch_json_cached(
+        DATA_URL,
+        DATA_FILE,
+        use_cache=USE_CACHED,
+    )
 
     filtered = [d for d in data if LATEST_SET_ID in d["set"] and not is_unique(d)]
     print(f"Found {len(filtered)} traits for set {LATEST_SET_ID}")
