@@ -4,14 +4,13 @@
 <script lang="ts">
     import ChampionPortrait from '$lib/components/champion-portrait.svelte'
     import SpellTooltip from '$lib/components/spell-tooltip.svelte'
-    import TraitIcon from '$lib/components/trait-icon.svelte'
-    import TraitTooltip from '$lib/components/trait-tooltip.svelte'
     import * as Tooltip from '$lib/components/ui/tooltip/index.js'
     import { CHAMPIONS_BY_ID, TRAITS_BY_ID } from '$lib/constants'
     import {
         getTraitLevel,
         type TraitLevel
     } from '../form-context/utils'
+    import ResultItemTrait from './result-item-trait.svelte'
 
     export let ids: string[]
 
@@ -102,41 +101,7 @@
     <!-- Traits -->
     <div class="flex gap-4 flex-wrap justify-center">
         {#each traits as { trait, level, count }}
-            <span
-                class:inactive={level === null}
-                class="inline-flex gap-0 justify-center items-center"
-            >
-                <div class="icon">
-                    <Tooltip.Root
-                        openDelay={100}
-                        closeOnPointerDown={true}
-                        group="trait"
-                        disableHoverableContent={true}
-                    >
-                        <Tooltip.Trigger class="h-[2.5em] w-[2.5em]">
-                            <TraitIcon
-                                id={trait.trait_id}
-                                style={level?.style_name}
-                                variant="md"
-                            />
-                        </Tooltip.Trigger>
-                        <Tooltip.Content
-                            class="boring-tooltip max-w-[400px]"
-                        >
-                            <TraitTooltip
-                                trait_id={trait.trait_id}
-                                traitLevelIdx={level?.levelIdx}
-                            />
-                        </Tooltip.Content>
-                    </Tooltip.Root>
-                </div>
-
-                <span
-                    class="label w-6 text-xs flex justify-center items-center"
-                >
-                    {count}
-                </span>
-            </span>
+            <ResultItemTrait id={trait.trait_id} {level} {count} />
         {/each}
     </div>
 </div>
@@ -146,25 +111,5 @@
         @apply p-6 rounded-sm;
 
         background-color: hsl(var(--card) / 60%);
-    }
-
-    .label {
-        border-width: 1.5px;
-        border-left: none;
-        border-color: #6b6d6b;
-        height: 1.55em;
-        width: 2em;
-    }
-
-    .icon :global(.outline-layer) {
-        padding-right: 0;
-    }
-
-    .inactive {
-        display: none;
-
-        @media screen(md) {
-            display: flex;
-        }
     }
 </style>
