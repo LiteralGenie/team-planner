@@ -6,7 +6,7 @@
         AttributeSlotValues,
         IdFilter
     } from '$lib/app/form-context/types'
-    import TraitCheckbox from '$lib/components/trait-checkbox.svelte'
+    import TraitCheckbox from '$lib/components/trait-checkbox/trait-checkbox.svelte'
     import { zip } from 'radash'
 
     export let slotControls: AttributeSlotControls
