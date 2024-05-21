@@ -20,7 +20,7 @@
         if (slotIndex === 'global') {
             return '0%'
         } else {
-            let offsetPercent = (slotIndex + 1) / (slots.length + 1)
+            let offsetPercent = (slotIndex + 1) / ($form.teamSize + 1)
             offsetPercent = 100 * offsetPercent
             return `${offsetPercent}%`
         }
