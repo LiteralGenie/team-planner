@@ -197,6 +197,16 @@ export function applyAttributeFilterWithGlobal(
     attrFilter: AttributeFilter
 ): Set<string> {
     const byGlobal = applyGlobalFilter(globalFilter)
+
+    // Override attribute filters that conflict with globals
+    attrFilter = deepCopy(attrFilter)
+    Object.values(globalFilter.traits)
+        .filter(({ included }) => !included)
+        .forEach(({ id }) => {
+            const trait = attrFilter.traits.find((t) => id === t.id)!
+            trait.included = false
+        })
+
     const byAttr = applyAttributeFilter(attrFilter)
 
     // Return intersection of sets
