@@ -104,7 +104,7 @@
             </div>
 
             <div
-                class="cell !p-1 text-muted-foreground text-sm flex flex-col sm:flex-row justify-end items-center gap-8"
+                class="cell !p-1 text-muted-foreground text-sm flex flex-col sm:flex-row justify-end items-center gap-2 sm:gap-8"
             >
                 <div class="w-full flex justify-start gap-2">
                     <GlobalFilterButton
@@ -114,7 +114,7 @@
                     <GlobalFilterPreview />
                 </div>
 
-                <div>
+                <div class="w-full sm:w-max">
                     <TeamSizeInput />
                 </div>
             </div>
