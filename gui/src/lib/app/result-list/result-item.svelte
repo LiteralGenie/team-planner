@@ -79,7 +79,7 @@
 
 <div class="card flex flex-col justify-center items-center gap-4">
     <!-- Champions -->
-    <div class="flex justify-start gap-4">
+    <div class="flex justify-start gap-4 flex-wrap">
         {#each ids as id}
             <span class="h-12 w-12">
                 <Tooltip.Root
@@ -100,7 +100,7 @@
     </div>
 
     <!-- Traits -->
-    <div class="flex gap-4">
+    <div class="flex gap-4 flex-wrap">
         {#each traits as { trait, level, count }}
             <span
                 class:inactive={level === null}
