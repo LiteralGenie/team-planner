@@ -3,73 +3,54 @@
 </script>
 
 <script lang="ts">
-    import ChampionPortrait from '$lib/components/champion-portrait.svelte'
+    import * as Popover from '$lib/components/ui/popover/index.js'
     import * as Tooltip from '$lib/components/ui/tooltip/index.js'
-    import { CHAMPIONS_BY_ID } from '$lib/constants'
-    import CheckmarkIcon from '$lib/icons/checkmark-icon.svelte'
-    import XIcon from '$lib/icons/x-icon.svelte'
-    import SpellTooltip from './spell-tooltip.svelte'
+    import SpellTooltip from '../spell-tooltip.svelte'
+    import Button from '../ui/button/button.svelte'
+    import ChampionCheckboxButton from './champion-checkbox-button.svelte'
+    import ChampionCheckboxLabel from './champion-checkbox-label.svelte'
 
     export let id: string
-
-    $: champion = CHAMPIONS_BY_ID[id]
-    $: label = champion.display_name
 
     export let value: ChampionCheckboxValue
     export let disabled = false
     export let disabledValue: ChampionCheckboxValue = 'excluded'
     export let disabledTooltip: string = ''
+    export let portal: string | undefined = undefined
 
     $: actualValue = disabled ? disabledValue : value
 </script>
 
+<!-- Desktop version -->
 <div
     class:disabled
-    class="root flex flex-col justify-center items-center text-center gap-[1px]"
+    class="root hidden md:flex flex-col justify-center items-center text-center gap-[1px]"
     class:active={actualValue !== null}
 >
     <Tooltip.Root
         group="spell"
-        openDelay={1000}
+        openDelay={500}
         closeOnPointerDown={true}
-        portal={'dialog'}
+        {portal}
         disableHoverableContent={true}
     >
         <Tooltip.Trigger
             class="cursor-default flex flex-col gap-1 items-center justify-center"
         >
-            <button
-                {disabled}
+            <ChampionCheckboxButton
                 on:click
-                type="button"
-                class="h-12 w-12 relative select-none"
-            >
-                <ChampionPortrait {id} />
+                {id}
+                {value}
+                {disabled}
+                {disabledValue}
+            />
 
-                <!-- Selection indicator -->
-                {#if actualValue === 'included' || actualValue === 'excluded'}
-                    <div
-                        class:green={actualValue === 'included'}
-                        class:red={actualValue === 'excluded'}
-                        class="mark absolute bottom-[2px] right-[2px] rounded-full p-[2px] text-foreground"
-                    >
-                        {#if actualValue === 'included'}
-                            <CheckmarkIcon
-                                class="h-[0.9em] w-[0.9em]"
-                            />
-                        {:else if actualValue === 'excluded'}
-                            <XIcon class="h-[0.9em] w-[0.9em]" />
-                        {/if}
-                    </div>
-                {/if}
-            </button>
-
-            <!-- Label -->
-            <span
-                class="text-xs text-muted-foreground whitespace-nowrap"
-            >
-                {label}
-            </span>
+            <ChampionCheckboxLabel
+                {id}
+                {value}
+                {disabled}
+                {disabledValue}
+            />
         </Tooltip.Trigger>
         <Tooltip.Content
             class={disabled
@@ -83,6 +64,45 @@
             {/if}
         </Tooltip.Content>
     </Tooltip.Root>
+</div>
+
+<!-- Mobile version -->
+<div
+    class:disabled
+    class="root md:hidden flex flex-col justify-center items-center text-center"
+    class:active={actualValue !== null}
+>
+    <ChampionCheckboxButton
+        on:click
+        {id}
+        {value}
+        {disabled}
+        {disabledValue}
+    />
+
+    <Popover.Root portal={'dialog'}>
+        <Popover.Trigger asChild let:builder>
+            <Button
+                builders={[builder]}
+                variant="link"
+                class="h-6 text-inherit"
+            >
+                <ChampionCheckboxLabel
+                    {id}
+                    {value}
+                    {disabled}
+                    {disabledValue}
+                />
+            </Button>
+        </Popover.Trigger>
+        <Popover.Content class="spell-tooltip-container">
+            {#if disabled}
+                {disabledTooltip}
+            {:else}
+                <SpellTooltip champion_id={id} />
+            {/if}
+        </Popover.Content>
+    </Popover.Root>
 </div>
 
 <style lang="postcss">

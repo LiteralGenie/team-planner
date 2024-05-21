@@ -143,7 +143,7 @@ def compute_subpart(
             p2 = compute_subpart(mSubpart["mPart2"], ctx)
             return product_list(p1, p2)
         case "{f3cbe7b2}":
-            # Recursion case? For set 11, only Irelia has this calculation type
+            # "Do other game calculation" case? For set 11, only Irelia has this calculation type
             spell = mSubpart["{88536426}"]
             return compute_spell_calc(ctx.mSpellCalculations[spell], ctx)
         case _:

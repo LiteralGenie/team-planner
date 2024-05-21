@@ -36,7 +36,7 @@
         ChampionGroupingType,
         IdFilter
     } from '$lib/app/form-context/types'
-    import ChampionCheckbox from '$lib/components/champion-checkbox.svelte'
+    import ChampionCheckbox from '$lib/components/champion-checkbox/champion-checkbox.svelte'
     import { alphabetical, group, sort } from 'radash'
     import Svelecte from 'svelecte'
     import type { SvelteComponent } from 'svelte'
@@ -205,6 +205,7 @@
                             value={state.included ? 'included' : null}
                             disabled={state.disabled}
                             disabledTooltip="Disabled by global filter"
+                            portal="dialog"
                         />
                     {/each}
                 </div>

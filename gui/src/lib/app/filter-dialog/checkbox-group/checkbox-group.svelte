@@ -39,12 +39,14 @@
 
     <div class="flex gap-6 flex-wrap">
         {#each options as { onChange, tooltip, tooltipPortal, ...props }}
-            <ConditionalTooltip {tooltip} portal={tooltipPortal}>
+            <ConditionalTooltip portal={tooltipPortal}>
                 <CheckboxItem
                     on:change={(ev) => onChange(ev.detail)}
                     id={props.label}
                     {...props}
                 />
+
+                <span slot="tooltip">{tooltip}</span>
             </ConditionalTooltip>
         {/each}
     </div>

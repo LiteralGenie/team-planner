@@ -2,7 +2,7 @@
     import { getFilterFormContext } from '$lib/app/form-context/context'
     import type { FormControlRecord } from '$lib/app/form-context/form-control-record'
     import type { IdFilter } from '$lib/app/form-context/types'
-    import ChampionCheckbox from '$lib/components/champion-checkbox.svelte'
+    import ChampionCheckbox from '$lib/components/champion-checkbox/champion-checkbox.svelte'
     import { zip } from 'radash'
 
     const { form, controls } = getFilterFormContext()
