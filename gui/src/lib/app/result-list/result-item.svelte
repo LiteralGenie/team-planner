@@ -2,14 +2,12 @@
 </script>
 
 <script lang="ts">
-    import ChampionPortrait from '$lib/components/champion-portrait.svelte'
-    import SpellTooltip from '$lib/components/spell-tooltip.svelte'
-    import * as Tooltip from '$lib/components/ui/tooltip/index.js'
     import { CHAMPIONS_BY_ID, TRAITS_BY_ID } from '$lib/constants'
     import {
         getTraitLevel,
         type TraitLevel
     } from '../form-context/utils'
+    import ResultItemChampion from './result-item-champion.svelte'
     import ResultItemTrait from './result-item-trait.svelte'
 
     export let ids: string[]
@@ -80,21 +78,7 @@
     <!-- Champions -->
     <div class="flex gap-4 flex-wrap justify-center">
         {#each ids as id}
-            <span class="h-12 w-12">
-                <Tooltip.Root
-                    group="spell"
-                    openDelay={100}
-                    closeOnPointerDown={true}
-                    disableHoverableContent={true}
-                >
-                    <Tooltip.Trigger class="cursor-default">
-                        <ChampionPortrait {id} />
-                    </Tooltip.Trigger>
-                    <Tooltip.Content class="spell-tooltip-container">
-                        <SpellTooltip champion_id={id} />
-                    </Tooltip.Content>
-                </Tooltip.Root>
-            </span>
+            <ResultItemChampion {id} />
         {/each}
     </div>
 

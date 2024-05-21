@@ -5,16 +5,12 @@
 <script lang="ts">
     import * as Popover from '$lib/components/ui/popover/index.js'
     import * as Tooltip from '$lib/components/ui/tooltip/index.js'
-    import { CHAMPIONS_BY_ID } from '$lib/constants'
     import SpellTooltip from '../spell-tooltip.svelte'
     import Button from '../ui/button/button.svelte'
     import ChampionCheckboxButton from './champion-checkbox-button.svelte'
     import ChampionCheckboxLabel from './champion-checkbox-label.svelte'
 
     export let id: string
-
-    $: champion = CHAMPIONS_BY_ID[id]
-    $: label = champion.display_name
 
     export let value: ChampionCheckboxValue
     export let disabled = false
