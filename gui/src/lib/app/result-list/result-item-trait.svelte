@@ -4,6 +4,8 @@
 <script lang="ts">
     import TraitIcon from '$lib/components/trait-icon.svelte'
     import TraitTooltip from '$lib/components/trait-tooltip.svelte'
+    import Button from '$lib/components/ui/button/button.svelte'
+    import * as Popover from '$lib/components/ui/popover/index.js'
     import * as Tooltip from '$lib/components/ui/tooltip/index.js'
     import { TRAITS_BY_ID } from '$lib/constants'
     import { type TraitLevel } from '../form-context/utils'
@@ -19,7 +21,8 @@
     class:inactive={level === null}
     class="inline-flex gap-0 justify-center items-center"
 >
-    <div class="icon">
+    <!-- Desktop version -->
+    <div class="icon hidden md:block">
         <Tooltip.Root
             openDelay={100}
             closeOnPointerDown={true}
@@ -41,6 +44,31 @@
             </Tooltip.Content>
         </Tooltip.Root>
     </div>
+
+    <!-- Mobile version -->
+    <span class="icon block md:hidden">
+        <Popover.Root>
+            <Popover.Trigger asChild let:builder>
+                <Button
+                    variant="ghost"
+                    builders={[builder]}
+                    class="h-[2.5em] w-[2.5em] p-0"
+                >
+                    <TraitIcon
+                        id={trait.trait_id}
+                        style={level?.style_name}
+                        variant="md"
+                    />
+                </Button>
+            </Popover.Trigger>
+            <Popover.Content class="spell-tooltip-container">
+                <TraitTooltip
+                    trait_id={trait.trait_id}
+                    traitLevelIdx={level?.levelIdx}
+                />
+            </Popover.Content>
+        </Popover.Root>
+    </span>
 
     <span class="label w-6 text-xs flex justify-center items-center">
         {count}
