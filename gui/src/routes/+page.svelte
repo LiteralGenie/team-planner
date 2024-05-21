@@ -8,7 +8,7 @@
     setFilterFormContext(DEFAULT_FILTER_FORM)
 </script>
 
-<main class="h-full w-full max-w-6xl mx-auto p-4 flex flex-col">
+<main class="max-w-6xl mx-auto p-4 pb-16 md:pb-4 flex flex-col">
     <Search />
 
     <hr class="mt-8 pb-4" />

@@ -119,10 +119,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- <section class="w-full p-8 flex justify-end">
-            <div><Button class="w-24">Search -></Button></div>
-        </section> -->
     </div>
 </div>
 
