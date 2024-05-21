@@ -3,8 +3,10 @@
 </script>
 
 <script lang="ts">
+    import * as Popover from '$lib/components/ui/popover/index.js'
     import * as Tooltip from '$lib/components/ui/tooltip/index.js'
     import TraitTooltip from '../trait-tooltip.svelte'
+    import Button from '../ui/button/button.svelte'
     import TraitCheckboxButton from './trait-checkbox-button.svelte'
     import TraitCheckboxLabel from './trait-checkbox-label.svelte'
 
@@ -16,7 +18,8 @@
     export let portal: string | undefined = undefined
 </script>
 
-<div class:disabled class="root">
+<!-- Desktop version -->
+<div class:disabled class="root hidden md:block">
     <Tooltip.Root
         openDelay={100}
         closeOnPointerDown={true}
@@ -50,6 +53,44 @@
             {/if}
         </Tooltip.Content>
     </Tooltip.Root>
+</div>
+
+<!-- Mobile version -->
+<div
+    class:disabled
+    class="root md:hidden flex flex-col justify-center items-center"
+>
+    <TraitCheckboxButton
+        on:click
+        {id}
+        {value}
+        {disabled}
+        {disabledValue}
+    />
+
+    <Popover.Root portal={'dialog'}>
+        <Popover.Trigger asChild let:builder>
+            <Button
+                builders={[builder]}
+                variant="link"
+                class="h-6 text-inherit"
+            >
+                <TraitCheckboxLabel
+                    {id}
+                    {value}
+                    {disabled}
+                    {disabledValue}
+                />
+            </Button>
+        </Popover.Trigger>
+        <Popover.Content class="spell-tooltip-container">
+            {#if disabled}
+                {disabledTooltip}
+            {:else}
+                <TraitTooltip trait_id={id} />
+            {/if}
+        </Popover.Content>
+    </Popover.Root>
 </div>
 
 <style lang="postcss">
