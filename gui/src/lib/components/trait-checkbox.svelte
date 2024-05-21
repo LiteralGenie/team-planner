@@ -3,18 +3,21 @@
 </script>
 
 <script lang="ts">
+    import * as Tooltip from '$lib/components/ui/tooltip/index.js'
+    import { TRAITS_BY_ID, TRAIT_ICONS } from '$lib/constants'
     import CheckmarkIcon from '$lib/icons/checkmark-icon.svelte'
     import XIcon from '$lib/icons/x-icon.svelte'
-    import ConditionalTooltip from './conditional-tooltip.svelte'
+    import TraitTooltip from './trait-tooltip.svelte'
 
-    export let src: string
-    export let label: string
+    export let id: string
+    export let value: TraitCheckboxValue
     export let disabled = false
     export let disabledValue: TraitCheckboxValue = 'excluded'
     export let disabledTooltip: string = ''
+    export let portal: string | undefined = undefined
 
-    export let value: TraitCheckboxValue
-
+    $: label = TRAITS_BY_ID[id].display_name
+    $: src = TRAIT_ICONS[id]
     $: actualValue = disabled ? disabledValue : value
 </script>
 
@@ -23,48 +26,66 @@
     class="root flex flex-col justify-center items-center text-center gap-[1px]"
     class:active={actualValue !== null}
 >
-    <ConditionalTooltip
-        tooltip={disabled ? disabledTooltip : ''}
-        {disabled}
+    <Tooltip.Root
+        openDelay={100}
+        closeOnPointerDown={true}
+        {portal}
+        group="trait"
+        disableHoverableContent={true}
     >
-        <button
-            {disabled}
-            on:click
-            type="button"
-            class="h-12 w-12 relative select-none"
-        >
-            <!-- Hex icon -->
-            <div class="hex hover-fill p-[2px]">
-                <div class="hex dark-fill p-[2px]">
-                    <div class="hex light-fill p-[2px]">
-                        <div class="hex dark-fill">
-                            <img class="h-[66%] w-[66%]" {src} />
+        <Tooltip.Trigger>
+            <button
+                {disabled}
+                on:click
+                type="button"
+                class="h-12 w-12 relative select-none"
+            >
+                <!-- Hex icon -->
+                <div class="hex hover-fill p-[2px]">
+                    <div class="hex dark-fill p-[2px]">
+                        <div class="hex light-fill p-[2px]">
+                            <div class="hex dark-fill">
+                                <img class="h-[66%] w-[66%]" {src} />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Selection indicator -->
-            {#if actualValue === 'included' || actualValue === 'excluded'}
-                <div
-                    class:green={actualValue === 'included'}
-                    class:red={actualValue === 'excluded'}
-                    class="mark absolute bottom-[2px] right-[3px] rounded-full p-[2px] text-foreground"
-                >
-                    {#if actualValue === 'included'}
-                        <CheckmarkIcon class="h-3 w-3" />
-                    {:else if actualValue === 'excluded'}
-                        <XIcon class="h-3 w-3" />
-                    {/if}
-                </div>
+                <!-- Selection indicator -->
+                {#if actualValue === 'included' || actualValue === 'excluded'}
+                    <div
+                        class:green={actualValue === 'included'}
+                        class:red={actualValue === 'excluded'}
+                        class="mark absolute bottom-[2px] right-[3px] rounded-full p-[2px] text-foreground"
+                    >
+                        {#if actualValue === 'included'}
+                            <CheckmarkIcon class="h-3 w-3" />
+                        {:else if actualValue === 'excluded'}
+                            <XIcon class="h-3 w-3" />
+                        {/if}
+                    </div>
+                {/if}
+            </button>
+
+            <!-- Label -->
+            <span
+                class="text-xs text-muted-foreground whitespace-nowrap"
+            >
+                {label}
+            </span>
+        </Tooltip.Trigger>
+        <Tooltip.Content class="boring-tooltip max-w-[400px]">
+            {#if disabled}
+                {disabledTooltip}
+            {:else}
+                <TraitTooltip trait_id={id} />
             {/if}
-        </button>
-
-        <!-- Label -->
-        <span class="text-xs text-muted-foreground whitespace-nowrap">
-            {label}
-        </span>
-    </ConditionalTooltip>
+        </Tooltip.Content>
+    </Tooltip.Root>
+    <!-- 
+    <ConditionalTooltip disabled={!showTooltip}>
+        <span slot="tooltip">{disabledTooltip}</span>
+    </ConditionalTooltip> -->
 </div>
 
 <style lang="postcss">

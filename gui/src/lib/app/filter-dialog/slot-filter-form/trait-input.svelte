@@ -7,10 +7,6 @@
         IdFilter
     } from '$lib/app/form-context/types'
     import TraitCheckbox from '$lib/components/trait-checkbox.svelte'
-    import TraitTooltip from '$lib/components/trait-tooltip.svelte'
-    import * as Tooltip from '$lib/components/ui/tooltip/index.js'
-    import type { CDragonTrait } from '$lib/constants'
-    import { TRAITS_BY_ID, TRAIT_ICONS } from '$lib/constants'
     import { zip } from 'radash'
 
     export let slotControls: AttributeSlotControls
@@ -20,11 +16,7 @@
 
     $: traitValues = slotValues.traits
     $: traitControls = slotControls.controls.traits.controls
-    $: zipped = zip(traitValues, traitControls).map(([val, ctrl]) => [
-        val,
-        ctrl,
-        TRAITS_BY_ID[val.id]
-    ]) as Array<[IdFilter, FormControlRecord<IdFilter>, CDragonTrait]>
+    $: zipped = zip(traitValues, traitControls)
 
     function handleClick(
         current: IdFilter,
@@ -47,28 +39,15 @@
 <fieldset>
     <legend class="pb-2">Traits</legend>
 
-    {#each zipped as [val, ctrl, trait]}
-        <Tooltip.Root
-            openDelay={100}
-            closeOnPointerDown={true}
+    {#each zipped as [val, ctrl]}
+        <TraitCheckbox
+            on:click={() => handleClick(val, ctrl)}
+            id={val.id}
+            value={val.included ? 'included' : null}
+            disabled={isDisabledGlobally(val.id)}
+            disabledTooltip="Disabled by global filter"
             portal="dialog"
-            group="trait"
-            disableHoverableContent={true}
-        >
-            <Tooltip.Trigger>
-                <TraitCheckbox
-                    on:click={() => handleClick(val, ctrl)}
-                    src={TRAIT_ICONS[val.id]}
-                    label={trait.display_name}
-                    value={val.included ? 'included' : null}
-                    disabled={isDisabledGlobally(val.id)}
-                    disabledTooltip="Disabled by global filter"
-                />
-            </Tooltip.Trigger>
-            <Tooltip.Content class="boring-tooltip max-w-[400px]">
-                <TraitTooltip trait_id={val.id} />
-            </Tooltip.Content>
-        </Tooltip.Root>
+        />
     {/each}
 </fieldset>
 

@@ -1,12 +1,11 @@
 <script lang="ts">
     import * as Tooltip from '$lib/components/ui/tooltip/index.js'
 
-    export let tooltip: string = ''
     export let portal: string | null = null
     export let disabled = false
 </script>
 
-{#if tooltip}
+{#if !disabled}
     <Tooltip.Root
         disableHoverableContent={true}
         openDelay={100}
@@ -19,7 +18,7 @@
             <slot />
         </Tooltip.Trigger>
         <Tooltip.Content class="boring-tooltip">
-            <span>{tooltip}</span>
+            <slot name="tooltip" />
         </Tooltip.Content>
     </Tooltip.Root>
 {:else}
