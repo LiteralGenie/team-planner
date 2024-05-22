@@ -19,7 +19,7 @@
 </script>
 
 <!-- Desktop version -->
-<div class:disabled class="root hidden md:block">
+<div class:disabled class="root hidden md:flex flex-col items-center">
     <Tooltip.Root
         openDelay={100}
         closeOnPointerDown={true}
@@ -28,7 +28,7 @@
         disableHoverableContent={true}
     >
         <Tooltip.Trigger>
-            <div class="flex flex-col">
+            <div class="flex flex-col items-center">
                 <TraitCheckboxButton
                     on:click
                     {id}
