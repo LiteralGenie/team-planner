@@ -47,4 +47,4 @@ npm run dev
 
 The team search is modeled as a search for connected subgraphs, with invididual champions being nodes and common traits as edges. Solutions are enumerated using a Rust-based SAT solver (`/core/`) and displayed a Svelte-based web gui (`/gui/`). The solver itself (a WASM module) is run by a web worker to avoid freezing the gui during searches.
 
-Game data and art assets are downloaded from [CDragon](https://www.communitydragon.org/) using various Python scripts in `/scripts/`. Most of these are then processed and copied to `/gui/src/lib/assets/tft/` 
+Game data and art assets are downloaded from [CDragon](https://www.communitydragon.org/) using various Python scripts in `/scripts/`. Most of this data is then processed and copied to `/gui/src/lib/assets/tft/`.
